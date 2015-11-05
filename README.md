@@ -32,6 +32,7 @@ This is the second section
 > 
 > Another theorem.
 
+$ pandoc -s --filter pandoc-numbering pandoc-numbering-sample.md -t markdown
 ---
 author:
 - 'Ch. Demko <chdemko@gmail.com>'
