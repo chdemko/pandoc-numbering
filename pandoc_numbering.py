@@ -57,22 +57,22 @@ def numbering(key, value, format, meta):
                                 length = i + 1
                                 break
 
-					# Convert the value to a category (eliminating the '#')
+                    # Convert the value to a category (eliminating the '#')
                     category = stringify(value[:length - 2])
                     if category not in count:
                         count[category] = 0
                     count[category] = count[category] + 1
 
-					# Replace the '#' by the category count
+                    # Replace the '#' by the category count
                     value[length - 1]['c'] = str(count[category])
 
-					# Prepare the final text
+                    # Prepare the final text
                     text = [Strong(value)]
 
-					# Add the title to the final text
+                    # Add the title to the final text
                     if title != None:
                         text.append(title)
-				
+
                     if tag != '#':
                         # Store the numbers and the label for automatic numbering (See referencing function)
                         numbers[tag] = value[length - 1]['c']
@@ -81,7 +81,7 @@ def numbering(key, value, format, meta):
                         # Return the final text in a Span element embedded in a Para element
                         return Para([Span([tag[1:], [], []], text)])
                     else:
-                    	# Return the final text in a Para element
+                        # Return the final text in a Para element
                         return Para(text)
                 else:
                     # Special case where the last element is '##...'
