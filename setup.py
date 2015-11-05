@@ -59,6 +59,9 @@ setup(
         #   5 - Production/Stable
         'Development Status :: 4 - Beta',
 
+        # Specify the OS
+        'Operating System :: OS Independent',
+        
         # Indicate who your project is intended for
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
