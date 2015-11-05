@@ -12,6 +12,5 @@ Classifier: Development Status :: 4 - Beta
 Classifier: Environment :: Console
 Classifier: Intended Audience :: End Users/Desktop
 Classifier: License :: OSI Approved :: CEA CNRS Inria Logiciel Libre License, version 2.1 (CeCILL-2.1)
-Classifier: Natural Language :: English
 Classifier: Programming Language :: Python
 
