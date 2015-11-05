@@ -31,7 +31,11 @@ This is the second section
 > Theorem #
 > 
 > Another theorem.
+~~~
 
+Converting the `pandoc-numbering-sample.md` file will give:
+
+~~~
 $ pandoc -s --filter pandoc-numbering pandoc-numbering-sample.md -t markdown
 ---
 author:
