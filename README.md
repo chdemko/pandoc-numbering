@@ -32,7 +32,13 @@ This is the second section
 > 
 > Another theorem.
 
-$ pandoc --filter pandoc-numbering pandoc-numbering-sample.md -t markdown
+---
+author:
+- 'Ch. Demko <chdemko@gmail.com>'
+date: '04/11/2015'
+title: Sample use of automatic numbering
+...
+
 This is the first section
 =========================
 
