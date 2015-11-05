@@ -5,9 +5,9 @@
 This is the first section
 =========================
 
-<i class="icon-folder-open"></i> Exercise #
+Exercise #
 
-This is the first {.toto .titi} exercise. Have also a look at the [](#second).
+This is the first exercise. Have also a look at the [](#second).
 
 > Theorem (Needed for the [second exercise](#second)) #theorem1
 > 

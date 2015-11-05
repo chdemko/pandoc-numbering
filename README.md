@@ -19,7 +19,8 @@ This is the first exercise. Have also a look at the [](#second).
 
 > Theorem (Needed for the [second exercise](#second)) #theorem1
 > 
-> This is a the first theorem. Look at the [exercise](#second "Go to the exercise #").
+> This is a the first theorem.
+> Look at the [exercise](#second "Go to the exercise #").
 
 Exercise (This is the second exercise) #second
 
