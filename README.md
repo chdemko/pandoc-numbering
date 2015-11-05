@@ -2,7 +2,7 @@
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
-Demonstration: Using [`pandoc-numbering-sample.md`] as input gives output files in [pdf], [tex], [html], [epub], [md] and other formats.
+Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in [pdf], [tex], [html], [epub], [md] and other formats.
 
 ~~~
 $ cat pandoc-numbering-sample.md 
@@ -73,7 +73,7 @@ This is the second section
 This version of pandoc-numbering was tested using pandoc 1.15.1 and is known to work under linux, Mac OS X and Windows.
 
 [pandoc]: http://pandoc.org/
-[`pandoc-numbering-sample.md`]: https://raw.githubusercontent.com/chdemko/pandoc-numbering/master/pandoc-numbering-sample.md
+[pandoc-numbering-sample.md]: https://raw.githubusercontent.com/chdemko/pandoc-numbering/master/pandoc-numbering-sample.md
 
 Usage
 -----
