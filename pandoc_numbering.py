@@ -13,6 +13,7 @@ import codecs
 count = {}
 numbers = {}
 labels = {}
+replace = None
 
 def toJSONFilters(actions):
     """Converts a list of actions into a filter
@@ -89,7 +90,7 @@ def numbering(key, value, format, meta):
                     return Para(value)
 
 def referencing(key, value, format, meta):
-    global numbers, labels
+    global numbers, labels, replace
 
     # Is it a link with a right tag?
     if key == 'Link' and value[1][0] in numbers:
@@ -98,13 +99,16 @@ def referencing(key, value, format, meta):
 
        if value[0] == []:
            # The link text is empty, replace it with the default label
-           return Link(labels[value[1][0]], value[1])
+           value[0] = labels[value[1][0]]
        else:
            # The link text is not empty, replace all '#' with the corresponding number
-           for (i, item) in enumerate(value[0]):
-               if item == Str('#'):
-                   value[0][i]['c'] = numbers[value[1][0]]
-           return Link(value[0], value[1])
+           replace = numbers[value[1][0]]
+           value[0] = walk(value[0], replacing, format, meta)
+
+def replacing(key, value, format, meta):
+    global replace
+    if key == 'Str' and value == '#':
+        return Str(replace)
 
 def main():
     toJSONFilters([numbering, referencing])
