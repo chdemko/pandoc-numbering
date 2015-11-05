@@ -1,9 +1,6 @@
----
-author:
-- 'Ch. Demko <chdemko@gmail.com>'
-date: '04/11/2015'
-title: Sample use of automatic numbering
-...
+% Sample use of automatic numbering
+% Ch. Demko <chdemko@gmail.com>
+% 04/11/2015
 
 This is the first section
 =========================
