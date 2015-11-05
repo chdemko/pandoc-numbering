@@ -18,7 +18,7 @@ Exercise (This is the second exercise) #second
 Use [theorem #](#theorem1)
 
 This is the second section
-=========================
+==========================
 
 > Theorem #
 > 
