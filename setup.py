@@ -14,8 +14,13 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError):
+    with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
+
 
 setup(
     name='pandoc-numbering',
@@ -23,7 +28,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.1',
+    version='0.1.2',
 
     # The project's description
     description='A pandoc filter for automatic numbering',
