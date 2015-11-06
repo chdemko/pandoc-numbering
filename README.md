@@ -7,7 +7,7 @@ Each paragraph ended by a `#` character will be numbered. The text preceding the
 to determine the number used as a replacement for the `#` character.
 
 * if it's a new key, a new numbering is started with index 1;
-* if it's an existing key, the last number is incrememted.
+* if it's an existing key, the last number is incremented.
 
 You can add an identifier to the `#` character. It does not change the behavior explained above. It allows to be cross-referred
 in links:
