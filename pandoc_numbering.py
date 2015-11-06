@@ -5,6 +5,7 @@ Pandoc filter to number all kinds of things.
 """
 
 from pandocfilters import walk, stringify, Str, Space, Para, Strong, Span, Link, Emph
+from functools import reduce
 import sys
 import json
 import io
