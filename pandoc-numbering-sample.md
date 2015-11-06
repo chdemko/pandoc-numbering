@@ -16,7 +16,7 @@ This is the first exercise. Have also a look at the [](#second).
 
 Exercise (This is the second exercise) #second
 
-Use [theorem #](#theorem1)
+Use [_theorem #_](#theorem1)
 
 This is the second section
 ==========================

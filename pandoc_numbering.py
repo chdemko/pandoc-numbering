@@ -93,17 +93,19 @@ def referencing(key, value, format, meta):
     global numbers, labels, replace
 
     # Is it a link with a right tag?
-    if key == 'Link' and value[1][0] in numbers:
-       # Replace all '#' with the corresponding number in the title
-       value[1][1] = value[1][1].replace('#', numbers[value[1][0]])
+    if key == 'Link':
+        [text, [identifier, title]] = value
+        if identifier in numbers:
+            # Replace all '#' with the corresponding number in the title
+            value[1][1] = title.replace('#', numbers[identifier])
 
-       if value[0] == []:
-           # The link text is empty, replace it with the default label
-           value[0] = labels[value[1][0]]
-       else:
-           # The link text is not empty, replace all '#' with the corresponding number
-           replace = numbers[value[1][0]]
-           value[0] = walk(value[0], replacing, format, meta)
+            if text == []:
+                # The link text is empty, replace it with the default label
+                value[0] = labels[identifier]
+            else:
+                # The link text is not empty, replace all '#' with the corresponding number
+                replace = numbers[identifier]
+                value[0] = walk(text, replacing, format, meta)
 
 def replacing(key, value, format, meta):
     global replace
