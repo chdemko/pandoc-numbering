@@ -1,8 +1,24 @@
+
 # pandoc-numbering
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
-Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in [pdf], [tex], [html], [epub], [md] and other formats.
+Each paragraph ended by a `#` character will be numbered. The text preceding the `#` character is used a as key
+to determine the number used as a replacement for the `#` character.
+
+* if it's a new key, a new numbering is started with index 1;
+* if it's an existing key, the last number is incrememted.
+
+You can add an identifier to the `#` character. It does not change the behavior explained above. It allows to be cross-referred
+in links:
+
+* `[](#identifier "title")` the empty text is replaced by the associated key concatenated with the associated number;
+* `[text](#identifier "title")` the character `#` is replaced by the associated number in the text.
+
+In both cases, the `#` character is replaced by the associated number in the title.
+
+Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in [pdf], [tex], [html], [epub], [md] and
+other formats.
 
 ~~~
 $ cat pandoc-numbering-sample.md 
@@ -32,13 +48,14 @@ This is the second section
 > Theorem #
 > 
 > Another theorem.
+
+Unnumbered ##
 ~~~
 
 Converting the `pandoc-numbering-sample.md` file will give:
 
 ~~~
 $ pandoc -s --filter pandoc-numbering pandoc-numbering-sample.md -t markdown
----
 ---
 author:
 - 'Ch. Demko <chdemko@gmail.com>'
@@ -70,6 +87,8 @@ This is the second section
 > **Theorem 2**
 >
 > Another theorem.
+
+Unnumbered \#
 ~~~
 
 This version of pandoc-numbering was tested using pandoc 1.15.1 and is known to work under linux, Mac OS X and Windows.
