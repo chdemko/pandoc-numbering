@@ -24,7 +24,7 @@ This is the first exercise. Have also a look at the [](#second).
 
 Exercise (This is the second exercise) #second
 
-Use [theorem #](#theorem1)
+Use [_theorem #_](#theorem1)
 
 This is the second section
 ==========================
@@ -38,6 +38,7 @@ Converting the `pandoc-numbering-sample.md` file will give:
 
 ~~~
 $ pandoc -s --filter pandoc-numbering pandoc-numbering-sample.md -t markdown
+---
 ---
 author:
 - 'Ch. Demko <chdemko@gmail.com>'
@@ -61,7 +62,7 @@ This is the first exercise. Have also a look at the [Exercise
 
 <span id="second">**Exercise 2*** (This is the second exercise)*</span>
 
-Use [theorem 1](#theorem1)
+Use [*theorem 1*](#theorem1)
 
 This is the second section
 ==========================
