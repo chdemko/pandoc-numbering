@@ -13,7 +13,7 @@ You can add an identifier to the `#` character. It does not change the behavior 
 in links:
 
 * `[](#identifier "title")` the empty text is replaced by the associated key concatenated with the associated number;
-* `[text](#identifier "title")` the character `#` is replaced by the associated number in the text.
+* `[text](#identifier "title")` the `#` character is replaced by the associated number in the text.
 
 In both cases, the `#` character is replaced by the associated number in the title.
 
