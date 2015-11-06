@@ -86,7 +86,7 @@ def numbering(key, value, format, meta):
                         return Para(text)
                 else:
                     # Special case where the last element is '##...'
-                    value[length - 1]['c'].replace('##', '#', 1)
+                    value[length - 1]['c'] = value[length - 1]['c'].replace('##', '#', 1)
                     return Para(value)
 
 def referencing(key, value, format, meta):
