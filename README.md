@@ -30,23 +30,23 @@ This is the first section
 
 Exercise #
 
-This is the first exercise. Have also a look at the [](#second).
+This is the first exercise. Have also a look at the [](#exercise:second).
 
-> Theorem (Needed for the [second exercise](#second)) #theorem1
+> Theorem (Needed for the [second exercise](#exercise:second)) #theorem:first
 > 
 > This is a the first theorem.
-> Look at the [exercise](#second "Go to the exercise #").
+> Look at the [exercise](#exercise:second "Go to the exercise #").
 
-Exercise (This is the second exercise) #second
+Exercise (This is the second exercise) #exercise:second
 
-Use [_theorem #_](#theorem1)
+Use [_theorem #_](#theorem:first)
 
 This is the second section
 ==========================
 
 > Theorem #
 > 
-> Another theorem.
+> Another theorem. Can be usefull in [](#exercise:1)
 
 Unnumbered ##
 ~~~
@@ -54,7 +54,6 @@ Unnumbered ##
 Converting the `pandoc-numbering-sample.md` file will give:
 
 ~~~
-$ pandoc -s --filter pandoc-numbering pandoc-numbering-sample.md -t markdown
 ---
 author:
 - 'Ch. Demko <chdemko@gmail.com>'
@@ -68,24 +67,25 @@ This is the first section
 **Exercise 1**
 
 This is the first exercise. Have also a look at the [Exercise
-2](#second).
+2](#exercise:second).
 
-> <span id="theorem1">**Theorem 1*** (Needed for the [second
-> exercise](#second))*</span>
+> <span id="theorem:first">**Theorem 1*** (Needed for the [second
+> exercise](#exercise:second))*</span>
 >
 > This is a the first theorem. Look at the
-> [exercise](#second "Go to the exercise 2").
+> [exercise](#exercise:second "Go to the exercise 2").
 
-<span id="second">**Exercise 2*** (This is the second exercise)*</span>
+<span id="exercise:second">**Exercise 2*** (This is the second
+exercise)*</span>
 
-Use [*theorem 1*](#theorem1)
+Use [*theorem 1*](#theorem:first)
 
 This is the second section
 ==========================
 
 > **Theorem 2**
 >
-> Another theorem.
+> Another theorem. Can be usefull in [](#exercise:1)
 
 Unnumbered \#
 ~~~
