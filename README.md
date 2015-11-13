@@ -20,7 +20,7 @@ Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in
 other formats.
 
 ~~~
-$ cat pandoc-numbering-sample.md 
+$ cat pandoc-numbering-sample.md
 % Sample use of automatic numbering
 % Ch. Demko <chdemko@gmail.com>
 % 04/11/2015
@@ -64,18 +64,18 @@ title: Sample use of automatic numbering
 This is the first section
 =========================
 
-**Exercise 1**
+<span id="exercise:1">**Exercise 1**</span>
 
 This is the first exercise. Have also a look at the [Exercise
 2](#exercise:second).
 
-> <span id="theorem:first">**Theorem 1*** (Needed for the [second
+> <span id="theorem:first">**Theorem 1** *(Needed for the [second
 > exercise](#exercise:second))*</span>
 >
 > This is a the first theorem. Look at the
 > [exercise](#exercise:second "Go to the exercise 2").
 
-<span id="exercise:second">**Exercise 2*** (This is the second
+<span id="exercise:second">**Exercise 2** *(This is the second
 exercise)*</span>
 
 Use [*theorem 1*](#theorem:first)
@@ -83,9 +83,9 @@ Use [*theorem 1*](#theorem:first)
 This is the second section
 ==========================
 
-> **Theorem 2**
+> <span id="theorem:2">**Theorem 2**</span>
 >
-> Another theorem. Can be usefull in [](#exercise:1)
+> Another theorem. Can be usefull in [Exercise 1](#exercise:1)
 
 Unnumbered \#
 ~~~
