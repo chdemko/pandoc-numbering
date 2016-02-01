@@ -104,7 +104,7 @@ def numbering(key, value, format, meta):
                 # Prepare the contents
                 contents = [Span([tag, [], []], text)]
 
-                # Special cas for LaTeX
+                # Special case for LaTeX
                 if format == 'latex':
                     contents.insert(0, RawInline('tex', '\\phantomsection'))
 
