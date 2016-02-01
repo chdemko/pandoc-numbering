@@ -112,4 +112,7 @@ setup(
     package_data={
         'sample': ['pandoc-numbering-sample.md'],
     },
+
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )

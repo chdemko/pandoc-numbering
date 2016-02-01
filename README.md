@@ -1,4 +1,5 @@
 # pandoc-numbering
+[![Build Status](https://secure.travis-ci.org/chdemko/pandoc-numbering.png)](http://travis-ci.org/chdemko/pandoc-numbering)
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
