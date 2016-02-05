@@ -4,7 +4,7 @@
 Pandoc filter to number all kinds of things.
 """
 
-from pandocfilters import walk, stringify, Str, Space, Para, Strong, Span, Link, Emph, RawInline
+from pandocfilters import toJSONFilters, walk, stringify, Str, Space, Para, Strong, Span, Link, Emph, RawInline
 from functools import reduce
 import sys
 import json
@@ -15,26 +15,6 @@ import unicodedata
 
 count = {}
 information = {}
-
-def toJSONFilters(actions):
-    """Converts a list of actions into a filter
-    """
-    try:
-        input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-    except AttributeError:
-        # Python 2 does not have sys.stdin.buffer.
-        # REF: http://stackoverflow.com/questions/2467928/python-unicodeencodeerror-when-reading-from-stdin
-        input_stream = codecs.getreader("utf-8")(sys.stdin)
-
-    doc = json.loads(input_stream.read())
-
-    if len(sys.argv) > 1:
-        format = sys.argv[1]
-    else:
-        format = ""
-
-    altered = reduce(lambda x, action: walk(x, action, format, doc[0]['unMeta']), actions, doc)
-    json.dump(altered, sys.stdout)
 
 def removeAccents(string):
     nfkd_form = unicodedata.normalize('NFKD', string)
@@ -122,7 +102,13 @@ def referencing(key, value, format, meta):
 
     # Is it a link with a right reference?
     if key == 'Link':
-        [text, [reference, title]] = value
+        try:
+            # pandoc 1.15
+            [text, [reference, title]] = value
+        except ValueError:
+            # pandoc 1.16
+            [attributes, text, [reference, title]] = value
+
         if re.match('^#([a-zA-Z][\w:.-]*)?$', reference):
             # Compute the name
             tag = reference[1:]
