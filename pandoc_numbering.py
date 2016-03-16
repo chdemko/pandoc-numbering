@@ -102,11 +102,13 @@ def referencing(key, value, format, meta):
 
     # Is it a link with a right reference?
     if key == 'Link':
+        pandoc1_15 = True
         try:
             # pandoc 1.15
             [text, [reference, title]] = value
         except ValueError:
             # pandoc 1.16
+            pandoc1_15 = False
             [attributes, text, [reference, title]] = value
 
         if re.match('^#([a-zA-Z][\w:.-]*)?$', reference):
@@ -114,17 +116,31 @@ def referencing(key, value, format, meta):
             tag = reference[1:]
 
             if tag in information:
-                # Replace all '#' with the corresponding number in the title
-                value[1][1] = title.replace('#', information[tag]['number'])
+                if pandoc1_15:
+                    # pandoc 1.15
 
-                if text == []:
-                    # The link text is empty, replace it with the default label
-                    value[0] = information[tag]['text']
+                    # Replace all '#' with the corresponding number in the title
+                    value[1][1] = title.replace('#', information[tag]['number'])
+                    if text == []:
+                        # The link text is empty, replace it with the default label
+                        value[0] = information[tag]['text']
+                    else:
+                        # The link text is not empty, replace all '#' with the corresponding number
+                        replace = information[tag]['number']
+                        value[0] = walk(text, replacing, format, meta)
                 else:
-                    # The link text is not empty, replace all '#' with the corresponding number
-                    replace = information[tag]['number']
-                    value[0] = walk(text, replacing, format, meta)
+                    # pandoc 1.16
 
+                    # Replace all '#' with the corresponding number in the title
+                    value[2][1] = title.replace('#', information[tag]['number'])
+                    if text == []:
+                        # The link text is empty, replace it with the default label
+                        value[1] = information[tag]['text']
+                    else:
+                        # The link text is not empty, replace all '#' with the corresponding number
+                        replace = information[tag]['number']
+                        value[1] = walk(text, replacing, format, meta)
+ 
 def replacing(key, value, format, meta):
     global replace
     if key == 'Str' and value == '#':
