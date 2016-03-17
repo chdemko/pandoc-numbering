@@ -12,6 +12,7 @@ import io
 import codecs
 import re
 import unicodedata
+import subprocess
 
 count = {}
 information = {}
@@ -102,13 +103,11 @@ def referencing(key, value, format, meta):
 
     # Is it a link with a right reference?
     if key == 'Link':
-        pandoc1_15 = True
-        try:
+        if pandoc_version() < '1.16':
             # pandoc 1.15
             [text, [reference, title]] = value
-        except ValueError:
+        else:
             # pandoc 1.16
-            pandoc1_15 = False
             [attributes, text, [reference, title]] = value
 
         if re.match('^#([a-zA-Z][\w:.-]*)?$', reference):
@@ -116,7 +115,7 @@ def referencing(key, value, format, meta):
             tag = reference[1:]
 
             if tag in information:
-                if pandoc1_15:
+                if pandoc_version() < '1.16':
                     # pandoc 1.15
 
                     # Replace all '#' with the corresponding number in the title
@@ -140,11 +139,18 @@ def referencing(key, value, format, meta):
                         # The link text is not empty, replace all '#' with the corresponding number
                         replace = information[tag]['number']
                         value[1] = walk(text, replacing, format, meta)
- 
+
 def replacing(key, value, format, meta):
     global replace
     if key == 'Str' and value == '#':
         return Str(replace)
+
+def pandoc_version():
+    if not hasattr(pandoc_version, "version"):
+        p = subprocess.Popen(['pandoc', '-v'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        pandoc_version.version = re.search(b'pandoc (.*)', out).group(1).decode('utf-8')
+    return pandoc_version.version
 
 def main():
     toJSONFilters([numbering, referencing])
