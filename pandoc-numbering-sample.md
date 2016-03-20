@@ -9,7 +9,7 @@ Exercise #
 
 This is the first exercise. Have also a look at the [](#exercise:second).
 
-> Theorem (Needed for the [second exercise](#exercise:second)) #theorem:first
+> Theorem (Needed for the [second exercise](#exercise:second)) #.#theorem:first
 > 
 > This is a the first theorem.
 > Look at the [exercise](#exercise:second "Go to the exercise #").
@@ -21,9 +21,13 @@ Use [_theorem #_](#theorem:first)
 This is the second section
 ==========================
 
-> Theorem #
+> Theorem #.#
 > 
 > Another theorem. Can be usefull in [](#exercise:1)
+
+> Theorem #.#
+> 
+> A last theorem.
 
 Unnumbered ##
 

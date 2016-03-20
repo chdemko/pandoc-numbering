@@ -17,6 +17,9 @@ in links:
 
 In both cases, the `#` character is replaced by the associated number in the title.
 
+You can add a sequence of '#.' character before the last '#' character. In this sequence the '#' characters are replaced by the
+numbering of the current headers.
+
 Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in [pdf], [tex], [html], [epub], [md] and
 other formats.
 
@@ -33,7 +36,7 @@ Exercise #
 
 This is the first exercise. Have also a look at the [](#exercise:second).
 
-> Theorem (Needed for the [second exercise](#exercise:second)) #theorem:first
+> Theorem (Needed for the [second exercise](#exercise:second)) #.#theorem:first
 > 
 > This is a the first theorem.
 > Look at the [exercise](#exercise:second "Go to the exercise #").
@@ -45,9 +48,13 @@ Use [_theorem #_](#theorem:first)
 This is the second section
 ==========================
 
-> Theorem #
+> Theorem #.#
 > 
 > Another theorem. Can be usefull in [](#exercise:1)
+
+> Theorem #.#
+> 
+> A last theorem.
 
 Unnumbered ##
 ~~~
@@ -70,7 +77,7 @@ This is the first section
 This is the first exercise. Have also a look at the [Exercise
 2](#exercise:second).
 
-> <span id="theorem:first">**Theorem 1** *(Needed for the [second
+> <span id="theorem:first">**Theorem 1.1** *(Needed for the [second
 > exercise](#exercise:second))*</span>
 >
 > This is a the first theorem. Look at the
@@ -84,9 +91,13 @@ Use [*theorem 1*](#theorem:first)
 This is the second section
 ==========================
 
-> <span id="theorem:2">**Theorem 2**</span>
+> <span id="theorem:2.1">**Theorem 2.1**</span>
 >
 > Another theorem. Can be usefull in [Exercise 1](#exercise:1)
+
+> <span id="theorem:2.2">**Theorem 2.2**</span>
+>
+> A last theorem.
 
 Unnumbered \#
 ~~~

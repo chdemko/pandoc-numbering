@@ -16,27 +16,34 @@ import subprocess
 
 count = {}
 information = {}
+headers = [0, 0, 0, 0, 0, 0]
 
 def removeAccents(string):
     nfkd_form = unicodedata.normalize('NFKD', string)
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 def toIdentifier(string):
-   # replace invalid characters by dash
-   string = re.sub('[^0-9a-zA-Z_-]+', '-', removeAccents(string.lower()))
+    # replace invalid characters by dash
+    string = re.sub('[^0-9a-zA-Z_-]+', '-', removeAccents(string.lower()))
 
-   # Remove leading digits
-   string = re.sub('^[^a-zA-Z]+', '', string)
+    # Remove leading digits
+    string = re.sub('^[^a-zA-Z]+', '', string)
 
-   return string
+    return string
 
 def numbering(key, value, format, meta):
-    if key == 'Para':
+    if key == 'Header':
+        index = value[0] - 1
+        headers[index] = headers[index] + 1
+        for i in range(index + 1, 6):
+            headers[i] = 0
+    elif key == 'Para':
         length = len(value)
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':
             last = value[length - 1]['c']
 
-            if re.match('^#([a-zA-Z][\w:.-]*)?$', last):
+            match = re.match('^((#\.)*#)([a-zA-Z][\w:.-]*)?$', last)
+            if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
                 global count, information
 
@@ -50,8 +57,13 @@ def numbering(key, value, format, meta):
                             length = i + 1
                             break
 
-                # Convert the value to a name (eliminating the '#')
-                name = toIdentifier(stringify(value[:length - 2]))
+                # Convert the value to a name
+                if match.group(2) == None:
+                    level = 0
+                    name = toIdentifier(stringify(value[:length - 2])) + ':'
+                else:
+                    level = len(match.group(1)) / 2
+                    name = toIdentifier(stringify(value[:length - 2])) + ':' + '.'.join(map(str, headers[:level])) + '.'
 
                 # Is it a new category?
                 if name not in count:
@@ -63,13 +75,13 @@ def numbering(key, value, format, meta):
                 number = str(count[name])
 
                 # Determine the tag
-                if last == '#':
-                    tag = name + ':' + number
+                if match.group(3) == None:
+                    tag = name + number
                 else:
-                    tag = last[1:]
+                    tag = match.group(3)
 
                 # Replace the '#' by the name count
-                value[length - 1]['c'] = number
+                value[length - 1]['c'] = '.'.join(map(str, headers[:level] + [number]))
 
                 # Prepare the final text
                 text = [Strong(value)]
