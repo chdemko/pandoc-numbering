@@ -23,7 +23,7 @@ This is the second section
 
 > Theorem #.#
 > 
-> Another theorem. Can be usefull in [](#exercise:1)
+> Another theorem. Can be useful in [](#exercise:1)
 
 > Theorem #.#
 > 
