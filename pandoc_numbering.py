@@ -62,7 +62,7 @@ def numbering(key, value, format, meta):
                     level = 0
                     name = toIdentifier(stringify(value[:length - 2])) + ':'
                 else:
-                    level = len(match.group(1)) / 2
+                    level = len(match.group(1)) // 2
                     name = toIdentifier(stringify(value[:length - 2])) + ':' + '.'.join(map(str, headers[:level])) + '.'
 
                 # Is it a new category?

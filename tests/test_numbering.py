@@ -8,7 +8,7 @@ def test_numbering():
     pandoc_numbering.information = {}
     assert pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
         '',
         {}
     ) == {
@@ -30,7 +30,7 @@ def test_numbering_latex():
     pandoc_numbering.information = {}
     assert pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
         'latex',
         {}
     ) == {
@@ -58,13 +58,13 @@ def test_numbering_double():
     pandoc_numbering.information = {}
     pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
         '',
         {}
     )
     assert pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
         '',
         {}
     ) == {
@@ -87,7 +87,7 @@ def test_numbering_title():
     assert pandoc_numbering.numbering(
         'Para',
         [
-            {'t': 'Str', 'c': 'Exercise'},
+            {'t': 'Str', 'c': u'Exercise'},
             {'t': 'Space', 'c': []},
             {'t': 'Str', 'c': '(The'},
             {'t': 'Space', 'c': []},
@@ -127,7 +127,7 @@ def test_numbering_level():
     assert pandoc_numbering.numbering(
         'Para',
         [
-            {'t': 'Str', 'c': 'Exercise'},
+            {'t': 'Str', 'c': u'Exercise'},
             {'t': 'Space', 'c': []},
             {'t': 'Str', 'c': '#.#.#'}
         ],
@@ -163,7 +163,7 @@ def test_numbering_level():
     assert pandoc_numbering.numbering(
         'Para',
         [
-            {'t': 'Str', 'c': 'Exercise'},
+            {'t': 'Str', 'c': u'Exercise'},
             {'t': 'Space', 'c': []},
             {'t': 'Str', 'c': '#.#.#'}
         ],
@@ -187,7 +187,7 @@ def test_numbering_level():
     assert pandoc_numbering.numbering(
         'Para',
         [
-            {'t': 'Str', 'c': 'Exercise'},
+            {'t': 'Str', 'c': u'Exercise'},
             {'t': 'Space', 'c': []},
             {'t': 'Str', 'c': '#.#.#'}
         ],
@@ -217,7 +217,7 @@ def test_numbering_level():
     assert pandoc_numbering.numbering(
         'Para',
         [
-            {'t': 'Str', 'c': 'Exercise'},
+            {'t': 'Str', 'c': u'Exercise'},
             {'t': 'Space', 'c': []},
             {'t': 'Str', 'c': '#.#.#'}
         ],

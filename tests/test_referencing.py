@@ -8,7 +8,7 @@ def test_referencing_simple():
     pandoc_numbering.information = {}
     pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#exercise:first'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#exercise:first'}],
         '',
         {}
     )
@@ -26,7 +26,7 @@ def test_referencing_title():
     pandoc_numbering.information = {}
     pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#exercise:first'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#exercise:first'}],
         '',
         {}
     )
@@ -44,7 +44,7 @@ def test_referencing_label():
     pandoc_numbering.information = {}
     pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#exercise:first'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#exercise:first'}],
         '',
         {}
     )
@@ -69,7 +69,7 @@ def test_referencing_unexisting():
     pandoc_numbering.information = {}
     pandoc_numbering.numbering(
         'Para',
-        [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
+        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
         '',
         {}
     )
