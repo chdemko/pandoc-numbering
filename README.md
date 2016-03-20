@@ -17,7 +17,7 @@ in links:
 
 In both cases, the `#` character is replaced by the associated number in the title.
 
-You can add a sequence of '#.' character before the last '#' character. In this sequence the '#' characters are replaced by the
+You can add a sequence of '#.' characters before the last '#' character. In this sequence, the '#' characters are replaced by the
 numbering of the current headers.
 
 Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in [pdf], [tex], [html], [epub], [md] and
