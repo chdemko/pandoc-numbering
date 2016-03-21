@@ -33,10 +33,11 @@ def toIdentifier(string):
 
 def numbering(key, value, format, meta):
     if key == 'Header':
-        index = value[0] - 1
-        headers[index] = headers[index] + 1
-        for i in range(index + 1, 6):
-            headers[i] = 0
+        [level, [id, classes, attributes], content] = value
+        if 'unnumbered' not in classes:
+            headers[level - 1] = headers[level - 1] + 1
+            for index in range(level, 6):
+                headers[index] = 0
     elif key == 'Para':
         length = len(value)
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':

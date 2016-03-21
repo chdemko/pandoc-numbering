@@ -124,6 +124,7 @@ def test_numbering_title():
 def test_numbering_level():
     pandoc_numbering.count = {}
     pandoc_numbering.information = {}
+    pandoc_numbering.headers = [0, 0, 0, 0, 0, 0]
     assert pandoc_numbering.numbering(
         'Para',
         [
@@ -233,6 +234,41 @@ def test_numbering_level():
                     {
                         't': 'Strong',
                         'c': [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '1.2.1'}]
+                    }
+                ]
+            ),
+        }]
+    }
+
+def test_numbering_unnumbered():
+    pandoc_numbering.count = {}
+    pandoc_numbering.information = {}
+    pandoc_numbering.headers = [0, 0, 0, 0, 0, 0]
+    pandoc_numbering.numbering(
+        'Header',
+        [1,['chapter', ['unnumbered'], []], [{'t': 'Str', 'c': 'Unnumbered'}, {'t': 'Space', 'c': []},{'t': 'Str', 'c': 'chapter'}]],
+        '',
+        {}
+    )
+    assert pandoc_numbering.numbering(
+        'Para',
+        [
+            {'t': 'Str', 'c': u'Exercise'},
+            {'t': 'Space', 'c': []},
+            {'t': 'Str', 'c': '#.#'}
+        ],
+        '',
+        {}
+    ) == {
+        't': 'Para',
+        'c': [{
+            't': 'Span',
+            'c': (
+                ['exercise:0.1', [], []],
+                [
+                    {
+                        't': 'Strong',
+                        'c': [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '0.1'}]
                     }
                 ]
             ),
