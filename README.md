@@ -87,7 +87,7 @@ This is the first exercise. Have also a look at the [Exercise
 <span id="exercise:second">**Exercise 2** *(This is the second
 exercise)*</span>
 
-Use [*theorem 1*](#theorem:first)
+Use [*theorem 1.1*](#theorem:first)
 
 This is the second section
 ==========================
