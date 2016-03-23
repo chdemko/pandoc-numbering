@@ -93,7 +93,7 @@ def numbering(key, value, format, meta):
                     text.append(title)
 
                 # Store the numbers and the label for automatic numbering (See referencing function)
-                information[tag] = {'number': number, 'text': value}
+                information[tag] = {'number': value[length - 1]['c'], 'text': value}
 
                 # Prepare the contents
                 contents = [Span([tag, [], []], text)]
