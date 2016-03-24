@@ -1,6 +1,7 @@
 # pandoc-numbering
 [![Build Status](https://secure.travis-ci.org/chdemko/pandoc-numbering.svg)](http://travis-ci.org/chdemko/pandoc-numbering)
 [![PyPI version](https://badge.fury.io/py/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
+[![Licence](https://img.shields.io/badge/licence-CeCILL--B-blue.svg)](http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html)
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
@@ -72,7 +73,7 @@ title: Sample use of automatic numbering
 
 This is the first section
 =========================
-
+https://img.shields.io/badge/licence-CeCILL--B-blue.svg
 <span id="exercise:1">**Exercise 1**</span>
 
 This is the first exercise. Have also a look at the [Exercise
