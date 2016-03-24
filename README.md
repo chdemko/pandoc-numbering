@@ -2,6 +2,7 @@
 [![Build Status](https://secure.travis-ci.org/chdemko/pandoc-numbering.svg)](http://travis-ci.org/chdemko/pandoc-numbering)
 [![PyPI version](https://badge.fury.io/py/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
 [![Licence](https://img.shields.io/badge/licence-CeCILL--B-blue.svg)](http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html)
+[![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
