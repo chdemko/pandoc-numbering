@@ -287,7 +287,7 @@ def test_numbering_hidden():
     )
     assert pandoc_numbering.numbering(
         'Para',
-        [{'c': 'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '_.#exercise:one','t': 'Str'}],
+        [{'c': u'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '_.#exercise:one','t': 'Str'}],
         '',
         {}
     ) == {
@@ -307,7 +307,7 @@ def test_numbering_hidden():
     }
     assert pandoc_numbering.numbering(
         'Para',
-        [{'c': 'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '_.#','t': 'Str'}],
+        [{'c': u'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '_.#','t': 'Str'}],
         '',
         {}
     ) == {
@@ -333,7 +333,7 @@ def test_numbering_hidden():
     )
     assert pandoc_numbering.numbering(
         'Para',
-        [{'c': 'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '_.#','t': 'Str'}],
+        [{'c': u'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '_.#','t': 'Str'}],
         '',
         {}
     ) == {
@@ -353,7 +353,7 @@ def test_numbering_hidden():
     }
     assert pandoc_numbering.numbering(
         'Para',
-        [{'c': 'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '#.#','t': 'Str'}],
+        [{'c': u'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '#.#','t': 'Str'}],
         '',
         {}
     ) == {
@@ -373,7 +373,7 @@ def test_numbering_hidden():
     }
     assert pandoc_numbering.numbering(
         'Para',
-        [{'c': 'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '#','t': 'Str'}],
+        [{'c': u'Exercise', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '#','t': 'Str'}],
         '',
         {}
     ) == {
