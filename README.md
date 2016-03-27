@@ -22,8 +22,9 @@ in links:
 
 In both cases, the `#` character is replaced by the associated number in the title.
 
-You can add a sequence of '#.' characters before the last '#' character. In this sequence, the '#' characters are replaced by the
-numbering of the current headers.
+You can add a sequence of '#.' characters before the last '#' character. In this sequence, the '#' characters are replaced by the numbering of the current headers.
+
+If you want to hide the numbering of the headers, you can replace the beginning of the '#.' sequence by a '_.' sequence.
 
 Demonstration: Using [pandoc-numbering-sample.md] as input gives output files in [pdf], [tex], [html], [epub], [md] and
 other formats.
@@ -50,8 +51,21 @@ Exercise (This is the second exercise) #exercise:second
 
 Use [_theorem #_](#theorem:first)
 
+Example _.#
+
+This is the first example of the first section
+
+Example _.#
+
+This is the second example of the first section
+
+
 This is the second section
 ==========================
+
+Example _.#
+
+This is the first example of the second section
 
 > Theorem #.#
 > 
@@ -60,6 +74,10 @@ This is the second section
 > Theorem #.#
 > 
 > A last theorem.
+
+Example _.#
+
+This is the second example of the second section
 
 Unnumbered ##
 ~~~
@@ -72,11 +90,11 @@ author:
 - 'Ch. Demko <chdemko@gmail.com>'
 date: '04/11/2015'
 title: Sample use of automatic numbering
-...
+---
 
 This is the first section
 =========================
-https://img.shields.io/badge/licence-CeCILL--B-blue.svg
+
 <span id="exercise:1">**Exercise 1**</span>
 
 This is the first exercise. Have also a look at the [Exercise
@@ -93,16 +111,32 @@ exercise)*</span>
 
 Use [*theorem 1.1*](#theorem:first)
 
+<span id="example:1.1">**Example 1**</span>
+
+This is the first example of the first section
+
+<span id="example:1.2">**Example 2**</span>
+
+This is the second example of the first section
+
 This is the second section
 ==========================
 
+<span id="example:2.1">**Example 1**</span>
+
+This is the first example of the second section
+
 > <span id="theorem:2.1">**Theorem 2.1**</span>
 >
-> Another theorem. Can be usefull in [Exercise 1](#exercise:1)
+> Another theorem. Can be useful in [Exercise 1](#exercise:1)
 
 > <span id="theorem:2.2">**Theorem 2.2**</span>
 >
 > A last theorem.
+
+<span id="example:2.2">**Example 2**</span>
+
+This is the second example of the second section
 
 Unnumbered \#
 ~~~

@@ -18,8 +18,21 @@ Exercise (This is the second exercise) #exercise:second
 
 Use [_theorem #_](#theorem:first)
 
+Example _.#
+
+This is the first example of the first section
+
+Example _.#
+
+This is the second example of the first section
+
+
 This is the second section
 ==========================
+
+Example _.#
+
+This is the first example of the second section
 
 > Theorem #.#
 > 
@@ -28,6 +41,10 @@ This is the second section
 > Theorem #.#
 > 
 > A last theorem.
+
+Example _.#
+
+This is the second example of the second section
 
 Unnumbered ##
 

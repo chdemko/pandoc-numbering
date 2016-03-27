@@ -43,7 +43,7 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':
             last = value[length - 1]['c']
 
-            match = re.match('^((#\.)*#)([a-zA-Z][\w:.-]*)?$', last)
+            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>[a-zA-Z][\w:.-]*)?$', last)
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
                 global count, information
@@ -59,12 +59,11 @@ def numbering(key, value, format, meta):
                             break
 
                 # Convert the value to a name
-                if match.group(2) == None:
-                    level = 0
-                    name = toIdentifier(stringify(value[:length - 2])) + ':'
-                else:
-                    level = len(match.group(1)) // 2
-                    name = toIdentifier(stringify(value[:length - 2])) + ':' + '.'.join(map(str, headers[:level])) + '.'
+                levelInf = len(match.group('hidden')) // 2
+                levelSup = len(match.group('header')) // 2
+                name = toIdentifier(stringify(value[:length - 2])) + ':'
+                if levelSup != 0:
+                    name = name + '.'.join(map(str, headers[:levelSup])) + '.'
 
                 # Is it a new category?
                 if name not in count:
@@ -76,13 +75,13 @@ def numbering(key, value, format, meta):
                 number = str(count[name])
 
                 # Determine the tag
-                if match.group(3) == None:
+                if match.group('tag') == None:
                     tag = name + number
                 else:
-                    tag = match.group(3)
+                    tag = match.group('tag')
 
-                # Replace the '#' by the name count
-                value[length - 1]['c'] = '.'.join(map(str, headers[:level] + [number]))
+                # Replace the '#.#...#' by the name count
+                value[length - 1]['c'] = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
 
                 # Prepare the final text
                 text = [Strong(value)]
@@ -162,7 +161,7 @@ def pandoc_version():
     if not hasattr(pandoc_version, "version"):
         p = subprocess.Popen(['pandoc', '-v'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         out, err = p.communicate()
-        pandoc_version.version = re.search(b'pandoc (.*)', out).group(1).decode('utf-8')
+        pandoc_version.version = re.search(b'pandoc (?P<version>.*)', out).group('version').decode('utf-8')
     return pandoc_version.version
 
 def main():
