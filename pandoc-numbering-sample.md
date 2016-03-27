@@ -46,5 +46,9 @@ Example _.#
 
 This is the second example of the second section
 
+Exercise #
+
+This is the third exercise.
+
 Unnumbered ##
 
