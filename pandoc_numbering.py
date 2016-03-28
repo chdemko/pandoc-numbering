@@ -58,29 +58,29 @@ def numbering(key, value, format, meta):
                             length = i + 1
                             break
 
-                # Convert the value to a name
+                # Convert the value to a category
                 levelInf = len(match.group('hidden')) // 2
                 levelSup = len(match.group('header')) // 2
-                name = toIdentifier(stringify(value[:length - 2])) + ':'
+                category = toIdentifier(stringify(value[:length - 2])) + ':'
                 if levelSup != 0:
-                    name = name + '.'.join(map(str, headers[:levelSup])) + '.'
+                    category = category + '.'.join(map(str, headers[:levelSup])) + '.'
 
                 # Is it a new category?
-                if name not in count:
-                    count[name] = 0
+                if category not in count:
+                    count[category] = 0
 
-                count[name] = count[name] + 1
+                count[category] = count[category] + 1
 
                 # Get the number
-                number = str(count[name])
+                number = str(count[category])
 
                 # Determine the tag
                 if match.group('tag') == None:
-                    tag = name + number
+                    tag = category + number
                 else:
                     tag = match.group('tag')
 
-                # Replace the '#.#...#' by the name count
+                # Replace the '#.#...#' by the category count
                 value[length - 1]['c'] = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
 
                 # Prepare the final text
