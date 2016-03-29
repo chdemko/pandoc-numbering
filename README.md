@@ -8,6 +8,8 @@
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
+[pandoc]: http://pandoc.org/
+
 Documentation
 -------------
 
