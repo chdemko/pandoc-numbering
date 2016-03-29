@@ -43,7 +43,8 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':
             last = value[length - 1]['c']
 
-            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>[a-zA-Z][\w:.-]*)?$', last)
+            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>(?P<prefix>[a-zA-Z][\w-]*:)?(?P<name>[a-zA-Z][\w-]*))?$', last)
+
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
                 global count, information
@@ -61,9 +62,11 @@ def numbering(key, value, format, meta):
                 # Convert the value to a category
                 levelInf = len(match.group('hidden')) // 2
                 levelSup = len(match.group('header')) // 2
-                category = toIdentifier(stringify(value[:length - 2])) + ':'
+                basicCategory = toIdentifier(stringify(value[:length - 2])) + ':'
                 if levelSup != 0:
-                    category = category + '.'.join(map(str, headers[:levelSup])) + '.'
+                    category = basicCategory + '.'.join(map(str, headers[:levelSup])) + '.'
+                else:
+                    category = basicCategory
 
                 # Is it a new category?
                 if category not in count:
@@ -77,6 +80,8 @@ def numbering(key, value, format, meta):
                 # Determine the tag
                 if match.group('tag') == None:
                     tag = category + number
+                elif match.group('prefix') == None:
+                	tag = basicCategory + match.group('name')
                 else:
                     tag = match.group('tag')
 
@@ -151,6 +156,16 @@ def referencing(key, value, format, meta):
                         # The link text is not empty, replace all '#' with the corresponding number
                         replace = information[tag]['number']
                         value[1] = walk(text, replacing, format, meta)
+    elif key == 'Cite':
+        match = re.match('^@(?P<tag>[a-zA-Z][\w-]*:(([a-zA-Z][\w-]*)|(\d*(\.\d*)*)))$', value[1][0]['c'])
+        if match != None:
+            # Deal with @prefix:name shortcut
+            tag = match.group('tag')
+            if tag in information:
+                if pandoc_version() < '1.16':
+                    return Link([Str(information[tag]['number'])], ['#' + tag, ''])
+                else:
+                    return Link(['', [], []], [Str(information[tag]['number'])], ['#' + tag, ''])
 
 def replacing(key, value, format, meta):
     global replace
