@@ -7,7 +7,7 @@ import os
 
 def test_numbering():
     assert pypandoc.convert(
-        'Exercise #\n',
+        u'Exercise #\n',
         'md',
         format = 'md',
         filters = [os.getcwd() + '/pandoc_numbering.py']
@@ -15,7 +15,7 @@ def test_numbering():
 
 def test_numbering_latex():
     assert pypandoc.convert(
-        'Exercise #\n',
+        u'Exercise #\n',
         'latex',
         format = 'md',
         filters = [os.getcwd() + '/pandoc_numbering.py']
@@ -23,7 +23,7 @@ def test_numbering_latex():
 
 def test_numbering_double():
     assert pypandoc.convert(
-        'Exercise #\n\nExercise #\n',
+        u'Exercise #\n\nExercise #\n',
         'md',
         format = 'md',
         filters = [os.getcwd() + '/pandoc_numbering.py']
@@ -31,7 +31,7 @@ def test_numbering_double():
 
 def test_numbering_title():
     assert pypandoc.convert(
-        'Exercise (The title) #\n',
+        u'Exercise (The title) #\n',
         'md',
         format = 'md',
         filters = [os.getcwd() + '/pandoc_numbering.py']
@@ -39,13 +39,13 @@ def test_numbering_title():
 
 def test_numbering_level():
     assert pypandoc.convert(
-        'Exercise #.#.#\n',
+        u'Exercise #.#.#\n',
         'md',
         format = 'md',
         filters = [os.getcwd() + '/pandoc_numbering.py']
     ) == '<span id="exercise:0.0.1">**Exercise 0.0.1**</span>\n'
 
-    assert pypandoc.convert("""First chapter
+    assert pypandoc.convert(u"""First chapter
 =============
 
 First section
@@ -80,7 +80,7 @@ Second section
 """
 
 def test_numbering_unnumbered():
-    assert pypandoc.convert("""First chapter{-}
+    assert pypandoc.convert(u"""First chapter{-}
 =============
 
 Exercise #.#
@@ -95,7 +95,7 @@ Exercise #.#
 """
 
 def test_numbering_hidden():
-    assert pypandoc.convert("""First chapter
+    assert pypandoc.convert(u"""First chapter
 =============
 
 Exercise _.#
