@@ -43,7 +43,7 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':
             last = value[length - 1]['c']
 
-            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>(?P<prefix>[a-zA-Z][\w-]*:)?(?P<name>[a-zA-Z][\w-]*))?$', last)
+            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*))?$', last)
 
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
@@ -156,8 +156,13 @@ def referencing(key, value, format, meta):
                         # The link text is not empty, replace all '#' with the corresponding number
                         replace = information[tag]['number']
                         value[1] = walk(text, replacing, format, meta)
-    elif key == 'Cite':
-        match = re.match('^@(?P<tag>[a-zA-Z][\w-]*:(([a-zA-Z][\w-]*)|(\d*(\.\d*)*)))$', value[1][0]['c'])
+    elif key == 'Cite' and \
+         'pandoc-numbering' in meta and \
+         meta['pandoc-numbering']['t'] == 'MetaMap' and \
+         'cite-shortcut' in meta['pandoc-numbering']['c'] and\
+         meta['pandoc-numbering']['c']['cite-shortcut']['t'] == 'MetaBool' and\
+         meta['pandoc-numbering']['c']['cite-shortcut']['c']:
+        match = re.match('^@(?P<tag>[a-zA-Z][\w.-]*:(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*)))$', value[1][0]['c'])
         if match != None:
             # Deal with @prefix:name shortcut
             tag = match.group('tag')
