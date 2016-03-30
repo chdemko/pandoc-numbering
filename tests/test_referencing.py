@@ -177,3 +177,61 @@ def test_referencing_headers():
             ]
         assert link2[2][1] == 'theorem 1.1'
 
+def test_referencing_cite_shortcut():
+    pandoc_numbering.count = {}
+    pandoc_numbering.information = {}
+    pandoc_numbering.headers = [0, 0, 0, 0, 0, 0]
+    pandoc_numbering.numbering(
+        'Para',
+        [{'c': u'Theorem', 't': 'Str'}, {'c': [], 't': 'Space'}, {'c': '#first', 't': 'Str'}],
+        '',
+        {}
+    )
+    assert pandoc_numbering.referencing(
+        'Cite',
+        [
+            [
+                {
+                    'citationSuffix': [],
+                    'citationNoteNum': 0,
+                    'citationMode': {'t': 'AuthorInText', 'c': []},
+                    'citationPrefix': [],
+                    'citationId': 'theorem:first',
+                    'citationHash': 0
+                }
+            ],
+            [
+                {
+                    't': 'Str',
+                    'c': '@theorem:first'
+                }
+            ]
+        ],
+        '',
+        {}
+    ) == None
+    
+    assert pandoc_numbering.referencing(
+        'Cite',
+        [
+            [
+                {
+                    'citationSuffix': [],
+                    'citationNoteNum': 0,
+                    'citationMode': {'t': 'AuthorInText', 'c': []},
+                    'citationPrefix': [],
+                    'citationId': 'theorem:first',
+                    'citationHash': 0
+                }
+            ],
+            [
+                {
+                    't': 'Str',
+                    'c': '@theorem:first'
+                }
+            ]
+        ],
+        '',
+        {'pandoc-numbering': {'c': {'cite-shortcut': {'c': True, 't': 'MetaBool'}}, 't': 'MetaMap'}}
+    ) == {'c': (['', [], []], [{'c': '1', 't': 'Str'}], ['#theorem:first', '']), 't': 'Link'}
+

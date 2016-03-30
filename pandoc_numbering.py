@@ -156,21 +156,21 @@ def referencing(key, value, format, meta):
                         # The link text is not empty, replace all '#' with the corresponding number
                         replace = information[tag]['number']
                         value[1] = walk(text, replacing, format, meta)
-    elif key == 'Cite' and \
-         'pandoc-numbering' in meta and \
-         meta['pandoc-numbering']['t'] == 'MetaMap' and \
-         'cite-shortcut' in meta['pandoc-numbering']['c'] and\
-         meta['pandoc-numbering']['c']['cite-shortcut']['t'] == 'MetaBool' and\
-         meta['pandoc-numbering']['c']['cite-shortcut']['c']:
-        match = re.match('^@(?P<tag>[a-zA-Z][\w.-]*:(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*)))$', value[1][0]['c'])
-        if match != None:
-            # Deal with @prefix:name shortcut
-            tag = match.group('tag')
-            if tag in information:
-                if pandoc_version() < '1.16':
-                    return Link([Str(information[tag]['number'])], ['#' + tag, ''])
-                else:
-                    return Link(['', [], []], [Str(information[tag]['number'])], ['#' + tag, ''])
+    elif key == 'Cite':
+        if 'pandoc-numbering' in meta and \
+            meta['pandoc-numbering']['t'] == 'MetaMap' and \
+            'cite-shortcut' in meta['pandoc-numbering']['c'] and\
+            meta['pandoc-numbering']['c']['cite-shortcut']['t'] == 'MetaBool' and\
+            meta['pandoc-numbering']['c']['cite-shortcut']['c']:
+            match = re.match('^@(?P<tag>[a-zA-Z][\w.-]*:(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*)))$', value[1][0]['c'])
+            if match != None:
+                # Deal with @prefix:name shortcut
+                tag = match.group('tag')
+                if tag in information:
+                    if pandoc_version() < '1.16':
+                        return Link([Str(information[tag]['number'])], ['#' + tag, ''])
+                    else:
+                        return Link(['', [], []], [Str(information[tag]['number'])], ['#' + tag, ''])
 
 def replacing(key, value, format, meta):
     global replace
