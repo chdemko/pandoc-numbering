@@ -115,5 +115,5 @@ setup(
     package_data={},
 
     setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pypandoc'],
+    tests_require=['pytest'],
 )
