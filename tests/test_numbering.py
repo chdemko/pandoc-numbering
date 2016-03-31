@@ -8,8 +8,8 @@ def test_numbering():
     pandoc_numbering.count = {}
     pandoc_numbering.information = {}
 
-    src = Para([Str('Exercise'), Space(), Str('#')])
-    dest = Para([Span(['exercise:1', [], []], [Strong( [Str('Exercise'), Space(), Str('1')] )])])
+    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    dest = Para([Span([u'exercise:1', [], []], [Strong( [Str(u'Exercise'), Space(), Str(u'1')] )])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
