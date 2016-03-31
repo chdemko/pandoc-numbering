@@ -67,6 +67,8 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
+        'Topic :: Software Development :: Documentation',
+        'Topic :: Text Processing :: Filters',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
@@ -75,6 +77,9 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+
+        # Natural language used
+        'Natural Language :: English',
     ],
 
     # What does your project relate to?
