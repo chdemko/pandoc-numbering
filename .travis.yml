@@ -11,5 +11,6 @@ before_install:
 script:
   - python setup.py build_ext -i
   - python -m compileall -f .
-  - python setup.py test
-
+  - coverage run --source=pandoc_numbering setup.py test
+after_success:
+  - coveralls
