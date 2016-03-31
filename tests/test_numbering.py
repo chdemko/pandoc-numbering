@@ -133,3 +133,13 @@ def test_numbering_hidden():
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
+def test_numbering_sharp_sharp():
+    init()
+
+    src = Para([Str(u'Exercise'), Space(), Str(u'##')])
+    dest = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', {})
+
+    assert src == dest
+
+
