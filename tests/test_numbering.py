@@ -1,29 +1,17 @@
 # This Python file uses the following encoding: utf-8
 from unittest import TestCase
+from pandocfilters import Para, Str, Space, Span, Strong
 
 import pandoc_numbering
 
 def test_numbering():
     pandoc_numbering.count = {}
     pandoc_numbering.information = {}
-    assert pandoc_numbering.numbering(
-        'Para',
-        [{'t': 'Str', 'c': u'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '#'}],
-        '',
-        {}
-    ) == {
-        't': 'Para',
-        'c': [{
-            't': 'Span',
-            'c': (
-                ['exercise:1', [], []],
-                [{
-                    't': 'Strong',
-                    'c': [{'t': 'Str', 'c': 'Exercise'}, {'t': 'Space', 'c': []}, {'t': 'Str', 'c': '1'}]
-                }]
-            ),
-        }]
-    }
+
+    src = Para([Str('Exercise'), Space(), Str('#')])
+    dest = Para([Span(['exercise:1', [], []], [Strong( [Str('Exercise'), Space(), Str('1')] )])])
+
+    assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
 def test_numbering_latex():
     pandoc_numbering.count = {}
