@@ -43,7 +43,7 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':
             last = value[length - 1]['c']
 
-            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?)$', last)
+            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
 
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
@@ -87,18 +87,10 @@ def numbering(key, value, format, meta):
                 number = str(count[category])
 
                 # Determine the final tag
-                if match.group('tag') == '':
-                    # Use the computed category and the current number if there is no tag
+                if match.group('name') == None:
                     tag = category + number
-                elif match.group('prefix') == None:
-                    # Use the basic category and the name if the tag is only composed of a name
-                	tag = basicCategory + match.group('name')
-                elif match.group('name') == None:
-                    # Use the prefix and the paragraph numbering if the tag is only composed of a prefix
-                    tag = match.group('prefix') + leading + number
                 else:
-                    # Use the full tag (composed of a prefix and a name)
-                    tag = match.group('tag')
+                    tag = basicCategory + match.group('name')
 
                 # Replace the '#.#...#' by the category count (omitting the hidden part)
                 value[length - 1]['c'] = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
