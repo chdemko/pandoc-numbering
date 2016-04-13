@@ -26,7 +26,7 @@ To apply the filter, use the following option with pandoc:
 Installation
 ------------
 
-pandoc-numbering requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows].  Either python 2.7 or 3.x will do.
+pandoc-numbering requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows]. Either python 2.7 or 3.x will do.
 
 Install pandoc-numbering as root using the bash command
 
@@ -36,7 +36,7 @@ To upgrade to the most recent release, use
 
     pip install --upgrade pandoc-numbering 
 
-`pip` is a script that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution.  If you are running linux, `pip` may be bundled separately. On a Debian-based system (including Ubuntu), you can install it as root using
+`pip` is a script that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution. If you are running linux, `pip` may be bundled separately. On a Debian-based system (including Ubuntu), you can install it as root using
 
     apt-get update
     apt-get install python-pip
