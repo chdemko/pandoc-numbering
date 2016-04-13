@@ -43,7 +43,7 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[length - 2] == Space() and value[length - 1]['t'] == 'Str':
             last = value[length - 1]['c']
 
-            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*))?$', last)
+            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<tag>(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?)$', last)
 
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
@@ -78,10 +78,12 @@ def numbering(key, value, format, meta):
                 number = str(count[category])
 
                 # Determine the tag
-                if match.group('tag') == None:
+                if match.group('tag') == '':
                     tag = category + number
                 elif match.group('prefix') == None:
                 	tag = basicCategory + match.group('name')
+                elif match.group('name') == None:
+                    tag = match.group('prefix') + number
                 else:
                     tag = match.group('tag')
 
