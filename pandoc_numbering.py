@@ -70,7 +70,11 @@ def numbering(key, value, format, meta):
                     leading = ''
 
                 # Compute the basicCategory and the category
-                basicCategory = toIdentifier(stringify(value[:length - 2])) + ':'
+                if match.group('prefix') == None:
+                    basicCategory = toIdentifier(stringify(value[:length - 2])) + ':'
+                else:
+                    basicCategory = match.group('prefix')
+
                 category = basicCategory + leading
 
                 # Is it a new category?

@@ -17,6 +17,19 @@ def test_numbering():
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
+def test_numbering_prefix_single():
+    init()
+
+    src = Para([Str(u'Exercise'), Space(), Str(u'#ex:')])
+    dest = Para([Span([u'ex:1', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'1')])])])
+
+    assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
+
+    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    dest = Para([Span([u'exercise:1', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'1')])])])
+
+    assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
+
 def test_numbering_latex():
     init()
 
