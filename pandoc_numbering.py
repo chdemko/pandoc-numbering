@@ -62,11 +62,16 @@ def numbering(key, value, format, meta):
                 # Convert the value to a category
                 levelInf = len(match.group('hidden')) // 2
                 levelSup = len(match.group('header')) // 2
-                basicCategory = toIdentifier(stringify(value[:length - 2])) + ':'
+
+                # Compute the leading (composed of the section numbering)
                 if levelSup != 0:
-                    category = basicCategory + '.'.join(map(str, headers[:levelSup])) + '.'
+                    leading = '.'.join(map(str, headers[:levelSup])) + '.'
                 else:
-                    category = basicCategory
+                    leading = ''
+
+                # Compute the basicCategory and the category
+                basicCategory = toIdentifier(stringify(value[:length - 2])) + ':'
+                category = basicCategory + leading
 
                 # Is it a new category?
                 if category not in count:
@@ -77,17 +82,21 @@ def numbering(key, value, format, meta):
                 # Get the number
                 number = str(count[category])
 
-                # Determine the tag
+                # Determine the final tag
                 if match.group('tag') == '':
+                    # Use the computed category and the current number if there is no tag
                     tag = category + number
                 elif match.group('prefix') == None:
+                    # Use the basic category and the name if the tag is only composed of a name
                 	tag = basicCategory + match.group('name')
                 elif match.group('name') == None:
-                    tag = match.group('prefix') + number
+                    # Use the prefix and the paragraph numbering if the tag is only composed of a prefix
+                    tag = match.group('prefix') + leading + number
                 else:
+                    # Use the full tag (composed of a prefix and a name)
                     tag = match.group('tag')
 
-                # Replace the '#.#...#' by the category count
+                # Replace the '#.#...#' by the category count (omitting the hidden part)
                 value[length - 1]['c'] = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
 
                 # Prepare the final text

@@ -59,11 +59,14 @@ def test_referencing_prefix():
 def test_referencing_prefix_single():
     init()
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#ex:')])
+    src = Header(1, [u'first-chapter', [], []], [Str(u'First'), Space(), Str('chapter')])
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = json.loads(json.dumps(createLink(['', [], []], [Str(u'exercise'), Space(), Str(u'#')], [u'#ex:1', u''])))
-    dest = json.loads(json.dumps(createLink(['', [], []], [Str(u'exercise'), Space(), Str(u'1')], [u'#ex:1', u''])))
+    src = Para([Str(u'Exercise'), Space(), Str(u'#.#ex:')])
+    pandoc_numbering.numbering(src['t'], src['c'], u'', {})
+
+    src = json.loads(json.dumps(createLink(['', [], []], [Str(u'exercise'), Space(), Str(u'#')], [u'#ex:1.1', u''])))
+    dest = json.loads(json.dumps(createLink(['', [], []], [Str(u'exercise'), Space(), Str(u'1.1')], [u'#ex:1.1', u''])))
 
     pandoc_numbering.referencing(src['t'], src['c'], '', {})
     assert src == dest
