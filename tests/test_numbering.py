@@ -8,6 +8,10 @@ def init():
     pandoc_numbering.count = {}
     pandoc_numbering.information = {}
     pandoc_numbering.headers = [0, 0, 0, 0, 0, 0]
+    if hasattr(pandoc_numbering.hasCiteShortCut, 'value'):
+        delattr(pandoc_numbering.hasCiteShortCut, 'value')
+    if hasattr(pandoc_numbering.getDefaultLevels, 'value'):
+        delattr(pandoc_numbering.getDefaultLevels, 'value')
 
 def test_numbering():
     init()
@@ -155,4 +159,77 @@ def test_numbering_sharp_sharp():
 
     assert src == dest
 
+def test_numbering_categories():
+    init()
+
+    meta = {
+        'pandoc-numbering': {
+            't': 'MetaMap',
+            'c': {
+                'categories': {
+                    't': 'MetaMap',
+                    'c': {
+                        'exercise': {
+                            't': 'MetaMap',
+                            'c': {'inf': {'t': 'MetaString', 'c': '1'}, 'sup': {'t': 'MetaString', 'c': '2'}}
+                        }
+                    }
+                }
+            }
+        }
+    }
+    src = Header(1, [u'first-chapter', [], []], [Str(u'First'), Space(), Str('chapter')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Header(1, [u'second-chapter', [], []], [Str(u'Second'), Space(), Str('chapter')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Header(2, [u'first-section', [], []], [Str(u'First'), Space(), Str('section')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Header(2, [u'second-section', [], []], [Str(u'Second'), Space(), Str('section')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    dest = Para([Str(u'Exercise'), Space(), Str(u'2.1')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    assert src == dest
+
+def test_numbering_categories_error():
+    init()
+
+    meta = {
+        'pandoc-numbering': {
+            't': 'MetaMap',
+            'c': {
+                'categories': {
+                    't': 'MetaMap',
+                    'c': {
+                        'exercise': {
+                            't': 'MetaMap',
+                            'c': {'inf': {'t': 'MetaString', 'c': 'error'}, 'sup': {'t': 'MetaString', 'c': 'error'}}
+                        }
+                    }
+                }
+            }
+        }
+    }
+    src = Header(1, [u'first-chapter', [], []], [Str(u'First'), Space(), Str('chapter')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Header(1, [u'second-chapter', [], []], [Str(u'Second'), Space(), Str('chapter')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Header(2, [u'first-section', [], []], [Str(u'First'), Space(), Str('section')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Header(2, [u'second-section', [], []], [Str(u'Second'), Space(), Str('section')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    dest = Para([Str(u'Exercise'), Space(), Str(u'1')])
+    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+    assert src == dest
 

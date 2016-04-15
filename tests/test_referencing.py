@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8    
+# This Python file uses the following encoding: utf-8
 from unittest import TestCase
 from pandocfilters import Para, Str, Space, Link, Header, Cite
 import sys
@@ -10,9 +10,13 @@ def init():
     pandoc_numbering.count = {}
     pandoc_numbering.information = {}
     pandoc_numbering.headers = [0, 0, 0, 0, 0, 0]
+    if hasattr(pandoc_numbering.hasCiteShortCut, 'value'):
+        delattr(pandoc_numbering.hasCiteShortCut, 'value')
+    if hasattr(pandoc_numbering.getDefaultLevels, 'value'):
+        delattr(pandoc_numbering.getDefaultLevels, 'value')
 
 def createLink(attributes, text, reference_title):
-    if pandoc_numbering.pandoc_version() < '1.16':
+    if pandoc_numbering.pandocVersion() < '1.16':
         return Link(text, reference_title)
     else:
         return Link(attributes, text, reference_title)
@@ -133,7 +137,7 @@ def test_referencing_headers():
     pandoc_numbering.referencing(src['t'], src['c'], '', {})
     assert src == dest
 
-def test_referencing_cite_shortcut():
+def test_referencing_without_cite_shortcut():
     init()
 
     src = Para([Str(u'Theorem'), Space(), Str(u'#theorem:first')])
@@ -144,7 +148,13 @@ def test_referencing_cite_shortcut():
 
     assert pandoc_numbering.referencing(src['t'], src['c'], '', {}) == None
     assert src == dest
-    
+
+def test_referencing_with_cite_shortcut():
+    init()
+
+    src = Para([Str(u'Theorem'), Space(), Str(u'#theorem:first')])
+    pandoc_numbering.numbering(src['t'], src['c'], u'', {})
+
     src = json.loads(json.dumps(Cite([], [Str(u'@theorem:first')])))
     dest = json.loads(json.dumps(createLink(['', [], []], [Str(u'1')], [u'#theorem:first', u''])))
 
