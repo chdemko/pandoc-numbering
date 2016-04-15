@@ -41,8 +41,7 @@ def numbering(key, value, format, meta):
             for index in range(level, 6):
                 headers[index] = 0
     elif key == 'Para':
-        length = len(value)
-        if length >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
+        if len(value) >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
             last = value[-1]['c']
 
             match = re.match('^' + headerRegex + '#(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
@@ -57,8 +56,7 @@ def numbering(key, value, format, meta):
                     for (i, item) in enumerate(value):
                         if item['t'] == 'Str' and item['c'][0] == '(':
                             title = Emph(value[i:-2])
-                            value = value[:i - 1] + value[length - 2:]
-                            length = i + 1
+                            value = value[:i - 1] + value[-2:]
                             break
 
                 # Compute the basicCategory and the category
@@ -121,8 +119,8 @@ def numbering(key, value, format, meta):
 
                 # Return the contents in a Para element
                 return Para(contents)
-            elif re.match('^##([a-zA-Z][\w:.-]*)?$', last):
-                # Special case where the last element is '##...'
+            elif re.match('^' + headerRegex + '##(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last):
+                # Special case where the last element is '...##...'
                 value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
                 return Para(value)
 
