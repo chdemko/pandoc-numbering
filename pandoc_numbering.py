@@ -43,7 +43,7 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
             last = value[-1]['c']
 
-            match = re.match('^((?P<header>(?P<hidden>(_\.)*)(#\.)*)#)(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
+            match = re.match('^((?P<header>(?P<hidden>(-\.)*)(#\.)*)#)(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
 
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
@@ -201,27 +201,25 @@ def getDefaultLevels(category, meta):
     if not hasattr(getDefaultLevels, 'value'):
         getDefaultLevels.value = {}
     if category not in getDefaultLevels.value:
-        inf = 0
-        sup = 0
+        levelInf = 0
+        levelSup = 0
         if 'pandoc-numbering' in meta and \
             meta['pandoc-numbering']['t'] == 'MetaMap' and \
             'categories' in meta['pandoc-numbering']['c'] and\
             meta['pandoc-numbering']['c']['categories']['t'] == 'MetaMap' and\
             category in meta['pandoc-numbering']['c']['categories']['c'] and\
-            meta['pandoc-numbering']['c']['categories']['c'][category]['t'] == 'MetaMap':
-            if 'inf' in meta['pandoc-numbering']['c']['categories']['c'][category]['c'] and\
-               meta['pandoc-numbering']['c']['categories']['c'][category]['c']['inf']['t'] == 'MetaString':
-                try:
-                    inf = int(meta['pandoc-numbering']['c']['categories']['c'][category]['c']['inf']['c'])
-                except ValueError:
-                    pass
-            if 'sup' in meta['pandoc-numbering']['c']['categories']['c'][category]['c'] and\
-               meta['pandoc-numbering']['c']['categories']['c'][category]['c']['sup']['t'] == 'MetaString':
-                try:
-                    sup = int(meta['pandoc-numbering']['c']['categories']['c'][category]['c']['sup']['c'])
-                except ValueError:
-                    pass
-        getDefaultLevels.value[category] = [inf, sup]
+            meta['pandoc-numbering']['c']['categories']['c'][category]['t'] == 'MetaInlines':
+            if len(meta['pandoc-numbering']['c']['categories']['c'][category]['c']) == 1 and\
+               meta['pandoc-numbering']['c']['categories']['c'][category]['c'][0]['t'] == 'Str':
+                match = re.match(
+                    '^(?P<header>(?P<hidden>(-\.)*)(#\.)*)$',
+                    meta['pandoc-numbering']['c']['categories']['c'][category]['c'][0]['c']
+                )
+                if match:
+                    # Compute the levelInf and levelSup values
+                    levelInf = len(match.group('hidden')) // 2
+                    levelSup = len(match.group('header')) // 2
+        getDefaultLevels.value[category] = [levelInf, levelSup]
     return getDefaultLevels.value[category]
 
 def pandocVersion():
