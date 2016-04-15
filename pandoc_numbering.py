@@ -17,6 +17,7 @@ import subprocess
 count = {}
 information = {}
 headers = [0, 0, 0, 0, 0, 0]
+headerRegex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
 
 def removeAccents(string):
     nfkd_form = unicodedata.normalize('NFKD', string)
@@ -32,6 +33,7 @@ def toIdentifier(string):
     return string
 
 def numbering(key, value, format, meta):
+    global headerRegex
     if key == 'Header':
         [level, [id, classes, attributes], content] = value
         if 'unnumbered' not in classes:
@@ -43,7 +45,7 @@ def numbering(key, value, format, meta):
         if length >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
             last = value[-1]['c']
 
-            match = re.match('^((?P<header>(?P<hidden>(-\.)*)(#\.)*)#)(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
+            match = re.match('^' + headerRegex + '#(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
 
             if match:
                 # Is it a Para and the last element is an identifier beginning with '#'
@@ -96,7 +98,7 @@ def numbering(key, value, format, meta):
                 else:
                     tag = basicCategory + match.group('name')
 
-                # Replace the '#.#...#' by the category count (omitting the hidden part)
+                # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
                 value[-1]['c'] = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
 
                 # Prepare the final text
@@ -198,6 +200,7 @@ def hasCiteShortCut(meta):
 
 
 def getDefaultLevels(category, meta):
+    global headerRegex
     if not hasattr(getDefaultLevels, 'value'):
         getDefaultLevels.value = {}
     if category not in getDefaultLevels.value:
@@ -205,16 +208,13 @@ def getDefaultLevels(category, meta):
         levelSup = 0
         if 'pandoc-numbering' in meta and \
             meta['pandoc-numbering']['t'] == 'MetaMap' and \
-            'categories' in meta['pandoc-numbering']['c'] and\
-            meta['pandoc-numbering']['c']['categories']['t'] == 'MetaMap' and\
-            category in meta['pandoc-numbering']['c']['categories']['c'] and\
-            meta['pandoc-numbering']['c']['categories']['c'][category]['t'] == 'MetaInlines':
-            if len(meta['pandoc-numbering']['c']['categories']['c'][category]['c']) == 1 and\
-               meta['pandoc-numbering']['c']['categories']['c'][category]['c'][0]['t'] == 'Str':
-                match = re.match(
-                    '^(?P<header>(?P<hidden>(-\.)*)(#\.)*)$',
-                    meta['pandoc-numbering']['c']['categories']['c'][category]['c'][0]['c']
-                )
+            'sectioning' in meta['pandoc-numbering']['c'] and\
+            meta['pandoc-numbering']['c']['sectioning']['t'] == 'MetaMap' and\
+            category in meta['pandoc-numbering']['c']['sectioning']['c'] and\
+            meta['pandoc-numbering']['c']['sectioning']['c'][category]['t'] == 'MetaInlines':
+            if len(meta['pandoc-numbering']['c']['sectioning']['c'][category]['c']) == 1 and\
+               meta['pandoc-numbering']['c']['sectioning']['c'][category]['c'][0]['t'] == 'Str':
+                match = re.match('^' + headerRegex + '$', meta['pandoc-numbering']['c']['sectioning']['c'][category]['c'][0]['c'])
                 if match:
                     # Compute the levelInf and levelSup values
                     levelInf = len(match.group('hidden')) // 2

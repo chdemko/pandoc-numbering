@@ -76,7 +76,7 @@ def test_numbering_title():
 def test_numbering_level():
     init()
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#.#')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.+.#')])
     dest = Para([Span([u'exercise:0.0.1', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'0.0.1')])])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
@@ -87,12 +87,12 @@ def test_numbering_level():
     src = Header(2, [u'first-section', [], []], [Str(u'First'), Space(), Str('section')])
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#.#')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.+.#')])
     dest = Para([Span( [u'exercise:1.1.1', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'1.1.1')])])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#.#')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.+.#')])
     dest = Para([Span([u'exercise:1.1.2', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'1.1.2')])])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
@@ -100,7 +100,7 @@ def test_numbering_level():
     src = Header(2, [u'second-section', [], []], [Str(u'Second'), Space(), Str('section')])
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#.#')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.+.#')])
     dest = Para([Span([u'exercise:1.2.1', [], []], [Strong( [Str(u'Exercise'), Space(), Str(u'1.2.1')])])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
@@ -111,7 +111,7 @@ def test_numbering_unnumbered():
     src = Header(1, [u'unnumbered-chapter', [u'unnumbered'], []], [Str(u'Unnumbered'), Space(), Str('chapter')])
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.#')])
     dest = Para([Span([u'exercise:0.1', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'0.1')])])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
@@ -140,7 +140,7 @@ def test_numbering_hidden():
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.#')])
     dest = Para([Span([u'exercise:2.2', [], []], [Strong([Str(u'Exercise'), Space(), Str(u'2.2')])])])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
@@ -159,18 +159,18 @@ def test_numbering_sharp_sharp():
 
     assert src == dest
 
-def test_numbering_categories():
+def test_numbering_sectioning():
     init()
 
     meta = {
         'pandoc-numbering': {
             't': 'MetaMap',
             'c': {
-                'categories': {
+                'sectioning': {
                     't': 'MetaMap',
                     'c': {
                         'exercise': {
-                            'c': [{'c': '-.#.', 't': 'Str'}],
+                            'c': [{'c': '-.+.', 't': 'Str'}],
                             't': 'MetaInlines'
                         }
                     }
@@ -192,43 +192,6 @@ def test_numbering_categories():
 
     src = Para([Str(u'Exercise'), Space(), Str(u'#')])
     dest = Para([Str(u'Exercise'), Space(), Str(u'2.1')])
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    assert src == dest
-
-def test_numbering_categories_error():
-    init()
-
-    meta = {
-        'pandoc-numbering': {
-            't': 'MetaMap',
-            'c': {
-                'categories': {
-                    't': 'MetaMap',
-                    'c': {
-                        'exercise': {
-                            't': 'MetaMap',
-                            'c': {'inf': {'t': 'MetaString', 'c': 'error'}, 'sup': {'t': 'MetaString', 'c': 'error'}}
-                        }
-                    }
-                }
-            }
-        }
-    }
-    src = Header(1, [u'first-chapter', [], []], [Str(u'First'), Space(), Str('chapter')])
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(1, [u'second-chapter', [], []], [Str(u'Second'), Space(), Str('chapter')])
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(2, [u'first-section', [], []], [Str(u'First'), Space(), Str('section')])
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(2, [u'second-section', [], []], [Str(u'Second'), Space(), Str('section')])
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
-    dest = Para([Str(u'Exercise'), Space(), Str(u'1')])
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
     assert src == dest

@@ -66,7 +66,7 @@ def test_referencing_prefix_single():
     src = Header(1, [u'first-chapter', [], []], [Str(u'First'), Space(), Str('chapter')])
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#.#ex:')])
+    src = Para([Str(u'Exercise'), Space(), Str(u'+.#ex:')])
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(['', [], []], [Str(u'exercise'), Space(), Str(u'#')], [u'#ex:1.1', u''])))
@@ -114,7 +114,7 @@ def test_referencing_headers():
     src = Header(1, [u'first-chapter', [], []], [Str(u'First'), Space(), Str('chapter')])
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = Para([Str(u'Theorem'), Space(), Str(u'#.#theorem:first')])
+    src = Para([Str(u'Theorem'), Space(), Str(u'+.#theorem:first')])
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(['', [], []], [], [u'#theorem:first', u''])))
