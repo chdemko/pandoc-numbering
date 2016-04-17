@@ -1,6 +1,7 @@
 # pandoc-numbering
 [![Build Status](https://img.shields.io/travis/chdemko/pandoc-numbering.svg)](http://travis-ci.org/chdemko/pandoc-numbering)
 [![Coveralls](https://img.shields.io/coveralls/chdemko/pandoc-numbering.svg)](https://coveralls.io/github/chdemko/pandoc-numbering)
+[![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
 [![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
 [![License](https://img.shields.io/pypi/l/pandoc-numbering.svg)](http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html)
 [![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
