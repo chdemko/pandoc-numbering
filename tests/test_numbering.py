@@ -14,13 +14,23 @@ def getMeta1():
         'pandoc-numbering': createMetaList([
             createMetaMap({
                 'category': createMetaInlines('exercise'),
+                'sectioning': createMetaInlines('-.+.')
+            })
+        ])
+    }
+
+def getMeta2():
+    return {
+        'pandoc-numbering': createMetaList([
+            createMetaMap({
+                'category': createMetaInlines('exercise'),
                 'first': createMetaString('2'),
                 'last': createMetaString('2'),
             })
         ])
     }
 
-def getMeta2():
+def getMeta3():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
@@ -31,7 +41,7 @@ def getMeta2():
         ])
     }
 
-def getMeta3():
+def getMeta4():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
@@ -41,7 +51,7 @@ def getMeta3():
         ])
     }
 
-def getMeta4():
+def getMeta5():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
@@ -289,30 +299,7 @@ def test_numbering_sharp_sharp():
 
     assert src == dest
 
-def test_numbering_sectioning_string():
-    init()
-
-    meta = {
-        'pandoc-numbering': {
-            't': 'MetaList',
-            'c': [
-                {
-                    't': 'MetaMap',
-                    'c': {
-                        'category': {
-                            't': 'MetaInlines',
-                            'c': [Str('exercise')]
-                        },
-                        'sectioning': {
-                            't': 'MetaInlines',
-                            'c': [Str('-.+.')]
-                        }
-                    }
-                }
-            ]
-        }
-    }
-
+def sectioning(meta):
     src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
@@ -324,6 +311,13 @@ def test_numbering_sectioning_string():
 
     src = Header(2, [u'second-section', [], []], createListStr('Second section'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+
+def test_numbering_sectioning_string():
+    init()
+
+    meta = getMeta1()
+
+    sectioning(meta)
 
     src = Para(createListStr('Exercise #'))
     dest = Para([
@@ -338,19 +332,9 @@ def test_numbering_sectioning_string():
 def test_numbering_sectioning_map():
     init()
 
-    meta = getMeta1()
+    meta = getMeta2()
 
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(1, [u'second-chapter', [], []], createListStr('Second chapter'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(2, [u'first-section', [], []], createListStr('First section'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(2, [u'second-section', [], []], createListStr('Second section'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+    sectioning(meta)
 
     src = Para([Str(u'Exercise'), Space(), Str(u'#')])
     dest = Para([
@@ -365,21 +349,11 @@ def test_numbering_sectioning_map():
 def test_numbering_sectioning_map_error():
     init()
 
-    meta = getMeta2()
+    meta = getMeta3()
 
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
+    sectioning(meta)
 
-    src = Header(1, [u'second-chapter', [], []], createListStr('Second chapter'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(2, [u'first-section', [], []], createListStr('First section'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Header(2, [u'second-section', [], []], createListStr('Second section'))
-    pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-
-    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    src = Para(createListStr('Exercise #'))
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
@@ -392,7 +366,7 @@ def test_numbering_sectioning_map_error():
 def test_classes():
     init()
 
-    meta = getMeta3()
+    meta = getMeta4()
 
     src = Para(createListStr('Exercise #'))
     dest = Para([
@@ -407,7 +381,7 @@ def test_classes():
 def test_format():
     init()
 
-    meta = getMeta4()
+    meta = getMeta5()
 
     src = Para(createListStr('Exercise #'))
     dest = json.loads(json.dumps(Para([
