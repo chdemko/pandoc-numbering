@@ -69,10 +69,9 @@ def test_listing_classic():
 
     assert json.loads(json.dumps(doc[1])) == json.loads(json.dumps(dest))
 
-def test_listing_latex():
-    init()
 
-    meta = getMeta1()
+def listing_latex(meta, color, tab, space):
+    init()
 
     src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
@@ -87,9 +86,9 @@ def test_listing_latex():
         RawBlock(
             'tex',
             ''.join([
-                '\\hypersetup{linkcolor=black}',
+                '\\hypersetup{linkcolor=' + color + '}',
                 '\\makeatletter',
-                '\\newcommand*\\l@exercise{\\@dottedtocline{1}{1.5em}{3.3em}}',
+                '\\newcommand*\\l@exercise{\\@dottedtocline{1}{' + tab + 'em}{' + space + 'em}}',
                 '\\@starttoc{exercise}',
                 '\\makeatother'
             ])
@@ -97,79 +96,19 @@ def test_listing_latex():
     ]
 
     assert json.loads(json.dumps(doc[1])) == json.loads(json.dumps(dest))
+
+
+def test_listing_latex():
+    listing_latex(getMeta1(), 'black', '1.5', '3.3')
 
 def test_listing_latex_color():
-    init()
-
     meta = getMeta1()
-    meta['toccolor']= createMetaInlines(u'blue')
-
-    src = Para(createListStr(u'Exercise #'))
-    pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr(u'Exercise (test) #'))
-    pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-
-    doc = [[{'unMeta': meta}], []]
-    pandoc_numbering.addListings(doc, 'latex', meta)
-
-    dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
-        RawBlock(
-            'tex',
-            ''.join([
-                '\\hypersetup{linkcolor=blue}',
-                '\\makeatletter',
-                '\\newcommand*\\l@exercise{\\@dottedtocline{1}{1.5em}{3.3em}}',
-                '\\@starttoc{exercise}',
-                '\\makeatother'
-            ])
-        )
-    ]
-
-    assert json.loads(json.dumps(doc[1])) == json.loads(json.dumps(dest))
+    meta['toccolor'] = createMetaInlines(u'blue')
+    listing_latex(meta, 'blue', '1.5', '3.3')
 
 def test_listing_latex_tab_space():
-    init()
-
-    meta = getMeta2()
-
-    src = Para(createListStr(u'Exercise #'))
-    pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr(u'Exercise (test) #'))
-    pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-
-    doc = [[{'unMeta': meta}], []]
-    pandoc_numbering.addListings(doc, 'latex', meta)
-
-    dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
-        RawBlock(
-            'tex',
-            '\\hypersetup{linkcolor=black}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{2.0em}{4.0em}}\\@starttoc{exercise}\\makeatother'
-        )
-    ]
-
-    assert json.loads(json.dumps(doc[1])) == json.loads(json.dumps(dest))
+	listing_latex(getMeta2(), 'black', '2.0', '4.0')
 
 def test_listing_latex_tab_space_error():
-    init()
-
-    meta = getMeta3()
-    src = Para(createListStr(u'Exercise #'))
-    pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr(u'Exercise (test) #'))
-    pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-
-    doc = [[{'unMeta': meta}], []]
-    pandoc_numbering.addListings(doc, 'latex', meta)
-
-    dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
-        RawBlock(
-            'tex',
-            '\\hypersetup{linkcolor=black}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{1.5em}{3.3em}}\\@starttoc{exercise}\\makeatother'
-        )
-    ]
-
-    assert json.loads(json.dumps(doc[1])) == json.loads(json.dumps(dest))
+	listing_latex(getMeta3(), 'black', '1.5', '3.3')
 
