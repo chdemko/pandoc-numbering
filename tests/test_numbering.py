@@ -64,11 +64,11 @@ def getMeta5():
 def test_numbering():
     init()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -77,21 +77,21 @@ def test_numbering():
 def test_numbering_prefix_single():
     init()
 
-    src = Para(createListStr('Exercise #ex:'))
+    src = Para(createListStr(u'Exercise #ex:'))
     dest = Para([
         Span(
             [u'ex:1', ['pandoc-numbering-text', 'ex'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -100,12 +100,12 @@ def test_numbering_prefix_single():
 def test_numbering_latex():
     init()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         RawInline(u'tex', u'\\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces Exercise}}'),
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -113,15 +113,15 @@ def test_numbering_latex():
 
     init()
 
-    src = Para(createListStr('Exercise (The title) #'))
+    src = Para(createListStr(u'Exercise (The title) #'))
     dest = Para([
         RawInline(u'tex', u'\\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces The title}}'),
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
             [
-                Strong(createListStr('Exercise 1')),
+                Strong(createListStr(u'Exercise 1')),
                 Space(),
-                Emph(createListStr('(') + createListStr('The title') + createListStr(')'))
+                Emph(createListStr(u'(') + createListStr(u'The title') + createListStr(u')'))
             ]
        )
     ])
@@ -131,14 +131,14 @@ def test_numbering_latex():
 def test_numbering_double():
     init()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         Span(
             [u'exercise:2', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 2'))]
+            [Strong(createListStr(u'Exercise 2'))]
         )
     ])
 
@@ -147,14 +147,14 @@ def test_numbering_double():
 def test_numbering_title():
     init()
 
-    src = Para(createListStr('Exercise (The title) #'))
+    src = Para(createListStr(u'Exercise (The title) #'))
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
             [
-                Strong(createListStr('Exercise 1')),
+                Strong(createListStr(u'Exercise 1')),
                 Space(),
-                Emph(createListStr('(') + createListStr('The title') + createListStr(')'))
+                Emph(createListStr(u'(') + createListStr(u'The title') + createListStr(u')'))
             ]
         )
     ])
@@ -164,50 +164,50 @@ def test_numbering_title():
 def test_numbering_level():
     init()
 
-    src = Para(createListStr('Exercise +.+.#'))
+    src = Para(createListStr(u'Exercise +.+.#'))
     dest = Para([
         Span(
             [u'exercise:0.0.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 0.0.1'))]
+            [Strong(createListStr(u'Exercise 0.0.1'))]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
+    src = Header(1, [u'first-chapter', [], []], createListStr(u'First chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Header(2, [u'first-section', [], []], createListStr('First section'))
+    src = Header(2, [u'first-section', [], []], createListStr(u'First section'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para(createListStr('Exercise +.+.#'))
+    src = Para(createListStr(u'Exercise +.+.#'))
     dest = Para([
         Span(
             [u'exercise:1.1.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1.1.1'))]
+            [Strong(createListStr(u'Exercise 1.1.1'))]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Para(createListStr('Exercise +.+.#'))
+    src = Para(createListStr(u'Exercise +.+.#'))
     dest = Para([
         Span(
             [u'exercise:1.1.2', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1.1.2'))]
+            [Strong(createListStr(u'Exercise 1.1.2'))]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Header(2, [u'second-section', [], []], createListStr('Second section'))
+    src = Header(2, [u'second-section', [], []], createListStr(u'Second section'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para(createListStr('Exercise +.+.#'))
+    src = Para(createListStr(u'Exercise +.+.#'))
     dest = Para([
         Span(
             [u'exercise:1.2.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1.2.1'))]
+            [Strong(createListStr(u'Exercise 1.2.1'))]
         )
     ])
 
@@ -216,14 +216,14 @@ def test_numbering_level():
 def test_numbering_unnumbered():
     init()
 
-    src = Header(1, [u'unnumbered-chapter', [u'unnumbered'], []], createListStr('Unnumbered chapter'))
+    src = Header(1, [u'unnumbered-chapter', [u'unnumbered'], []], createListStr(u'Unnumbered chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para(createListStr('Exercise +.#'))
+    src = Para(createListStr(u'Exercise +.#'))
     dest = Para([
         Span(
             [u'exercise:0.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 0.1'))]
+            [Strong(createListStr(u'Exercise 0.1'))]
         )
     ])
 
@@ -232,49 +232,49 @@ def test_numbering_unnumbered():
 def test_numbering_hidden():
     init()
 
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
+    src = Header(1, [u'first-chapter', [], []], createListStr(u'First chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para(createListStr('Exercise -.#exercise:one'))
+    src = Para(createListStr(u'Exercise -.#exercise:one'))
     dest = Para([
         Span(
             [u'exercise:one', ['pandoc-numbering-text', 'exercise'], []],
             [
-                Strong(createListStr('Exercise 1'))
+                Strong(createListStr(u'Exercise 1'))
             ]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Para(createListStr('Exercise -.#'))
+    src = Para(createListStr(u'Exercise -.#'))
     dest = Para([
         Span(
             [u'exercise:1.2', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 2'))]
+            [Strong(createListStr(u'Exercise 2'))]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Header(1, [u'second-chapter', [], []], createListStr('Second chapter'))
+    src = Header(1, [u'second-chapter', [], []], createListStr(u'Second chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
-    src = Para(createListStr('Exercise -.#'))
+    src = Para(createListStr(u'Exercise -.#'))
     dest = Para([
         Span(
             [u'exercise:2.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
-    src = Para(createListStr('Exercise +.#'))
+    src = Para(createListStr(u'Exercise +.#'))
     dest = Para([
         Span(
             [u'exercise:2.2', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 2.2'))]
+            [Strong(createListStr(u'Exercise 2.2'))]
         )
     ])
 
@@ -284,7 +284,7 @@ def test_numbering_hidden():
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -293,23 +293,23 @@ def test_numbering_hidden():
 def test_numbering_sharp_sharp():
     init()
 
-    src = Para(createListStr('Exercise ##'))
-    dest = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise ##'))
+    dest = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], '', {})
 
     assert src == dest
 
 def sectioning(meta):
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
+    src = Header(1, [u'first-chapter', [], []], createListStr(u'First chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
-    src = Header(1, [u'second-chapter', [], []], createListStr('Second chapter'))
+    src = Header(1, [u'second-chapter', [], []], createListStr(u'Second chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
-    src = Header(2, [u'first-section', [], []], createListStr('First section'))
+    src = Header(2, [u'first-section', [], []], createListStr(u'First section'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
-    src = Header(2, [u'second-section', [], []], createListStr('Second section'))
+    src = Header(2, [u'second-section', [], []], createListStr(u'Second section'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
 def test_numbering_sectioning_string():
@@ -319,11 +319,11 @@ def test_numbering_sectioning_string():
 
     sectioning(meta)
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         Span(
             [u'exercise:2.2.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 2.1'))]
+            [Strong(createListStr(u'Exercise 2.1'))]
         )
     ])
 
@@ -340,7 +340,7 @@ def test_numbering_sectioning_map():
     dest = Para([
         Span(
             [u'exercise:2.2.1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 2.1'))]
+            [Strong(createListStr(u'Exercise 2.1'))]
         )
     ])
 
@@ -353,11 +353,11 @@ def test_numbering_sectioning_map_error():
 
     sectioning(meta)
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -368,11 +368,11 @@ def test_classes():
 
     meta = getMeta4()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'my-class'], []],
-            [Strong(createListStr('Exercise 1'))]
+            [Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -383,13 +383,13 @@ def test_format():
 
     meta = getMeta5()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     dest = json.loads(json.dumps(Para([
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercice'], []],
             [
-                Span(['', ['description'], []], createListStr('Exercise')),
-                Span(['', ['number'], []], createListStr('1')),
+                Span(['', ['description'], []], createListStr(u'Exercise')),
+                Span(['', ['number'], []], createListStr(u'1')),
                 Span(['', ['title'], []], [])
             ]
         )
