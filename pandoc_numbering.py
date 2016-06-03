@@ -53,7 +53,7 @@ def toJSONFilters(actions):
     json.dump(altered, sys.stdout)
 
 def removeAccents(string):
-    nfkd_form = unicodedata.normalize('NFKD', u'' + string)
+    nfkd_form = unicodedata.normalize('NFKD', string)
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 def toIdentifier(string):

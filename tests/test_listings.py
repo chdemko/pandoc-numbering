@@ -13,9 +13,9 @@ def getMeta1():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'listing': createMetaInlines('Listings of exercises'),
-                'sectioning': createMetaInlines('-.+.')
+                'category': createMetaInlines(u'exercise'),
+                'listing': createMetaInlines(u'Listings of exercises'),
+                'sectioning': createMetaInlines(u'-.+.')
             })
         ])
     }
@@ -24,11 +24,11 @@ def getMeta2():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'listing': createMetaInlines('Listings of exercises'),
-                'sectioning': createMetaInlines('-.+.'),
-                'tab': createMetaString('2'),
-                'space': createMetaString('4'),
+                'category': createMetaInlines(u'exercise'),
+                'listing': createMetaInlines(u'Listings of exercises'),
+                'sectioning': createMetaInlines(u'-.+.'),
+                'tab': createMetaString(u'2'),
+                'space': createMetaString(u'4'),
             })
         ])
     }
@@ -37,11 +37,11 @@ def getMeta3():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'listing': createMetaInlines('Listings of exercises'),
-                'sectioning': createMetaInlines('-.+.'),
-                'tab': createMetaString('a'),
-                'space': createMetaString('b'),
+                'category': createMetaInlines(u'exercise'),
+                'listing': createMetaInlines(u'Listings of exercises'),
+                'sectioning': createMetaInlines(u'-.+.'),
+                'tab': createMetaString(u'a'),
+                'space': createMetaString(u'b'),
             })
         ])
     }
@@ -102,7 +102,7 @@ def test_listing_latex_color():
     init()
 
     meta = getMeta1()
-    meta['toccolor']= createMetaInlines('blue')
+    meta['toccolor']= createMetaInlines(u'blue')
 
     src = Para(createListStr('Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)

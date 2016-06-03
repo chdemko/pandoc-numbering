@@ -12,7 +12,7 @@ def getMeta1():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('theorem'),
+                'category': createMetaInlines(u'theorem'),
                 'cite-shortcut': createMetaBool(True)
             })
         ])
@@ -22,7 +22,7 @@ def getMeta2():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
+                'category': createMetaInlines(u'exercise'),
                 'format': createMetaBool(False)
             })
         ])

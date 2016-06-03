@@ -13,8 +13,8 @@ def getMeta1():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'sectioning': createMetaInlines('-.+.')
+                'category': createMetaInlines(u'exercise'),
+                'sectioning': createMetaInlines(u'-.+.')
             })
         ])
     }
@@ -23,9 +23,9 @@ def getMeta2():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'first': createMetaString('2'),
-                'last': createMetaString('2'),
+                'category': createMetaInlines(u'exercise'),
+                'first': createMetaString(u'2'),
+                'last': createMetaString(u'2'),
             })
         ])
     }
@@ -34,9 +34,9 @@ def getMeta3():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'first': createMetaString('a'),
-                'last': createMetaString('b'),
+                'category': createMetaInlines(u'exercise'),
+                'first': createMetaString(u'a'),
+                'last': createMetaString(u'b'),
             })
         ])
     }
@@ -45,8 +45,8 @@ def getMeta4():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
-                'classes': createMetaList([createMetaInlines('my-class')])
+                'category': createMetaInlines(u'exercise'),
+                'classes': createMetaList([createMetaInlines(u'my-class')])
             })
         ])
     }
@@ -55,7 +55,7 @@ def getMeta5():
     return {
         'pandoc-numbering': createMetaList([
             createMetaMap({
-                'category': createMetaInlines('exercise'),
+                'category': createMetaInlines(u'exercise'),
                 'format': createMetaBool(False)
             })
         ])
