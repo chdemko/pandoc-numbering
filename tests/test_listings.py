@@ -51,19 +51,19 @@ def test_listing_classic():
 
     meta = getMeta1()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
-    src = Para(createListStr('Exercise (test) #'))
+    src = Para(createListStr(u'Exercise (test) #'))
     pandoc_numbering.numbering(src['t'], src['c'], '', meta)
 
     doc = [[{'unMeta': meta}], []]
     pandoc_numbering.addListings(doc, '', meta)
 
     dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr('Listings of exercises')),
+        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
 	    BulletList([
-	    	[Plain([createLink(['', [], []], createListStr('0.0.1 Exercise'), ['#exercise:0.0.1', ''])])],
-	    	[Plain([createLink(['', [], []], createListStr('0.0.2 test'), ['#exercise:0.0.2', ''])])]
+	    	[Plain([createLink(['', [], []], createListStr(u'0.0.1 Exercise'), ['#exercise:0.0.1', ''])])],
+	    	[Plain([createLink(['', [], []], createListStr(u'0.0.2 test'), ['#exercise:0.0.2', ''])])]
 	    ])
 	]
 
@@ -74,16 +74,16 @@ def test_listing_latex():
 
     meta = getMeta1()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr('Exercise (test) #'))
+    src = Para(createListStr(u'Exercise (test) #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
 
     doc = [[{'unMeta': meta}], []]
     pandoc_numbering.addListings(doc, 'latex', meta)
 
     dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr('Listings of exercises')),
+        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
         RawBlock(
             'tex',
             ''.join([
@@ -104,16 +104,16 @@ def test_listing_latex_color():
     meta = getMeta1()
     meta['toccolor']= createMetaInlines(u'blue')
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr('Exercise (test) #'))
+    src = Para(createListStr(u'Exercise (test) #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
 
     doc = [[{'unMeta': meta}], []]
     pandoc_numbering.addListings(doc, 'latex', meta)
 
     dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr('Listings of exercises')),
+        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
         RawBlock(
             'tex',
             ''.join([
@@ -133,16 +133,16 @@ def test_listing_latex_tab_space():
 
     meta = getMeta2()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr('Exercise (test) #'))
+    src = Para(createListStr(u'Exercise (test) #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
 
     doc = [[{'unMeta': meta}], []]
     pandoc_numbering.addListings(doc, 'latex', meta)
 
     dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr('Listings of exercises')),
+        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
         RawBlock(
             'tex',
             '\\hypersetup{linkcolor=black}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{2.0em}{4.0em}}\\@starttoc{exercise}\\makeatother'
@@ -155,16 +155,16 @@ def test_listing_latex_tab_space_error():
     init()
 
     meta = getMeta3()
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
-    src = Para(createListStr('Exercise (test) #'))
+    src = Para(createListStr(u'Exercise (test) #'))
     pandoc_numbering.numbering(src['t'], src['c'], 'latex', meta)
 
     doc = [[{'unMeta': meta}], []]
     pandoc_numbering.addListings(doc, 'latex', meta)
 
     dest = [
-        Header(1, ['', ['unnumbered'], []], createListStr('Listings of exercises')),
+        Header(1, ['', ['unnumbered'], []], createListStr(u'Listings of exercises')),
         RawBlock(
             'tex',
             '\\hypersetup{linkcolor=black}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{1.5em}{3.3em}}\\@starttoc{exercise}\\makeatother'
