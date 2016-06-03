@@ -31,7 +31,7 @@ def getMeta2():
 def test_referencing_simple():
     init()
 
-    src = Para(createListStr('Exercise #exercise:first'))
+    src = Para(createListStr(u'Exercise #exercise:first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(
@@ -41,7 +41,7 @@ def test_referencing_simple():
     )))
     dest = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('Exercise 1'),
+        createListStr(u'Exercise 1'),
         [u'#exercise:first', u'']
     )))
 
@@ -51,7 +51,7 @@ def test_referencing_simple():
 def test_referencing_title():
     init()
 
-    src = Para(createListStr('Exercise (The title) -.+.#exercise:first'))
+    src = Para(createListStr(u'Exercise (The title) -.+.#exercise:first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(
@@ -61,7 +61,7 @@ def test_referencing_title():
     )))
     dest = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('Exercise 0.1'),
+        createListStr(u'Exercise 0.1'),
         [u'#exercise:first', u'exercise Exercise the title The title 0.0 0.0.1 1 0.1 0.1']
     )))
 
@@ -71,22 +71,22 @@ def test_referencing_title():
 def test_referencing_prefix():
     init()
 
-    src = Para(createListStr('Exercise (The title) #exercise:first'))
+    src = Para(createListStr(u'Exercise (The title) #exercise:first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('#d#D#t#T#n#'),
+        createListStr(u'#d#D#t#T#n#'),
         [u'#exercise:first', u'']
     )))
     dest = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('exercise') +
-        createListStr('Exercise') +
-        createListStr('the title') +
-        createListStr('The title') +
-        createListStr('1') +
-        createListStr('1'),
+        createListStr(u'exercise') +
+        createListStr(u'Exercise') +
+        createListStr(u'the title') +
+        createListStr(u'The title') +
+        createListStr(u'1') +
+        createListStr(u'1'),
         [u'#exercise:first', u'']
     )))
 
@@ -96,14 +96,14 @@ def test_referencing_prefix():
 def test_referencing_prefix_single():
     init()
 
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
+    src = Header(1, [u'first-chapter', [], []], createListStr(u'First chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = Para(createListStr('Exercise +.#ex:'))
+    src = Para(createListStr(u'Exercise +.#ex:'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = json.loads(json.dumps(createLink(['', [], []], createListStr('exercise #'), [u'#ex:1.1', u''])))
-    dest = json.loads(json.dumps(createLink(['', [], []], createListStr('exercise 1.1'), [u'#ex:1.1', u''])))
+    src = json.loads(json.dumps(createLink(['', [], []], createListStr(u'exercise #'), [u'#ex:1.1', u''])))
+    dest = json.loads(json.dumps(createLink(['', [], []], createListStr(u'exercise 1.1'), [u'#ex:1.1', u''])))
 
     pandoc_numbering.referencing(src['t'], src['c'], '', {})
     assert src == dest
@@ -111,11 +111,11 @@ def test_referencing_prefix_single():
 def test_referencing_name():
     init()
 
-    src = Para(createListStr('Exercise #first'))
+    src = Para(createListStr(u'Exercise #first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = json.loads(json.dumps(createLink(['', [], []], createListStr('exercise #'), [u'#exercise:first', u''])))
-    dest = json.loads(json.dumps(createLink(['', [], []], createListStr('exercise 1'), [u'#exercise:first', u''])))
+    src = json.loads(json.dumps(createLink(['', [], []], createListStr(u'exercise #'), [u'#exercise:first', u''])))
+    dest = json.loads(json.dumps(createLink(['', [], []], createListStr(u'exercise 1'), [u'#exercise:first', u''])))
 
     pandoc_numbering.referencing(src['t'], src['c'], '', {})
     assert src == dest
@@ -123,13 +123,13 @@ def test_referencing_name():
 def test_referencing_automatic():
     init()
 
-    src = Para(createListStr('Exercise #'))
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(['', [], []], [], [u'#exercise:1', u''])))
     dest = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('Exercise 1'),
+        createListStr(u'Exercise 1'),
         [u'#exercise:1', u'']
     )))
 
@@ -148,16 +148,16 @@ def test_referencing_unexisting():
 def test_referencing_headers():
     init()
 
-    src = Header(1, [u'first-chapter', [], []], createListStr('First chapter'))
+    src = Header(1, [u'first-chapter', [], []], createListStr(u'First chapter'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = Para(createListStr('Theorem +.#theorem:first'))
+    src = Para(createListStr(u'Theorem +.#theorem:first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(createLink(['', [], []], [], [u'#theorem:first', u''])))
     dest = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('Theorem 1.1'),
+        createListStr(u'Theorem 1.1'),
         [u'#theorem:first', u'']
     )))
 
@@ -166,12 +166,12 @@ def test_referencing_headers():
 
     src = json.loads(json.dumps(createLink(
         ['', [], []],
-        createListStr('See theorem #'),
+        createListStr(u'See theorem #'),
         [u'#theorem:first', u'theorem #']
     )))
     dest = json.loads(json.dumps(
         createLink(['', [], []],
-        createListStr('See theorem 1.1'),
+        createListStr(u'See theorem 1.1'),
         [u'#theorem:first', u'theorem 1.1']
     )))
 
@@ -181,11 +181,11 @@ def test_referencing_headers():
 def test_referencing_without_cite_shortcut():
     init()
 
-    src = Para(createListStr('Theorem #theorem:first'))
+    src = Para(createListStr(u'Theorem #theorem:first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
-    src = Cite([], createListStr('@theorem:first'))
-    dest = Cite([], createListStr('@theorem:first'))
+    src = Cite([], createListStr(u'@theorem:first'))
+    dest = Cite([], createListStr(u'@theorem:first'))
 
     assert pandoc_numbering.referencing(src['t'], src['c'], '', {}) == None
     assert src == dest
@@ -195,7 +195,7 @@ def test_referencing_with_cite_shortcut():
 
     meta = getMeta1()
 
-    src = Para(createListStr('Theorem #theorem:first'))
+    src = Para(createListStr(u'Theorem #theorem:first'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', {})
 
     src = json.loads(json.dumps(Cite([], [Str(u'@theorem:first')])))
@@ -218,11 +218,11 @@ def test_referencing_format():
             Span(
                 ['', ['pandoc-numbering-link', 'exercise'], []],
                 [
-                    Span(['', ['description'], []], createListStr('Exercise')),
+                    Span(['', ['description'], []], createListStr(u'Exercise')),
                     Span(['', ['title'], []], []),
-                    Span(['', ['local'], []], createListStr('1')),
-                    Span(['', ['global'], []], createListStr('1')),
-                    Span(['', ['section'], []], createListStr('')),
+                    Span(['', ['local'], []], createListStr(u'1')),
+                    Span(['', ['global'], []], createListStr(u'1')),
+                    Span(['', ['section'], []], createListStr(u'')),
                 ]
             )
         ],
