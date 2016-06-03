@@ -208,7 +208,7 @@ def test_referencing_format():
 
     meta = getMeta2()
 
-    src = Para([Str(u'Exercise'), Space(), Str(u'#')])
+    src = Para(createListStr(u'Exercise #'))
     pandoc_numbering.numbering(src['t'], src['c'], u'', meta)
 
     src = json.loads(json.dumps(createLink(['', [], []], [], [u'#exercise:1', u''])))
@@ -232,5 +232,4 @@ def test_referencing_format():
     pandoc_numbering.referencing(src['t'], src['c'], '', meta)
 
     assert json.loads(json.dumps(src)) == dest
-
 

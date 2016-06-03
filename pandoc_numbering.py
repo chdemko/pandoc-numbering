@@ -374,27 +374,42 @@ def replacing(key, value, format, meta):
 
             return ret
 
+def hasMeta(meta):
+    return 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList'
+
+def isCorrect(definition):
+    return definition['t'] == 'MetaMap' and\
+        'category' in definition['c'] and\
+        definition['c']['category']['t'] == 'MetaInlines' and\
+        len(definition['c']['category']['c']) == 1 and\
+        definition['c']['category']['c'][0]['t'] == 'Str'
+
+def hasProperty(definition, name, type):
+    return name in definition['c'] and definition['c'][name]['t'] == type
+
+def getProperty(definition, name):
+    return definition['c'][name]['c']
+
+def getFirstValue(definition, name):
+	return getProperty(definition, name)[0]['c']
+
 def addListings(doc, format, meta):
+
     global collections, information
-    if 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList':
+
+    if hasMeta(meta):
 
         listings = []
 
         # Loop on all listings definition
         for definition in meta['pandoc-numbering']['c']:
-            if definition['t'] == 'MetaMap' and\
-               'category' in definition['c'] and\
-               'listing' in definition['c'] and\
-               definition['c']['category']['t'] == 'MetaInlines' and\
-               definition['c']['listing']['t'] == 'MetaInlines' and\
-               len(definition['c']['category']['c']) == 1 and\
-               definition['c']['category']['c'][0]['t'] == 'Str':
+            if isCorrect(definition) and hasProperty(definition, 'listing', 'MetaInlines'):
 
                 # Get the category name
-                category = definition['c']['category']['c'][0]['c']
+                category = getFirstValue(definition, 'category')
 
                 # Get the title
-                title = definition['c']['listing']['c']
+                title = getProperty(definition, 'listing')
 
                 if format == 'latex':
 
@@ -407,18 +422,18 @@ def addListings(doc, format, meta):
                         linkcolor = '\\hypersetup{linkcolor=black}'
 
                     # Get the tab
-                    if 'tab' in definition['c'] and definition['c']['tab']['t'] == 'MetaString':
+                    if hasProperty(definition, 'tab', 'MetaString'):
                         try:
-                            tab = float(definition['c']['tab']['c'])
+                            tab = float(getProperty(definition, 'tab'))
                         except ValueError:
                             tab = None
                     else:
                         tab = None
 
                     # Get the space
-                    if 'space' in definition['c'] and definition['c']['space']['t'] == 'MetaString':
+                    if hasProperty(definition, 'space', 'MetaString'):
                         try:
-                            space = float(definition['c']['space']['c'])
+                            space = float(getProperty(definition, 'space'))
                         except ValueError:
                             space = None
                     else:
@@ -483,24 +498,13 @@ def addListings(doc, format, meta):
 def getFormat(category, meta):
     if not hasattr(getFormat, 'value'):
         getFormat.value = {}
-
-        if 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList':
-
+        if hasMeta(meta):
             # Loop on all listings definition
             for definition in meta['pandoc-numbering']['c']:
-
-                if definition['t'] == 'MetaMap' and\
-                   'format' in definition['c'] and\
-                   'category' in definition['c'] and\
-                   definition['c']['category']['t'] == 'MetaInlines' and\
-                   len(definition['c']['category']['c']) == 1 and\
-                   definition['c']['category']['c'][0]['t'] == 'Str' and\
-                   definition['c']['format']['t'] == 'MetaBool':
-
-                    getFormat.value[definition['c']['category']['c'][0]['c']] = definition['c']['format']['c']
+                if isCorrect(definition) and hasProperty(definition, 'format', 'MetaBool'):
+                    getFormat.value[getFirstValue(definition, 'category')] = getProperty(definition, 'format')
 
     if not category in getFormat.value:
-
         getFormat.value[category] = True
 
     return getFormat.value[category]
@@ -508,109 +512,68 @@ def getFormat(category, meta):
 def getCiteShortCut(category, meta):
     if not hasattr(getCiteShortCut, 'value'):
         getCiteShortCut.value = {}
-
-        if 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList':
-
+        if hasMeta(meta):
             # Loop on all listings definition
             for definition in meta['pandoc-numbering']['c']:
-
-                if definition['t'] == 'MetaMap' and\
-                   'cite-shortcut' in definition['c'] and\
-                   'category' in definition['c'] and\
-                   definition['c']['category']['t'] == 'MetaInlines' and\
-                   len(definition['c']['category']['c']) == 1 and\
-                   definition['c']['category']['c'][0]['t'] == 'Str' and\
-                   definition['c']['cite-shortcut']['t'] == 'MetaBool':
-
-                    getCiteShortCut.value[definition['c']['category']['c'][0]['c']] = definition['c']['cite-shortcut']['c']
+                if isCorrect(definition) and hasProperty(definition, 'cite-shortcut', 'MetaBool'):
+                    getCiteShortCut.value[getFirstValue(definition, 'category')] = getProperty(definition, 'cite-shortcut')
 
     if not category in getCiteShortCut.value:
-
         getCiteShortCut.value[category] = False
 
     return getCiteShortCut.value[category]
 
 def getDefaultLevels(category, meta):
     if not hasattr(getDefaultLevels, 'value'):
-
         getDefaultLevels.value = {}
-
-        if 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList':
-
+        if hasMeta(meta):
             # Loop on all listings definition
             for definition in meta['pandoc-numbering']['c']:
-
-                if definition['t'] == 'MetaMap' and\
-                   'category' in definition['c'] and\
-                   definition['c']['category']['t'] == 'MetaInlines' and\
-                   len(definition['c']['category']['c']) == 1 and\
-                   definition['c']['category']['c'][0]['t'] == 'Str':
-
+                if isCorrect(definition):
                     levelInf = 0
                     levelSup = 0
-
-                    if 'sectioning' in definition['c'] and\
-                       definition['c']['sectioning']['t'] == 'MetaInlines' and\
-                       len(definition['c']['sectioning']['c']) == 1 and\
-                       definition['c']['sectioning']['c'][0]['t'] == 'Str':
+                    if hasProperty(definition, 'sectioning', 'MetaInlines') and\
+                       len(getProperty(definition, 'sectioning')) == 1 and\
+                       getProperty(definition, 'sectioning')[0]['t'] == 'Str':
 
                         global headerRegex
 
-                        match = re.match('^' + headerRegex + '$', definition['c']['sectioning']['c'][0]['c'])
+                        match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
                         if match:
                             # Compute the levelInf and levelSup values
                             levelInf = len(match.group('hidden')) // 2
                             levelSup = len(match.group('header')) // 2
-
                     else:
-
-                        if 'first' in definition['c'] and definition['c']['first']['t'] == 'MetaString':
+                        if hasProperty(definition, 'first', 'MetaString'):
                             try:
-                                levelInf = max(min(int(definition['c']['first']['c']) - 1, 6), 0)
+                                levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
                             except ValueError:
                                 pass
-
-                        if 'last' in definition['c'] and definition['c']['last']['t'] == 'MetaString':
+                        if hasProperty(definition, 'last', 'MetaString'):
                             try:
-                                levelSup = max(min(int(definition['c']['last']['c']), 6), levelInf)
+                                levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
                             except ValueError:
                                 pass
-
-                    getDefaultLevels.value[definition['c']['category']['c'][0]['c']] = [levelInf, levelSup]
+                    getDefaultLevels.value[getFirstValue(definition, 'category')] = [levelInf, levelSup]
 
     if not category in getDefaultLevels.value:
-
         getDefaultLevels.value[category] = [0, 0]
 
     return getDefaultLevels.value[category]
 
 def getClasses(category, meta):
     if not hasattr(getClasses, 'value'):
-
         getClasses.value = {}
-
-        if 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList':
-
+        if hasMeta(meta):
             # Loop on all listings definition
             for definition in meta['pandoc-numbering']['c']:
-
-                if definition['t'] == 'MetaMap' and\
-                   'category' in definition['c'] and\
-                   definition['c']['category']['t'] == 'MetaInlines' and\
-                   len(definition['c']['category']['c']) == 1 and\
-                   definition['c']['category']['c'][0]['t'] == 'Str':
-
-                    if 'classes' in definition['c'] and definition['c']['classes']['t'] == 'MetaList':
-
-                        classes = []
-
-                        for elt in definition['c']['classes']['c']:
-                            classes.append(stringify(elt))
-
-                        getClasses.value[definition['c']['category']['c'][0]['c']] = classes
+                if isCorrect(definition) and hasProperty(definition, 'classes', 'MetaList'):
+                    classes = []
+                    for elt in getProperty(definition, 'classes'):
+                        classes.append(stringify(elt))
+                    getClasses.value[getFirstValue(definition, 'category')] = classes
 
     if not category in getClasses.value:
-
         getClasses.value[category] = [category]
 
     return getClasses.value[category]
