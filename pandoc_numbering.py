@@ -13,6 +13,7 @@ import codecs
 import re
 import unicodedata
 import subprocess
+from unidecode import unidecode
 
 count = {}
 information = {}
