@@ -428,7 +428,6 @@ def getFirstValue(definition, name):
 
 def addListings(doc, format, meta):
     if hasMeta(meta):
-
         listings = []
 
         # Loop on all listings definition
@@ -441,89 +440,87 @@ def addListings(doc, format, meta):
                 # Get the title
                 title = getProperty(definition, 'listing')
 
+                listings.append(Header(1, ['', ['unnumbered'], []], title))
+
                 if format == 'latex':
-
-                    # Special case for latex output
-
-                    # Get the link color
-                    if 'toccolor' in meta:
-                        linkcolor = '\\hypersetup{linkcolor=' + stringify(meta['toccolor']['c']) + '}'
-                    else:
-                        linkcolor = '\\hypersetup{linkcolor=black}'
-
-                    # Get the tab
-                    if hasProperty(definition, 'tab', 'MetaString'):
-                        try:
-                            tab = float(getProperty(definition, 'tab'))
-                        except ValueError:
-                            tab = None
-                    else:
-                        tab = None
-
-                    # Get the space
-                    if hasProperty(definition, 'space', 'MetaString'):
-                        try:
-                            space = float(getProperty(definition, 'space'))
-                        except ValueError:
-                            space = None
-                    else:
-                        space = None
-
-                    # Deal with default tab length
-                    if tab == None:
-                        tab = 1.5
-
-                    # Deal with default space length
-                    if space == None:
-                        level = 0
-                        if category in collections:
-                            # Loop on the collection
-                            for tag in collections[category]:
-                                level = max(level, information[tag]['section'].count('.'))
-                        space = level + 2.3
-
-                    # Add a RawBlock
-                    latexCategory = re.sub('[^a-z]+', '', category)
-                    latex = [
-                        linkcolor,
-                        '\\makeatletter',
-                        '\\newcommand*\\l@' + latexCategory + '{\\@dottedtocline{1}{' + str(tab) + 'em}{'+ str(space) +'em}}',
-                        '\\@starttoc{' + latexCategory + '}',
-                        '\\makeatother'
-                    ]
-                    elt = [RawBlock('tex', ''.join(latex))]
+                    extendListingsLaTeX(listings, meta, definition, category)
                 else:
-                    if category in collections:
-                        # Prepare the list
-                        elements = []
-
-                        # Loop on the collection
-                        for tag in collections[category]:
-
-                            # Add an item to the list
-                            text = information[tag]['toc']
-
-                            if pandocVersion() < '1.16':
-                                # pandoc 1.15
-                                link = Link(text, ['#' + tag, ''])
-                            else:
-                                # pandoc 1.16
-                                link = Link(['', [], []], text, ['#' + tag, ''])
-
-                            elements.append([Plain([link])])
-
-                        # Add a bullet list
-                        elt = [BulletList(elements)]
-                    else:
-
-                        # Add nothing
-                        elt = []
-
-                # Add a new listing
-                listings = listings + [Header(1, ['', ['unnumbered'], []], title)] + elt
+                    extendListingsOther(listings, meta, definition, category)
 
         # Add listings to the document
-        doc[1] = listings + doc[1]
+        doc[1][0:0] = listings
+
+def extendListingsLaTeX(listings, meta, definition, category):
+    # Get the link color
+    if 'toccolor' in meta:
+        linkcolor = '\\hypersetup{linkcolor=' + stringify(meta['toccolor']['c']) + '}'
+    else:
+        linkcolor = '\\hypersetup{linkcolor=black}'
+
+    # Get the tab
+    if hasProperty(definition, 'tab', 'MetaString'):
+        try:
+            tab = float(getProperty(definition, 'tab'))
+        except ValueError:
+            tab = None
+    else:
+        tab = None
+
+    # Get the space
+    if hasProperty(definition, 'space', 'MetaString'):
+        try:
+            space = float(getProperty(definition, 'space'))
+        except ValueError:
+            space = None
+    else:
+        space = None
+
+    # Deal with default tab length
+    if tab == None:
+        tab = 1.5
+
+    # Deal with default space length
+    if space == None:
+        level = 0
+        if category in collections:
+            # Loop on the collection
+            for tag in collections[category]:
+                level = max(level, information[tag]['section'].count('.'))
+        space = level + 2.3
+
+    # Add a RawBlock
+    latexCategory = re.sub('[^a-z]+', '', category)
+    latex = [
+        linkcolor,
+        '\\makeatletter',
+        '\\newcommand*\\l@' + latexCategory + '{\\@dottedtocline{1}{' + str(tab) + 'em}{'+ str(space) +'em}}',
+        '\\@starttoc{' + latexCategory + '}',
+        '\\makeatother'
+    ]
+    listings.append(RawBlock('tex', ''.join(latex)))
+
+def extendListingsOther(listings, meta, definition, category):
+    if category in collections:
+        # Prepare the list
+        elements = []
+
+        # Loop on the collection
+        for tag in collections[category]:
+
+            # Add an item to the list
+            text = information[tag]['toc']
+
+            if pandocVersion() < '1.16':
+                # pandoc 1.15
+                link = Link(text, ['#' + tag, ''])
+            else:
+                # pandoc 1.16
+                link = Link(['', [], []], text, ['#' + tag, ''])
+
+            elements.append([Plain([link])])
+
+        # Add a bullet list
+        listings.append(BulletList(elements))
 
 def getValue(category, meta, fct, default, analyzeDefinition):
     if not hasattr(fct, 'value'):
