@@ -110,150 +110,153 @@ def numberingPara(value, format, meta):
     global headerRegex
     if len(value) >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
         last = value[-1]['c']
-
         match = re.match('^' + headerRegex + '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
-
         if match:
             # Is it a Para and the last element is an identifier beginning with '#'
-            global count, information, collections
-
-            # Detect the title
-            title = []
-            if value[-3]['t'] == 'Str' and value[-3]['c'][-1:] == ')':
-                for (i, item) in enumerate(value):
-                    if item['t'] == 'Str' and item['c'][0] == '(':
-                        title = value[i:-2]
-                        title[0]['c'] = title[0]['c'][1:]
-                        title[-1]['c'] = title[-1]['c'][:-1]
-                        value = value[:i - 1] + value[-2:]
-                        break
-
-            # Compute the description
-            description = value[:-2]
-
-            # Compute the basicCategory and the category
-            if match.group('prefix') == None:
-                basicCategory = toIdentifier(stringify(description))
-            else:
-                basicCategory = match.group('prefix')
-
-            # Compute the levelInf and levelSup values
-            levelInf = len(match.group('hidden')) // 2
-            levelSup = len(match.group('header')) // 2
-
-            # Get the default inf and sup level
-            if levelInf == 0 and levelSup == 0:
-                [levelInf, levelSup] = getDefaultLevels(basicCategory, meta)
-
-            # Compute the section number
-            sectionNumber = '.'.join(map(str, headers[:levelSup]))
-
-            # Compute the leading (composed of the section numbering and a dot)
-            if levelSup != 0:
-                leading = sectionNumber + '.'
-            else:
-                leading = ''
-
-            category = basicCategory + ':' + leading
-
-            # Is it a new category?
-            if category not in count:
-                count[category] = 0
-
-            count[category] = count[category] + 1
-
-            # Get the number
-            number = str(count[category])
-
-            # Determine the final tag
-            if match.group('name') == None:
-                tag = category + number
-            else:
-                tag = basicCategory + ':' + match.group('name')
-
-            # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
-            localNumber = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
-
-            # Compute the globalNumber
-            if sectionNumber:
-                globalNumber = sectionNumber + '.' + number
-            else:
-                globalNumber = number
-
-            # Is the automatic formatting required for this category?
-            if getFormat(basicCategory, meta):
-                # Prepare the final text
-                text = [Strong(description + [Space(), Str(localNumber)])]
-
-                # Add the title to the final text
-                if title:
-                    text = text + [Space(), Emph([Str('(')] + title + [Str(')')])]
-
-                # Compute the link
-                link = description + [Space(), Str(localNumber)]
-
-                # Compute the toc
-                toc = [Str(globalNumber), Space()]
-                if title:
-                    toc = toc + title
-                else:
-                    toc = toc + description
-
-            else:
-                # Prepare the final text
-                text = [
-                    Span(['', ['description'], []], description),
-                    Span(['', ['title'], []], title),
-                    Span(['', ['local'], []], [Str(localNumber)]),
-                    Span(['', ['global'], []], [Str(globalNumber)]),
-                    Span(['', ['section'], []], [Str(sectionNumber)]),
-                ]
-
-                # Compute the link
-                link = [Span(['', ['pandoc-numbering-link'] + getClasses(basicCategory, meta), []], text)]
-
-                # Compute the toc
-                toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
-
-
-            # Store the numbers and the label for automatic numbering (See referencing function)
-            information[tag] = {
-                'section': sectionNumber,
-                'local': localNumber,
-                'global': globalNumber,
-                'count': number,
-                'description': description,
-                'title': title,
-                'link': link,
-                'toc': toc
-            }
-
-            # Prepare the contents
-            contents = [Span([tag, ['pandoc-numbering-text'] + getClasses(basicCategory, meta), []], text)]
-
-            # Compute collections
-            if basicCategory not in collections:
-                collections[basicCategory] = []
-
-            collections[basicCategory].append(tag)
-
-            # Special case for LaTeX
-            if format == 'latex' and getFormat(basicCategory, meta):
-                latexCategory = re.sub('[^a-z]+', '', basicCategory)
-                if title:
-                  entry = title
-                else:
-                  entry = description
-                latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
-                    leading + number + '}{\ignorespaces ' + toLatex(entry) + '}}'
-                contents.insert(0, RawInline('tex', latex))
-
-            # Return the contents in a Para element
-            return Para(contents)
+            return numberingEffective(match, value, format, meta)
         elif re.match('^' + headerRegex + '##(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last):
             # Special case where the last element is '...##...'
-            value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
-            return Para(value)
+            return numberingSharpSharp(value)
+
+def numberingEffective(match, value, format, meta):
+    global count, information, collections
+
+    # Detect the title
+    title = []
+    if value[-3]['t'] == 'Str' and value[-3]['c'][-1:] == ')':
+        for (i, item) in enumerate(value):
+            if item['t'] == 'Str' and item['c'][0] == '(':
+                title = value[i:-2]
+                title[0]['c'] = title[0]['c'][1:]
+                title[-1]['c'] = title[-1]['c'][:-1]
+                value = value[:i - 1] + value[-2:]
+                break
+
+    # Compute the description
+    description = value[:-2]
+
+    # Compute the basicCategory and the category
+    if match.group('prefix') == None:
+        basicCategory = toIdentifier(stringify(description))
+    else:
+        basicCategory = match.group('prefix')
+
+    # Compute the levelInf and levelSup values
+    levelInf = len(match.group('hidden')) // 2
+    levelSup = len(match.group('header')) // 2
+
+    # Get the default inf and sup level
+    if levelInf == 0 and levelSup == 0:
+        [levelInf, levelSup] = getDefaultLevels(basicCategory, meta)
+
+    # Compute the section number
+    sectionNumber = '.'.join(map(str, headers[:levelSup]))
+
+    # Compute the leading (composed of the section numbering and a dot)
+    if levelSup != 0:
+        leading = sectionNumber + '.'
+    else:
+        leading = ''
+
+    category = basicCategory + ':' + leading
+
+    # Is it a new category?
+    if category not in count:
+        count[category] = 0
+
+    count[category] = count[category] + 1
+
+    # Get the number
+    number = str(count[category])
+
+    # Determine the final tag
+    if match.group('name') == None:
+        tag = category + number
+    else:
+        tag = basicCategory + ':' + match.group('name')
+
+    # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
+    localNumber = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
+
+    # Compute the globalNumber
+    if sectionNumber:
+        globalNumber = sectionNumber + '.' + number
+    else:
+        globalNumber = number
+
+    # Is the automatic formatting required for this category?
+    if getFormat(basicCategory, meta):
+        # Prepare the final text
+        text = [Strong(description + [Space(), Str(localNumber)])]
+
+        # Add the title to the final text
+        if title:
+            text = text + [Space(), Emph([Str('(')] + title + [Str(')')])]
+
+        # Compute the link
+        link = description + [Space(), Str(localNumber)]
+
+        # Compute the toc
+        toc = [Str(globalNumber), Space()]
+        if title:
+            toc = toc + title
+        else:
+            toc = toc + description
+
+    else:
+        # Prepare the final text
+        text = [
+            Span(['', ['description'], []], description),
+            Span(['', ['title'], []], title),
+            Span(['', ['local'], []], [Str(localNumber)]),
+            Span(['', ['global'], []], [Str(globalNumber)]),
+            Span(['', ['section'], []], [Str(sectionNumber)]),
+        ]
+
+        # Compute the link
+        link = [Span(['', ['pandoc-numbering-link'] + getClasses(basicCategory, meta), []], text)]
+
+        # Compute the toc
+        toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
+
+
+    # Store the numbers and the label for automatic numbering (See referencing function)
+    information[tag] = {
+        'section': sectionNumber,
+        'local': localNumber,
+        'global': globalNumber,
+        'count': number,
+        'description': description,
+        'title': title,
+        'link': link,
+        'toc': toc
+    }
+
+    # Prepare the contents
+    contents = [Span([tag, ['pandoc-numbering-text'] + getClasses(basicCategory, meta), []], text)]
+
+    # Compute collections
+    if basicCategory not in collections:
+        collections[basicCategory] = []
+
+    collections[basicCategory].append(tag)
+
+    # Special case for LaTeX
+    if format == 'latex' and getFormat(basicCategory, meta):
+        latexCategory = re.sub('[^a-z]+', '', basicCategory)
+        if title:
+          entry = title
+        else:
+          entry = description
+        latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
+            leading + number + '}{\ignorespaces ' + toLatex(entry) + '}}'
+        contents.insert(0, RawInline('tex', latex))
+
+    # Return the contents in a Para element
+    return Para(contents)
+
+def numberingSharpSharp(value):
+    value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
 
 replace = None
 search = None
