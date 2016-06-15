@@ -128,51 +128,9 @@ def numberingEffective(match, value, format, meta):
     category = computeCategory(basicCategory, leading)
     number = str(count[category])
     tag = computeTag(match, basicCategory, category, number)
-
-    # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
-    localNumber = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
-
-    # Compute the globalNumber
-    if sectionNumber:
-        globalNumber = sectionNumber + '.' + number
-    else:
-        globalNumber = number
-
-    # Is the automatic formatting required for this category?
-    if getFormat(basicCategory, meta):
-        # Prepare the final text
-        text = [Strong(description + [Space(), Str(localNumber)])]
-
-        # Add the title to the final text
-        if title:
-            text = text + [Space(), Emph([Str('(')] + title + [Str(')')])]
-
-        # Compute the link
-        link = description + [Space(), Str(localNumber)]
-
-        # Compute the toc
-        toc = [Str(globalNumber), Space()]
-        if title:
-            toc = toc + title
-        else:
-            toc = toc + description
-
-    else:
-        # Prepare the final text
-        text = [
-            Span(['', ['description'], []], description),
-            Span(['', ['title'], []], title),
-            Span(['', ['local'], []], [Str(localNumber)]),
-            Span(['', ['global'], []], [Str(globalNumber)]),
-            Span(['', ['section'], []], [Str(sectionNumber)]),
-        ]
-
-        # Compute the link
-        link = [Span(['', ['pandoc-numbering-link'] + getClasses(basicCategory, meta), []], text)]
-
-        # Compute the toc
-        toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
-
+    localNumber = computeLocalNumber(levelInf, levelSup, number)
+    globalNumber = computeGlobalNumber(sectionNumber, number)
+    [text, link, toc] = computeTextLinkToc(meta, basicCategory, description, title, localNumber, globalNumber, sectionNumber)
 
     # Store the numbers and the label for automatic numbering (See referencing function)
     information[tag] = {
@@ -197,14 +155,7 @@ def numberingEffective(match, value, format, meta):
 
     # Special case for LaTeX
     if format == 'latex' and getFormat(basicCategory, meta):
-        latexCategory = re.sub('[^a-z]+', '', basicCategory)
-        if title:
-          entry = title
-        else:
-          entry = description
-        latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
-            leading + number + '}{\ignorespaces ' + toLatex(entry) + '}}'
-        contents.insert(0, RawInline('tex', latex))
+        addLaTeX(contents, basicCategory, title, description, leading, number)
 
     # Return the contents in a Para element
     return Para(contents)
@@ -251,7 +202,6 @@ def computeLeading(levelSup, sectionNumber):
     else:
         return ''
 
-
 def computeCategory(basicCategory, leading):
     category = basicCategory + ':' + leading
 
@@ -269,6 +219,64 @@ def computeTag(match, basicCategory, category, number):
         return category + number
     else:
         return basicCategory + ':' + match.group('name')
+
+def computeLocalNumber(levelInf, levelSup, number):
+    # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
+    return '.'.join(map(str, headers[levelInf:levelSup] + [number]))
+
+def computeGlobalNumber(sectionNumber, number):
+    # Compute the globalNumber
+    if sectionNumber:
+        return sectionNumber + '.' + number
+    else:
+        return number
+
+def computeTextLinkToc(meta, basicCategory, description, title, localNumber, globalNumber, sectionNumber):
+    # Is the automatic formatting required for this category?
+    if getFormat(basicCategory, meta):
+        # Prepare the final text
+        text = [Strong(description + [Space(), Str(localNumber)])]
+
+        # Add the title to the final text
+        if title:
+            text = text + [Space(), Emph([Str('(')] + title + [Str(')')])]
+
+        # Compute the link
+        link = description + [Space(), Str(localNumber)]
+
+        # Compute the toc
+        toc = [Str(globalNumber), Space()]
+        if title:
+            toc = toc + title
+        else:
+            toc = toc + description
+
+    else:
+        # Prepare the final text
+        text = [
+            Span(['', ['description'], []], description),
+            Span(['', ['title'], []], title),
+            Span(['', ['local'], []], [Str(localNumber)]),
+            Span(['', ['global'], []], [Str(globalNumber)]),
+            Span(['', ['section'], []], [Str(sectionNumber)]),
+        ]
+
+        # Compute the link
+        link = [Span(['', ['pandoc-numbering-link'] + getClasses(basicCategory, meta), []], text)]
+
+        # Compute the toc
+        toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
+    return [text, link, toc]
+
+def addLaTeX(contents, basicCategory, title, description, leading, number):
+    latexCategory = re.sub('[^a-z]+', '', basicCategory)
+    if title:
+      entry = title
+    else:
+      entry = description
+    latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
+        leading + number + '}{\ignorespaces ' + toLatex(entry) + '}}'
+    contents.insert(0, RawInline('tex', latex))
 
 def numberingSharpSharp(value):
     value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
