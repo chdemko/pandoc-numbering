@@ -119,61 +119,15 @@ def numberingPara(value, format, meta):
             return numberingSharpSharp(value)
 
 def numberingEffective(match, value, format, meta):
-    global count, information, collections
-
-    # Detect the title
-    title = []
-    if value[-3]['t'] == 'Str' and value[-3]['c'][-1:] == ')':
-        for (i, item) in enumerate(value):
-            if item['t'] == 'Str' and item['c'][0] == '(':
-                title = value[i:-2]
-                title[0]['c'] = title[0]['c'][1:]
-                title[-1]['c'] = title[-1]['c'][:-1]
-                value = value[:i - 1] + value[-2:]
-                break
-
-    # Compute the description
-    description = value[:-2]
-
-    # Compute the basicCategory and the category
-    if match.group('prefix') == None:
-        basicCategory = toIdentifier(stringify(description))
-    else:
-        basicCategory = match.group('prefix')
-
-    # Compute the levelInf and levelSup values
-    levelInf = len(match.group('hidden')) // 2
-    levelSup = len(match.group('header')) // 2
-
-    # Get the default inf and sup level
-    if levelInf == 0 and levelSup == 0:
-        [levelInf, levelSup] = getDefaultLevels(basicCategory, meta)
-
-    # Compute the section number
-    sectionNumber = '.'.join(map(str, headers[:levelSup]))
-
-    # Compute the leading (composed of the section numbering and a dot)
-    if levelSup != 0:
-        leading = sectionNumber + '.'
-    else:
-        leading = ''
-
-    category = basicCategory + ':' + leading
-
-    # Is it a new category?
-    if category not in count:
-        count[category] = 0
-
-    count[category] = count[category] + 1
-
-    # Get the number
+    title = computeTitle(value)
+    description = computeDescription(value)
+    basicCategory = computeBasicCategory(match, description)
+    [levelInf, levelSup] = computeLevels(match, basicCategory, meta)
+    sectionNumber = computeSectionNumber(levelSup)
+    leading = computeLeading(levelSup, sectionNumber)
+    category = computeCategory(basicCategory, leading)
     number = str(count[category])
-
-    # Determine the final tag
-    if match.group('name') == None:
-        tag = category + number
-    else:
-        tag = basicCategory + ':' + match.group('name')
+    tag = computeTag(match, basicCategory, category, number)
 
     # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
     localNumber = '.'.join(map(str, headers[levelInf:levelSup] + [number]))
@@ -254,6 +208,67 @@ def numberingEffective(match, value, format, meta):
 
     # Return the contents in a Para element
     return Para(contents)
+
+def computeTitle(value):
+    title = []
+    if value[-3]['t'] == 'Str' and value[-3]['c'][-1:] == ')':
+        for (i, item) in enumerate(value):
+            if item['t'] == 'Str' and item['c'][0] == '(':
+                title = value[i:-2]
+                title[0]['c'] = title[0]['c'][1:]
+                title[-1]['c'] = title[-1]['c'][:-1]
+                del value[i-1:-2]
+                break
+    return title
+
+def computeDescription(value):
+    return value[:-2]
+
+def computeBasicCategory(match, description):
+    if match.group('prefix') == None:
+        return toIdentifier(stringify(description))
+    else:
+        return match.group('prefix')
+
+def computeLevels(match, basicCategory, meta):
+    # Compute the levelInf and levelSup values
+    levelInf = len(match.group('hidden')) // 2
+    levelSup = len(match.group('header')) // 2
+
+    # Get the default inf and sup level
+    if levelInf == 0 and levelSup == 0:
+        [levelInf, levelSup] = getDefaultLevels(basicCategory, meta)
+
+    return [levelInf, levelSup]
+
+def computeSectionNumber(levelSup):
+    return '.'.join(map(str, headers[:levelSup]))
+
+def computeLeading(levelSup, sectionNumber):
+    # Compute the leading (composed of the section numbering and a dot)
+    if levelSup != 0:
+        return sectionNumber + '.'
+    else:
+        return ''
+
+
+def computeCategory(basicCategory, leading):
+    category = basicCategory + ':' + leading
+
+    # Is it a new category?
+    if category not in count:
+        count[category] = 0
+
+    count[category] = count[category] + 1
+
+    return category
+
+def computeTag(match, basicCategory, category, number):
+    # Determine the final tag
+    if match.group('name') == None:
+        return category + number
+    else:
+        return basicCategory + ':' + match.group('name')
 
 def numberingSharpSharp(value):
     value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
