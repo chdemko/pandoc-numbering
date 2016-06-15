@@ -531,88 +531,73 @@ def addListings(doc, format, meta):
         # Add listings to the document
         doc[1] = listings + doc[1]
 
-def getFormat(category, meta):
-    if not hasattr(getFormat, 'value'):
-        getFormat.value = {}
-        if hasMeta(meta):
-            # Loop on all listings definition
-            for definition in meta['pandoc-numbering']['c']:
-                if isCorrect(definition) and hasProperty(definition, 'format', 'MetaBool'):
-                    getFormat.value[getFirstValue(definition, 'category')] = getProperty(definition, 'format')
-
-    if not category in getFormat.value:
-        getFormat.value[category] = True
-
-    return getFormat.value[category]
-
-def getCiteShortCut(category, meta):
-    if not hasattr(getCiteShortCut, 'value'):
-        getCiteShortCut.value = {}
-        if hasMeta(meta):
-            # Loop on all listings definition
-            for definition in meta['pandoc-numbering']['c']:
-                if isCorrect(definition) and hasProperty(definition, 'cite-shortcut', 'MetaBool'):
-                    getCiteShortCut.value[getFirstValue(definition, 'category')] = getProperty(definition, 'cite-shortcut')
-
-    if not category in getCiteShortCut.value:
-        getCiteShortCut.value[category] = False
-
-    return getCiteShortCut.value[category]
-
-def getDefaultLevels(category, meta):
-    if not hasattr(getDefaultLevels, 'value'):
-        getDefaultLevels.value = {}
+def getValue(category, meta, fct, default, analyzeDefinition):
+    if not hasattr(fct, 'value'):
+        fct.value = {}
         if hasMeta(meta):
             # Loop on all listings definition
             for definition in meta['pandoc-numbering']['c']:
                 if isCorrect(definition):
-                    levelInf = 0
-                    levelSup = 0
-                    if hasProperty(definition, 'sectioning', 'MetaInlines') and\
-                       len(getProperty(definition, 'sectioning')) == 1 and\
-                       getProperty(definition, 'sectioning')[0]['t'] == 'Str':
+                    analyzeDefinition(definition)
 
-                        global headerRegex
+    if not category in fct.value:
+        fct.value[category] = default
 
-                        match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
-                        if match:
-                            # Compute the levelInf and levelSup values
-                            levelInf = len(match.group('hidden')) // 2
-                            levelSup = len(match.group('header')) // 2
-                    else:
-                        if hasProperty(definition, 'first', 'MetaString'):
-                            try:
-                                levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
-                            except ValueError:
-                                pass
-                        if hasProperty(definition, 'last', 'MetaString'):
-                            try:
-                                levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
-                            except ValueError:
-                                pass
-                    getDefaultLevels.value[getFirstValue(definition, 'category')] = [levelInf, levelSup]
+    return fct.value[category]
 
-    if not category in getDefaultLevels.value:
-        getDefaultLevels.value[category] = [0, 0]
+def getFormat(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'format', 'MetaBool'):
+            getFormat.value[getFirstValue(definition, 'category')] = getProperty(definition, 'format')
+        
+    return getValue(category, meta, getFormat, True, analyzeDefinition)
 
-    return getDefaultLevels.value[category]
+def getCiteShortCut(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'cite-shortcut', 'MetaBool'):
+            getCiteShortCut.value[getFirstValue(definition, 'category')] = getProperty(definition, 'cite-shortcut')
 
-def getClasses(category, meta):
-    if not hasattr(getClasses, 'value'):
-        getClasses.value = {}
-        if hasMeta(meta):
-            # Loop on all listings definition
-            for definition in meta['pandoc-numbering']['c']:
-                if isCorrect(definition) and hasProperty(definition, 'classes', 'MetaList'):
-                    classes = []
-                    for elt in getProperty(definition, 'classes'):
-                        classes.append(stringify(elt))
-                    getClasses.value[getFirstValue(definition, 'category')] = classes
+    return getValue(category, meta, getCiteShortCut, False, analyzeDefinition)
 
-    if not category in getClasses.value:
-        getClasses.value[category] = [category]
+def getDefaultLevels(category, meta):
+    def analyzeDefinition(definition):
+        levelInf = 0
+        levelSup = 0
+        if hasProperty(definition, 'sectioning', 'MetaInlines') and\
+           len(getProperty(definition, 'sectioning')) == 1 and\
+           getProperty(definition, 'sectioning')[0]['t'] == 'Str':
 
-    return getClasses.value[category]
+            global headerRegex
+
+            match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
+            if match:
+                # Compute the levelInf and levelSup values
+                levelInf = len(match.group('hidden')) // 2
+                levelSup = len(match.group('header')) // 2
+        else:
+            if hasProperty(definition, 'first', 'MetaString'):
+                try:
+                    levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
+                except ValueError:
+                    pass
+            if hasProperty(definition, 'last', 'MetaString'):
+                try:
+                    levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
+                except ValueError:
+                    pass
+        getDefaultLevels.value[getFirstValue(definition, 'category')] = [levelInf, levelSup]
+
+    return getValue(category, meta, getDefaultLevels, [0, 0], analyzeDefinition)
+
+def getClasses(category, meta): 
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'classes', 'MetaList'):
+            classes = []
+            for elt in getProperty(definition, 'classes'):
+                classes.append(stringify(elt))
+            getClasses.value[getFirstValue(definition, 'category')] = classes
+
+    return getValue(category, meta, getClasses, [category], analyzeDefinition)
 
 def pandocVersion():
     if not hasattr(pandocVersion, 'value'):
