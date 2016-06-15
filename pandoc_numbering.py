@@ -560,32 +560,39 @@ def getCiteShortCut(category, meta):
     return getValue(category, meta, getCiteShortCut, False, analyzeDefinition)
 
 def getDefaultLevels(category, meta):
-    def analyzeDefinition(definition):
+    def getLevelsFromYaml(definition):
         levelInf = 0
         levelSup = 0
+        if hasProperty(definition, 'first', 'MetaString'):
+            try:
+                levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
+            except ValueError:
+                pass
+        if hasProperty(definition, 'last', 'MetaString'):
+            try:
+                levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
+            except ValueError:
+                pass
+        return [levelInf, levelSup]
+
+    def getLevelsFromRegex(definition):
+        global headerRegex
+
+        match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
+        if match:
+            # Compute the levelInf and levelSup values
+            return [len(match.group('hidden')) // 2, len(match.group('header')) // 2]
+        else:
+            return [0, 0]
+
+    def analyzeDefinition(definition):
         if hasProperty(definition, 'sectioning', 'MetaInlines') and\
            len(getProperty(definition, 'sectioning')) == 1 and\
            getProperty(definition, 'sectioning')[0]['t'] == 'Str':
 
-            global headerRegex
-
-            match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
-            if match:
-                # Compute the levelInf and levelSup values
-                levelInf = len(match.group('hidden')) // 2
-                levelSup = len(match.group('header')) // 2
+            getDefaultLevels.value[getFirstValue(definition, 'category')] = getLevelsFromRegex(definition)
         else:
-            if hasProperty(definition, 'first', 'MetaString'):
-                try:
-                    levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
-                except ValueError:
-                    pass
-            if hasProperty(definition, 'last', 'MetaString'):
-                try:
-                    levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
-                except ValueError:
-                    pass
-        getDefaultLevels.value[getFirstValue(definition, 'category')] = [levelInf, levelSup]
+            getDefaultLevels.value[getFirstValue(definition, 'category')] = getLevelsFromYaml(definition)
 
     return getValue(category, meta, getDefaultLevels, [0, 0], analyzeDefinition)
 
