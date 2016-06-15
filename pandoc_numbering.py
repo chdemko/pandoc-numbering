@@ -257,104 +257,108 @@ def lowering(key, value, format, meta):
         return Str(value.lower())
 
 def referencing(key, value, format, meta):
-    global information, replace, search
-
-    # Is it a link with a right reference?
     if key == 'Link':
-        if pandocVersion() < '1.16':
-            # pandoc 1.15
-            [text, [reference, title]] = value
-        else:
-            # pandoc > 1.15
-            [attributes, text, [reference, title]] = value
-
-        if re.match('^(#([a-zA-Z][\w:.-]*))$', reference):
-            # Compute the name
-            tag = reference[1:]
-
-            if tag in information:
-                if pandocVersion() < '1.16':
-                    # pandoc 1.15
-                    i = 0
-                else:
-                    # pandoc > 1.15
-                    i = 1
-
-                # Replace all '#t', '#T', '#d', '#D', '#s', '#g', '#c', '#n', '#' with the corresponding text in the title
-                value[i + 1][1] = value[i + 1][1].replace('#t', stringify(information[tag]['title']).lower())
-                value[i + 1][1] = value[i + 1][1].replace('#T', stringify(information[tag]['title']))
-                value[i + 1][1] = value[i + 1][1].replace('#d', stringify(information[tag]['description']).lower())
-                value[i + 1][1] = value[i + 1][1].replace('#D', stringify(information[tag]['description']))
-                value[i + 1][1] = value[i + 1][1].replace('#s', information[tag]['section'])
-                value[i + 1][1] = value[i + 1][1].replace('#g', information[tag]['global'])
-                value[i + 1][1] = value[i + 1][1].replace('#c', information[tag]['count'])
-                value[i + 1][1] = value[i + 1][1].replace('#n', information[tag]['local'])
-                value[i + 1][1] = value[i + 1][1].replace('#', information[tag]['local'])
-
-                if text == []:
-                    # The link text is empty, replace it with the default label
-                    value[i] = information[tag]['link']
-                else:
-                    # The link text is not empty
-
-                    #replace all '#t' with the title in lower case
-                    replace = walk(information[tag]['title'], lowering, format, meta)
-                    search = '#t'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#T' with the title
-                    replace = information[tag]['title']
-                    search = '#T'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#d' with the description in lower case
-                    replace = walk(information[tag]['description'], lowering, format, meta)
-                    search = '#d'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#D' with the description
-                    replace = information[tag]['description']
-                    search = '#D'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#s' with the corresponding number
-                    replace = [Str(information[tag]['section'])]
-                    search = '#s'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#g' with the corresponding number
-                    replace = [Str(information[tag]['global'])]
-                    search = '#g'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#c' with the corresponding number
-                    replace = [Str(information[tag]['count'])]
-                    search = '#c'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#n' with the corresponding number
-                    replace = [Str(information[tag]['local'])]
-                    search = '#n'
-                    value[i] = walk(value[i], replacing, format, meta)
-
-                    #replace all '#' with the corresponding number
-                    replace = [Str(information[tag]['local'])]
-                    search = '#'
-                    value[i] = walk(value[i], replacing, format, meta)
-
+        return referencingLink(value, format, meta)
     elif key == 'Cite':
-        match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', value[1][0]['c'])
-        if match != None and getCiteShortCut(match.group('category'), meta):
+        return referencingCite(value, format, meta)
 
-            # Deal with @prefix:name shortcut
-            tag = match.group('tag')
-            if tag in information:
-                if pandocVersion() < '1.16':
-                    # pandoc 1.15
-                    return Link([Str(information[tag]['local'])], ['#' + tag, ''])
-                else:
-                    # pandoc > 1.15
-                    return Link(['', [], []], [Str(information[tag]['local'])], ['#' + tag, ''])
+def referencingLink(value, format, meta):
+    global information, replace, search
+    if pandocVersion() < '1.16':
+        # pandoc 1.15
+        [text, [reference, title]] = value
+    else:
+        # pandoc > 1.15
+        [attributes, text, [reference, title]] = value
+
+    if re.match('^(#([a-zA-Z][\w:.-]*))$', reference):
+        # Compute the name
+        tag = reference[1:]
+
+        if tag in information:
+            if pandocVersion() < '1.16':
+                # pandoc 1.15
+                i = 0
+            else:
+                # pandoc > 1.15
+                i = 1
+
+            # Replace all '#t', '#T', '#d', '#D', '#s', '#g', '#c', '#n', '#' with the corresponding text in the title
+            value[i + 1][1] = value[i + 1][1].replace('#t', stringify(information[tag]['title']).lower())
+            value[i + 1][1] = value[i + 1][1].replace('#T', stringify(information[tag]['title']))
+            value[i + 1][1] = value[i + 1][1].replace('#d', stringify(information[tag]['description']).lower())
+            value[i + 1][1] = value[i + 1][1].replace('#D', stringify(information[tag]['description']))
+            value[i + 1][1] = value[i + 1][1].replace('#s', information[tag]['section'])
+            value[i + 1][1] = value[i + 1][1].replace('#g', information[tag]['global'])
+            value[i + 1][1] = value[i + 1][1].replace('#c', information[tag]['count'])
+            value[i + 1][1] = value[i + 1][1].replace('#n', information[tag]['local'])
+            value[i + 1][1] = value[i + 1][1].replace('#', information[tag]['local'])
+
+            if text == []:
+                # The link text is empty, replace it with the default label
+                value[i] = information[tag]['link']
+            else:
+                # The link text is not empty
+
+                #replace all '#t' with the title in lower case
+                replace = walk(information[tag]['title'], lowering, format, meta)
+                search = '#t'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#T' with the title
+                replace = information[tag]['title']
+                search = '#T'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#d' with the description in lower case
+                replace = walk(information[tag]['description'], lowering, format, meta)
+                search = '#d'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#D' with the description
+                replace = information[tag]['description']
+                search = '#D'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#s' with the corresponding number
+                replace = [Str(information[tag]['section'])]
+                search = '#s'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#g' with the corresponding number
+                replace = [Str(information[tag]['global'])]
+                search = '#g'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#c' with the corresponding number
+                replace = [Str(information[tag]['count'])]
+                search = '#c'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#n' with the corresponding number
+                replace = [Str(information[tag]['local'])]
+                search = '#n'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                #replace all '#' with the corresponding number
+                replace = [Str(information[tag]['local'])]
+                search = '#'
+                value[i] = walk(value[i], replacing, format, meta)
+
+def referencingCite(value, format, meta):
+    global information
+    match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', value[1][0]['c'])
+    if match != None and getCiteShortCut(match.group('category'), meta):
+
+        # Deal with @prefix:name shortcut
+        tag = match.group('tag')
+        if tag in information:
+            if pandocVersion() < '1.16':
+                # pandoc 1.15
+                return Link([Str(information[tag]['local'])], ['#' + tag, ''])
+            else:
+                # pandoc > 1.15
+                return Link(['', [], []], [Str(information[tag]['local'])], ['#' + tag, ''])
 
 def replacing(key, value, format, meta):
     global replace, search
