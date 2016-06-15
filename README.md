@@ -3,6 +3,7 @@
 [![Coveralls](https://img.shields.io/coveralls/chdemko/pandoc-numbering.svg)](https://coveralls.io/github/chdemko/pandoc-numbering)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
 [![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
+[![PyPI format](https://img.shields.io/pypi/format/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
 [![License](https://img.shields.io/pypi/l/pandoc-numbering.svg)](http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html)
 [![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
 [![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
