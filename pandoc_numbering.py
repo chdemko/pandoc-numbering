@@ -451,12 +451,27 @@ def addListings(doc, format, meta):
         doc[1][0:0] = listings
 
 def extendListingsLaTeX(listings, meta, definition, category):
+    space = getSpace(definition, category)
+    tab = getTab(definition, category)
+    # Add a RawBlock
+    latexCategory = re.sub('[^a-z]+', '', category)
+    latex = [
+        getLinkColor(meta),
+        '\\makeatletter',
+        '\\newcommand*\\l@' + latexCategory + '{\\@dottedtocline{1}{' + str(tab) + 'em}{'+ str(space) +'em}}',
+        '\\@starttoc{' + latexCategory + '}',
+        '\\makeatother'
+    ]
+    listings.append(RawBlock('tex', ''.join(latex)))
+
+def getLinkColor(meta):
     # Get the link color
     if 'toccolor' in meta:
-        linkcolor = '\\hypersetup{linkcolor=' + stringify(meta['toccolor']['c']) + '}'
+        return '\\hypersetup{linkcolor=' + stringify(meta['toccolor']['c']) + '}'
     else:
-        linkcolor = '\\hypersetup{linkcolor=black}'
+        return '\\hypersetup{linkcolor=black}'
 
+def getTab(definition, category):
     # Get the tab
     if hasProperty(definition, 'tab', 'MetaString'):
         try:
@@ -466,6 +481,13 @@ def extendListingsLaTeX(listings, meta, definition, category):
     else:
         tab = None
 
+    # Deal with default tab length
+    if tab == None:
+        return 1.5
+    else:
+        return tab
+
+def getSpace(definition, category):
     # Get the space
     if hasProperty(definition, 'space', 'MetaString'):
         try:
@@ -475,10 +497,6 @@ def extendListingsLaTeX(listings, meta, definition, category):
     else:
         space = None
 
-    # Deal with default tab length
-    if tab == None:
-        tab = 1.5
-
     # Deal with default space length
     if space == None:
         level = 0
@@ -486,18 +504,9 @@ def extendListingsLaTeX(listings, meta, definition, category):
             # Loop on the collection
             for tag in collections[category]:
                 level = max(level, information[tag]['section'].count('.'))
-        space = level + 2.3
-
-    # Add a RawBlock
-    latexCategory = re.sub('[^a-z]+', '', category)
-    latex = [
-        linkcolor,
-        '\\makeatletter',
-        '\\newcommand*\\l@' + latexCategory + '{\\@dottedtocline{1}{' + str(tab) + 'em}{'+ str(space) +'em}}',
-        '\\@starttoc{' + latexCategory + '}',
-        '\\makeatother'
-    ]
-    listings.append(RawBlock('tex', ''.join(latex)))
+        return level + 2.3
+    else:
+        return space
 
 def extendListingsOther(listings, meta, definition, category):
     if category in collections:
