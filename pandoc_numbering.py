@@ -107,7 +107,6 @@ def numberingHeader(value):
             headers[index] = 0
 
 def numberingPara(value, format, meta):
-    global headerRegex
     if len(value) >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
         last = value[-1]['c']
         match = re.match('^' + headerRegex + '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
@@ -295,7 +294,7 @@ def referencing(key, value, format, meta):
         return referencingCite(value, format, meta)
 
 def referencingLink(value, format, meta):
-    global information, replace, search
+    global replace, search
     if pandocVersion() < '1.16':
         # pandoc 1.15
         [text, [reference, title]] = value
@@ -378,7 +377,6 @@ def referencingLink(value, format, meta):
                 value[i] = walk(value[i], replacing, format, meta)
 
 def referencingCite(value, format, meta):
-    global information
     match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', value[1][0]['c'])
     if match != None and getCiteShortCut(match.group('category'), meta):
 
@@ -393,7 +391,6 @@ def referencingCite(value, format, meta):
                 return Link(['', [], []], [Str(information[tag]['local'])], ['#' + tag, ''])
 
 def replacing(key, value, format, meta):
-    global replace, search
     if key == 'Str':
         prepare = value.split(search)
         if len(prepare) > 1:
@@ -430,9 +427,6 @@ def getFirstValue(definition, name):
 	return getProperty(definition, name)[0]['c']
 
 def addListings(doc, format, meta):
-
-    global collections, information
-
     if hasMeta(meta):
 
         listings = []
@@ -559,32 +553,30 @@ def getCiteShortCut(category, meta):
 
     return getValue(category, meta, getCiteShortCut, False, analyzeDefinition)
 
+def getLevelsFromYaml(definition):
+    levelInf = 0
+    levelSup = 0
+    if hasProperty(definition, 'first', 'MetaString'):
+        try:
+            levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
+        except ValueError:
+            pass
+    if hasProperty(definition, 'last', 'MetaString'):
+        try:
+            levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
+        except ValueError:
+            pass
+    return [levelInf, levelSup]
+
+def getLevelsFromRegex(definition):
+    match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
+    if match:
+        # Compute the levelInf and levelSup values
+        return [len(match.group('hidden')) // 2, len(match.group('header')) // 2]
+    else:
+        return [0, 0]
+
 def getDefaultLevels(category, meta):
-    def getLevelsFromYaml(definition):
-        levelInf = 0
-        levelSup = 0
-        if hasProperty(definition, 'first', 'MetaString'):
-            try:
-                levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
-            except ValueError:
-                pass
-        if hasProperty(definition, 'last', 'MetaString'):
-            try:
-                levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
-            except ValueError:
-                pass
-        return [levelInf, levelSup]
-
-    def getLevelsFromRegex(definition):
-        global headerRegex
-
-        match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
-        if match:
-            # Compute the levelInf and levelSup values
-            return [len(match.group('hidden')) // 2, len(match.group('header')) // 2]
-        else:
-            return [0, 0]
-
     def analyzeDefinition(definition):
         if hasProperty(definition, 'sectioning', 'MetaInlines') and\
            len(getProperty(definition, 'sectioning')) == 1 and\
