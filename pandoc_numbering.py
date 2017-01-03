@@ -4,8 +4,6 @@
 Pandoc filter to number all kinds of things.
 """
 
-from __future__ import print_function
-
 from pandocfilters import walk, stringify, Str, Space, Para, BulletList, Plain, Strong, Span, Link, Emph, RawInline, RawBlock, Header
 from functools import reduce
 import json
@@ -15,9 +13,6 @@ import codecs
 import re
 import unicodedata
 import subprocess
-
-def warning(*objs):
-    print("WARNING: ", *objs, file=sys.stderr)
 
 count = {}
 information = {}
