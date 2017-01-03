@@ -4,6 +4,8 @@
 Pandoc filter to number all kinds of things.
 """
 
+from __future__ import print_function
+
 from pandocfilters import walk, stringify, Str, Space, Para, BulletList, Plain, Strong, Span, Link, Emph, RawInline, RawBlock, Header
 from functools import reduce
 import json
@@ -14,6 +16,9 @@ import re
 import unicodedata
 import subprocess
 
+def warning(*objs):
+    print("WARNING: ", *objs, file=sys.stderr)
+
 count = {}
 information = {}
 collections = {}
@@ -21,36 +26,79 @@ headers = [0, 0, 0, 0, 0, 0]
 headerRegex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
 
 def toJSONFilters(actions):
-    """Converts a list of actions into a filter that reads a JSON-formatted
-    pandoc document from stdin, transforms it by walking the tree
-    with the actions, and returns a new JSON-formatted pandoc document
-    to stdout.  The argument is a list of functions action(key, value, format, meta),
-    where key is the type of the pandoc object (e.g. 'Str', 'Para'),
-    value is the contents of the object (e.g. a string for 'Str',
-    a list of inline elements for 'Para'), format is the target
-    output format (which will be taken for the first command line
-    argument if present), and meta is the document's metadata.
-    If the function returns None, the object to which it applies
-    will remain unchanged.  If it returns an object, the object will
-    be replaced.    If it returns a list, the list will be spliced in to
-    the list to which the target object belongs.    (So, returning an
-    empty list deletes the object.)
+    """Generate a JSON-to-JSON filter from stdin to stdout
+
+    The filter:
+
+    * reads a JSON-formatted pandoc document from stdin
+    * transforms it by walking the tree and performing the actions
+    * returns a new JSON-formatted pandoc document to stdout
+
+    The argument `actions` is a list of functions of the form
+    `action(key, value, format, meta)`, as described in more
+    detail under `walk`.
+
+    This function calls `applyJSONFilters`, with the `format`
+    argument provided by the first command-line argument,
+    if present.  (Pandoc sets this by default when calling
+    filters.)
     """
     try:
         input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
     except AttributeError:
         # Python 2 does not have sys.stdin.buffer.
-        # REF: http://stackoverflow.com/questions/2467928/python-unicodeencodeerror-when-reading-from-stdin
+        # REF: https://stackoverflow.com/questions/2467928/python-unicodeencode
         input_stream = codecs.getreader("utf-8")(sys.stdin)
 
-    doc = json.loads(input_stream.read())
+    source = input_stream.read()
     if len(sys.argv) > 1:
         format = sys.argv[1]
     else:
         format = ""
-    altered = reduce(lambda x, action: walk(x, action, format, doc[0]['unMeta']), actions, doc)
-    addListings(altered, format, altered[0]['unMeta'])
-    json.dump(altered, sys.stdout)
+
+    sys.stdout.write(applyJSONFilters(actions, source, format))
+
+def applyJSONFilters(actions, source, format=""):
+    """Walk through JSON structure and apply filters
+
+    This:
+
+    * reads a JSON-formatted pandoc document from a source string
+    * transforms it by walking the tree and performing the actions
+    * returns a new JSON-formatted pandoc document as a string
+
+    The `actions` argument is a list of functions (see `walk`
+    for a full description).
+
+    The argument `source` is a string encoded JSON object.
+
+    The argument `format` is a string describing the output format.
+
+    Returns a the new JSON-formatted pandoc document.
+    """
+
+    doc = json.loads(source)
+
+    if 'meta' in doc:
+        meta = doc['meta']
+    elif doc[0]:  # old API
+        meta = doc[0]['unMeta']
+    else:
+        meta = {}
+    altered = doc
+    for action in actions:
+        altered = walk(altered, action, format, meta)
+
+    if 'meta' in altered:
+        meta = altered['meta']
+    elif meta[0]:  # old API
+        meta = altered[0]['unMeta']
+    else:
+        meta = {}
+
+    addListings(altered, format, meta)
+
+    return json.dumps(altered)
 
 def removeAccents(string):
     nfkd_form = unicodedata.normalize('NFKD', string)
@@ -107,7 +155,7 @@ def numberingHeader(value):
             headers[index] = 0
 
 def numberingPara(value, format, meta):
-    if len(value) >= 3 and value[-2] == Space() and value[-1]['t'] == 'Str':
+    if len(value) >= 3 and value[-2]['t'] == 'Space' and value[-1]['t'] == 'Str':
         last = value[-1]['c']
         match = re.match('^' + headerRegex + '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
         if match:
@@ -448,7 +496,10 @@ def addListings(doc, format, meta):
                     extendListingsOther(listings, meta, definition, category)
 
         # Add listings to the document
-        doc[1][0:0] = listings
+        if 'blocks' in doc:
+            doc['blocks'][0:0] = listings
+        else:  # old API
+            doc[1][0:0] = listings
 
 def extendListingsLaTeX(listings, meta, definition, category):
     space = getSpace(definition, category)
