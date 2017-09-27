@@ -61,6 +61,14 @@ def getMeta5():
         ])
     }
 
+def test_numbering_none():
+    init()
+
+    src =  Para(createListStr(u'Not an exercise'))
+    dest = src
+
+    assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
+
 def test_numbering():
     init()
 
