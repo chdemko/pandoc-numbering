@@ -75,7 +75,7 @@ def applyJSONFilters(actions, source, format=""):
     doc = json.loads(source)
 
     if 'pandoc-api-version' in doc:
-        pandocVersion.value = doc['pandoc-api-version']
+        pandocVersion.value = '.'.join(map(str, doc['pandoc-api-version']))
 
     if 'meta' in doc:
         meta = doc['meta']
