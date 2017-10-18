@@ -4,7 +4,7 @@
 Pandoc filter to number all kinds of things.
 """
 
-from pandocfilters import walk, stringify, Str, Space, Para, BulletList, Plain, Strong, Span, Link, Emph, RawInline, RawBlock, Header
+from pandocfilters import walk, stringify, Str, Space, Para, BulletList, Plain, Strong, Span, Link, Emph, RawInline, RawBlock, Header, DefinitionList
 from functools import reduce
 import json
 import io
@@ -141,6 +141,8 @@ def numbering(key, value, format, meta):
         return numberingHeader(value)
     elif key == 'Para':
         return numberingPara(value, format, meta)
+    elif key == 'DefinitionList':
+        return numberingDefinitionList(value, format, meta)
 
 def numberingHeader(value):
     [level, [id, classes, attributes], content] = value
@@ -149,16 +151,26 @@ def numberingHeader(value):
         for index in range(level, 6):
             headers[index] = 0
 
-def numberingPara(value, format, meta):
+def numberingInlines(value, format, meta):
     if len(value) >= 3 and value[-2]['t'] == 'Space' and value[-1]['t'] == 'Str':
         last = value[-1]['c']
         match = re.match('^' + headerRegex + '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
         if match:
-            # Is it a Para and the last element is an identifier beginning with '#'
+            # Is the last element an identifier beginning with '#'
             return numberingEffective(match, value, format, meta)
         elif re.match('^' + headerRegex + '##(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last):
             # Special case where the last element is '...##...'
             return numberingSharpSharp(value)
+    return value
+
+def numberingPara(value, format, meta):
+    return Para(numberingInlines(value, format, meta))
+
+def numberingDefinitionList(value, format, meta):
+    return DefinitionList([
+        [numberingInlines(term, format, meta), defs]
+        for [term, defs] in value
+    ])
 
 def numberingEffective(match, value, format, meta):
     title = computeTitle(value)
@@ -199,8 +211,7 @@ def numberingEffective(match, value, format, meta):
     if format == 'latex' and getFormat(basicCategory, meta):
         addLaTeX(contents, basicCategory, title, description, leading, number)
 
-    # Return the contents in a Para element
-    return Para(contents)
+    return contents
 
 def computeTitle(value):
     title = []
@@ -322,6 +333,7 @@ def addLaTeX(contents, basicCategory, title, description, leading, number):
 
 def numberingSharpSharp(value):
     value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
+    return value
 
 replace = None
 search = None
