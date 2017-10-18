@@ -74,12 +74,16 @@ def applyJSONFilters(actions, source, format=""):
 
     doc = json.loads(source)
 
+    if 'pandoc-api-version' in doc:
+        pandocVersion.value = doc['pandoc-api-version']
+
     if 'meta' in doc:
         meta = doc['meta']
     elif doc[0]:  # old API
         meta = doc[0]['unMeta']
     else:
         meta = {}
+
     altered = doc
     for action in actions:
         altered = walk(altered, action, format, meta)
