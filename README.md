@@ -2,12 +2,12 @@
 [![Build Status](https://img.shields.io/travis/chdemko/pandoc-numbering.svg)](http://travis-ci.org/chdemko/pandoc-numbering)
 [![Coveralls](https://img.shields.io/coveralls/chdemko/pandoc-numbering.svg)](https://coveralls.io/github/chdemko/pandoc-numbering)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
-[![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
-[![PyPI format](https://img.shields.io/pypi/format/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
+[![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
+[![PyPI format](https://img.shields.io/pypi/format/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 [![License](https://img.shields.io/pypi/l/pandoc-numbering.svg)](http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html)
-[![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
-[![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
-[![Development Status](https://img.shields.io/pypi/status/pandoc-numbering.svg)](https://pypi.python.org/pypi/pandoc-numbering/)
+[![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
+[![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
+[![Development Status](https://img.shields.io/pypi/status/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 
 *pandoc-numbering* is a [pandoc] filter for numbering all kinds of things.
 
