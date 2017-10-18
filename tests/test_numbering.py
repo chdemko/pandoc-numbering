@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from unittest import TestCase
-from pandocfilters import Para, Str, Space, Span, Strong, RawInline, Emph, Header
+from pandocfilters import Para, Str, Space, Span, Strong, RawInline, Emph, Header, DefinitionList, Plain
 
 import json
 
@@ -61,6 +61,14 @@ def getMeta5():
         ])
     }
 
+def test_numbering_none():
+    init()
+
+    src =  Para(createListStr(u'Not an exercise'))
+    dest = src
+
+    assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
+
 def test_numbering():
     init()
 
@@ -72,6 +80,37 @@ def test_numbering():
         )
     ])
 
+    assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
+
+def test_numbering_definitionlist():
+    init()
+
+    src = DefinitionList([
+        [
+            createListStr(u'Exercise #'),
+            [Plain([createListStr(u'Content A')])]
+        ],
+        [
+            createListStr(u'Exercise #'),
+            [Plain([createListStr(u'Content B')])]
+        ]
+    ])
+    dest = DefinitionList([
+        [
+            [Span(
+                [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
+                [Strong(createListStr(u'Exercise 1'))]
+            )],
+            [Plain([createListStr(u'Content A')])]
+        ],
+        [
+            [Span(
+                [u'exercise:2', ['pandoc-numbering-text', 'exercise'], []],
+                [Strong(createListStr(u'Exercise 2'))]
+            )],
+            [Plain([createListStr(u'Content B')])]
+        ]
+    ])
     assert pandoc_numbering.numbering(src['t'], src['c'], '', {}) == dest
 
 def test_numbering_prefix_single():
@@ -396,4 +435,3 @@ def test_format():
     ])))
 
     json.loads(json.dumps(pandoc_numbering.numbering(src['t'], src['c'], '', meta))) == dest
-
