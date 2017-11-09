@@ -380,8 +380,6 @@ def computeTextLinkToc(meta, basicCategory, description, title, localNumber, glo
         else:
             toc = copy.deepcopy(getToc(basicCategory, meta))
 
-        warning(toc)
-
         replace = description
         search = '%D'
         toc = walk(toc, replacing, format, meta)
