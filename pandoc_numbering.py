@@ -13,12 +13,16 @@ import codecs
 import re
 import unicodedata
 import subprocess
+import copy
 
 count = {}
 information = {}
 collections = {}
 headers = [0, 0, 0, 0, 0, 0]
 headerRegex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
+
+replace = None
+search = None
 
 def toJSONFilters(actions):
     """Generate a JSON-to-JSON filter from stdin to stdout
@@ -199,7 +203,7 @@ def numberingEffective(match, value, format, meta):
         'description': description,
         'title': title,
         'link': link,
-        'toc': toc
+        'toc': [Str(globalNumber), Space()] + toc
     }
 
     # Prepare the contents
@@ -213,7 +217,7 @@ def numberingEffective(match, value, format, meta):
 
     # Special case for LaTeX
     if format == 'latex' and getFormat(basicCategory, meta):
-        addLaTeX(contents, basicCategory, title, description, leading, number)
+        addLaTeX(contents, basicCategory, toc, leading, number)
 
     return contents
 
@@ -289,24 +293,110 @@ def computeGlobalNumber(sectionNumber, number):
         return number
 
 def computeTextLinkToc(meta, basicCategory, description, title, localNumber, globalNumber, sectionNumber):
+    global replace, search
+
     # Is the automatic formatting required for this category?
     if getFormat(basicCategory, meta):
+
         # Prepare the final text
-        text = [Strong(description + [Space(), Str(localNumber)])]
-
-        # Add the title to the final text
         if title:
-            text = text + [Space(), Emph([Str('(')] + title + [Str(')')])]
-
-        # Compute the link
-        link = description + [Space(), Str(localNumber)]
-
-        # Compute the toc
-        toc = [Str(globalNumber), Space()]
-        if title:
-            toc = toc + title
+            text = copy.deepcopy(getTextTitle(basicCategory, meta))
         else:
-            toc = toc + description
+            text = copy.deepcopy(getText(basicCategory, meta))
+
+        replace = description
+        search = '%D'
+        text = walk(text, replacing, format, meta)
+
+        replace = walk(description, lowering, format, meta)
+        search = '%d'
+        text = walk(text, replacing, format, meta)
+
+        replace = title
+        search = '%T'
+        text = walk(text, replacing, format, meta)
+
+        replace = walk(title, lowering, format, meta)
+        search = '%t'
+        text = walk(text, replacing, format, meta)
+
+        replace = [Str(sectionNumber)]
+        search = '%s'
+        text = walk(text, replacing, format, meta)
+
+        replace = [Str(globalNumber)]
+        search = '%g'
+        text = walk(text, replacing, format, meta)
+
+        replace = [Str(localNumber)]
+        search = '%n'
+        text = walk(text, replacing, format, meta)
+
+        replace = [Str(localNumber)]
+        search = '#'
+        text = walk(text, replacing, format, meta)
+
+        # Prepare the final link
+        if title:
+            link = copy.deepcopy(getLinkTitle(basicCategory, meta))
+        else:
+            link = copy.deepcopy(getLink(basicCategory, meta))
+
+        replace = description
+        search = '%D'
+        link = walk(link, replacing, format, meta)
+
+        replace = walk(description, lowering, format, meta)
+        search = '%d'
+        link = walk(link, replacing, format, meta)
+
+        replace = title
+        search = '%T'
+        link = walk(link, replacing, format, meta)
+
+        replace = walk(title, lowering, format, meta)
+        search = '%t'
+        link = walk(link, replacing, format, meta)
+
+        replace = [Str(sectionNumber)]
+        search = '%s'
+        link = walk(link, replacing, format, meta)
+
+        replace = [Str(globalNumber)]
+        search = '%g'
+        link = walk(link, replacing, format, meta)
+
+        replace = [Str(localNumber)]
+        search = '%n'
+        link = walk(link, replacing, format, meta)
+
+        replace = [Str(localNumber)]
+        search = '#'
+        link = walk(link, replacing, format, meta)
+
+        # Prepare the final toc
+        if title:
+            toc = copy.deepcopy(getTocTitle(basicCategory, meta))
+        else:
+            toc = copy.deepcopy(getToc(basicCategory, meta))
+
+        warning(toc)
+
+        replace = description
+        search = '%D'
+        toc = walk(toc, replacing, format, meta)
+
+        replace = walk(description, lowering, format, meta)
+        search = '%d'
+        toc = walk(toc, replacing, format, meta)
+
+        replace = title
+        search = '%T'
+        toc = walk(toc, replacing, format, meta)
+
+        replace = walk(title, lowering, format, meta)
+        search = '%t'
+        toc = walk(toc, replacing, format, meta)
 
     else:
         # Prepare the final text
@@ -325,22 +415,15 @@ def computeTextLinkToc(meta, basicCategory, description, title, localNumber, glo
         toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
     return [text, link, toc]
 
-def addLaTeX(contents, basicCategory, title, description, leading, number):
+def addLaTeX(contents, basicCategory, toc, leading, number):
     latexCategory = re.sub('[^a-z]+', '', basicCategory)
-    if title:
-      entry = title
-    else:
-      entry = description
     latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
-        leading + number + '}{\ignorespaces ' + toLatex(entry) + '}}'
+        leading + number + '}{\ignorespaces ' + toLatex(toc) + '}}'
     contents.insert(0, RawInline('tex', latex))
 
 def numberingSharpSharp(value):
     value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
     return value
-
-replace = None
-search = None
 
 def lowering(key, value, format, meta):
     if key == 'Str':
@@ -373,7 +456,17 @@ def referencingLink(value, format, meta):
                 # pandoc > 1.15
                 i = 1
 
-            # Replace all '#t', '#T', '#d', '#D', '#s', '#g', '#c', '#n', '#' with the corresponding text in the title
+            # Replace all '%t', '%T', '%d', '%D', '%s', '%g', '%c', '%n', '#' with the corresponding text in the title
+            value[i + 1][1] = value[i + 1][1].replace('%t', stringify(information[tag]['title']).lower())
+            value[i + 1][1] = value[i + 1][1].replace('%T', stringify(information[tag]['title']))
+            value[i + 1][1] = value[i + 1][1].replace('%d', stringify(information[tag]['description']).lower())
+            value[i + 1][1] = value[i + 1][1].replace('%D', stringify(information[tag]['description']))
+            value[i + 1][1] = value[i + 1][1].replace('%s', information[tag]['section'])
+            value[i + 1][1] = value[i + 1][1].replace('%g', information[tag]['global'])
+            value[i + 1][1] = value[i + 1][1].replace('%c', information[tag]['count'])
+            value[i + 1][1] = value[i + 1][1].replace('%n', information[tag]['local'])
+
+            # Keep # notation for compatibility
             value[i + 1][1] = value[i + 1][1].replace('#t', stringify(information[tag]['title']).lower())
             value[i + 1][1] = value[i + 1][1].replace('#T', stringify(information[tag]['title']))
             value[i + 1][1] = value[i + 1][1].replace('#d', stringify(information[tag]['description']).lower())
@@ -382,6 +475,7 @@ def referencingLink(value, format, meta):
             value[i + 1][1] = value[i + 1][1].replace('#g', information[tag]['global'])
             value[i + 1][1] = value[i + 1][1].replace('#c', information[tag]['count'])
             value[i + 1][1] = value[i + 1][1].replace('#n', information[tag]['local'])
+
             value[i + 1][1] = value[i + 1][1].replace('#', information[tag]['local'])
 
             if text == []:
@@ -390,47 +484,90 @@ def referencingLink(value, format, meta):
             else:
                 # The link text is not empty
 
-                #replace all '#t' with the title in lower case
+                # replace all '%t' with the title in lower case
+                replace = walk(information[tag]['title'], lowering, format, meta)
+                search = '%t'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%T' with the title
+                replace = information[tag]['title']
+                search = '%T'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%d' with the description in lower case
+                replace = walk(information[tag]['description'], lowering, format, meta)
+                search = '%d'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%D' with the description
+                replace = information[tag]['description']
+                search = '%D'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%s' with the corresponding number
+                replace = [Str(information[tag]['section'])]
+                search = '%s'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%g' with the corresponding number
+                replace = [Str(information[tag]['global'])]
+                search = '%g'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%c' with the corresponding number
+                replace = [Str(information[tag]['count'])]
+                search = '%c'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # replace all '%n' with the corresponding number
+                replace = [Str(information[tag]['local'])]
+                search = '%n'
+                value[i] = walk(value[i], replacing, format, meta)
+
+                # Keep # notation for compatibility
+
+                # replace all '#t' with the title in lower case
                 replace = walk(information[tag]['title'], lowering, format, meta)
                 search = '#t'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#T' with the title
+                # replace all '#T' with the title
                 replace = information[tag]['title']
                 search = '#T'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#d' with the description in lower case
+                # replace all '#d' with the description in lower case
                 replace = walk(information[tag]['description'], lowering, format, meta)
                 search = '#d'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#D' with the description
+                # replace all '#D' with the description
                 replace = information[tag]['description']
                 search = '#D'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#s' with the corresponding number
+                # replace all '#s' with the corresponding number
                 replace = [Str(information[tag]['section'])]
                 search = '#s'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#g' with the corresponding number
+                # replace all '#g' with the corresponding number
                 replace = [Str(information[tag]['global'])]
                 search = '#g'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#c' with the corresponding number
+                # replace all '#c' with the corresponding number
                 replace = [Str(information[tag]['count'])]
                 search = '#c'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#n' with the corresponding number
+                # replace all '#n' with the corresponding number
                 replace = [Str(information[tag]['local'])]
                 search = '#n'
                 value[i] = walk(value[i], replacing, format, meta)
 
-                #replace all '#' with the corresponding number
+
+                # replace all '#' with the corresponding number
                 replace = [Str(information[tag]['local'])]
                 search = '#'
                 value[i] = walk(value[i], replacing, format, meta)
@@ -483,7 +620,7 @@ def getProperty(definition, name):
     return definition['c'][name]['c']
 
 def getFirstValue(definition, name):
-	return getProperty(definition, name)[0]['c']
+    return getProperty(definition, name)[0]['c']
 
 def addListings(doc, format, meta):
     if hasMeta(meta):
@@ -611,8 +748,62 @@ def getFormat(category, meta):
     def analyzeDefinition(definition):
         if hasProperty(definition, 'format', 'MetaBool'):
             getFormat.value[getFirstValue(definition, 'category')] = getProperty(definition, 'format')
-        
+
     return getValue(category, meta, getFormat, True, analyzeDefinition)
+
+def getText(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'text', 'MetaInlines'):
+            getText.value[getFirstValue(definition, 'category')] = getProperty(definition, 'text')
+        elif hasProperty(definition, 'text', 'MetaBlocks') and getProperty(definition, 'text') == []:
+            getText.value[getFirstValue(definition, 'category')] = []
+
+    return getValue(category, meta, getText, [Strong([Str('%D'), Space(), Str('%n')])], analyzeDefinition)
+
+def getTextTitle(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'text-title', 'MetaInlines'):
+            getTextTitle.value[getFirstValue(definition, 'category')] = getProperty(definition, 'text-title')
+        elif hasProperty(definition, 'text-title', 'MetaBlocks') and getProperty(definition, 'text-title') == []:
+            getTextTitle.value[getFirstValue(definition, 'category')] = []
+
+    return getValue(category, meta, getTextTitle, [Strong([Str('%D'), Space(), Str('%n')]), Space(), Emph([Str('('), Str('%T'), Str(')')])], analyzeDefinition)
+
+def getLink(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'link', 'MetaInlines'):
+            getLink.value[getFirstValue(definition, 'category')] = getProperty(definition, 'link')
+        elif hasProperty(definition, 'link', 'MetaBlocks') and getProperty(definition, 'link') == []:
+            getLink.value[getFirstValue(definition, 'category')] = []
+
+    return getValue(category, meta, getLink, [Str('%D'), Space(), Str('%n')], analyzeDefinition)
+
+def getLinkTitle(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'link-title', 'MetaInlines'):
+            getLinkTitle.value[getFirstValue(definition, 'category')] = getProperty(definition, 'link-title')
+        elif hasProperty(definition, 'link-title', 'MetaBlocks') and getProperty(definition, 'link-title') == []:
+            getLinkTitle.value[getFirstValue(definition, 'category')] = []
+
+    return getValue(category, meta, getLinkTitle, [Str('%D'), Space(), Str('%n')], analyzeDefinition)
+
+def getToc(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'toc', 'MetaInlines'):
+            getToc.value[getFirstValue(definition, 'category')] = getProperty(definition, 'toc')
+        elif hasProperty(definition, 'toc', 'MetaBlocks') and getProperty(definition, 'toc') == []:
+            getToc.value[getFirstValue(definition, 'category')] = []
+
+    return getValue(category, meta, getToc, [Str('%D')], analyzeDefinition)
+
+def getTocTitle(category, meta):
+    def analyzeDefinition(definition):
+        if hasProperty(definition, 'toc-title', 'MetaInlines'):
+            getTocTitle.value[getFirstValue(definition, 'category')] = getProperty(definition, 'toc-title')
+        elif hasProperty(definition, 'toc-title', 'MetaBlocks') and getProperty(definition, 'toc-title') == []:
+            getTocTitle.value[getFirstValue(definition, 'category')] = []
+
+    return getValue(category, meta, getTocTitle, [Str('%T')], analyzeDefinition)
 
 def getCiteShortCut(category, meta):
     def analyzeDefinition(definition):
@@ -656,7 +847,7 @@ def getDefaultLevels(category, meta):
 
     return getValue(category, meta, getDefaultLevels, [0, 0], analyzeDefinition)
 
-def getClasses(category, meta): 
+def getClasses(category, meta):
     def analyzeDefinition(definition):
         if hasProperty(definition, 'classes', 'MetaList'):
             classes = []
