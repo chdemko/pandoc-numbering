@@ -206,18 +206,26 @@ def numberingEffective(match, value, format, meta):
         'toc': [Str(globalNumber), Space()] + toc
     }
 
-    # Prepare the contents
-    contents = [Span([tag, ['pandoc-numbering-text'] + getClasses(basicCategory, meta), []], text)]
-
     # Compute collections
     if basicCategory not in collections:
         collections[basicCategory] = []
 
     collections[basicCategory].append(tag)
 
-    # Special case for LaTeX
-    if format == 'latex' and getFormat(basicCategory, meta):
-        addLaTeX(contents, basicCategory, toc, leading, number)
+    # Prepare the contents
+    if format == 'latex':
+        pageRef = [RawInline('tex', '\\label{' + tag + '}')]
+        if getFormat(basicCategory, meta):
+            latexCategory = re.sub('[^a-z]+', '', basicCategory)
+            latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
+                leading + number + '}{\ignorespaces ' + toLatex(toc) + '}}'
+            latexToc = [RawInline('tex', latex)]
+        else:
+            latexToc=[]
+    else:
+        pageRef = []
+        latexToc=[]
+    contents = latexToc + [Span([tag, ['pandoc-numbering-text'] + getClasses(basicCategory, meta), []], pageRef + text)]
 
     return contents
 
@@ -413,12 +421,6 @@ def computeTextLinkToc(meta, basicCategory, description, title, localNumber, glo
         toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
     return [text, link, toc]
 
-def addLaTeX(contents, basicCategory, toc, leading, number):
-    latexCategory = re.sub('[^a-z]+', '', basicCategory)
-    latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
-        leading + number + '}{\ignorespaces ' + toLatex(toc) + '}}'
-    contents.insert(0, RawInline('tex', latex))
-
 def numberingSharpSharp(value):
     value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
     return value
@@ -454,7 +456,7 @@ def referencingLink(value, format, meta):
                 # pandoc > 1.15
                 i = 1
 
-            # Replace all '%t', '%T', '%d', '%D', '%s', '%g', '%c', '%n', '#' with the corresponding text in the title
+            # Replace all '%t', '%T', '%d', '%D', '%s', '%g', '%c', '%n', '%p', '#' with the corresponding text in the title
             value[i + 1][1] = value[i + 1][1].replace('%t', stringify(information[tag]['title']).lower())
             value[i + 1][1] = value[i + 1][1].replace('%T', stringify(information[tag]['title']))
             value[i + 1][1] = value[i + 1][1].replace('%d', stringify(information[tag]['description']).lower())
@@ -463,6 +465,7 @@ def referencingLink(value, format, meta):
             value[i + 1][1] = value[i + 1][1].replace('%g', information[tag]['global'])
             value[i + 1][1] = value[i + 1][1].replace('%c', information[tag]['count'])
             value[i + 1][1] = value[i + 1][1].replace('%n', information[tag]['local'])
+            value[i + 1][1] = value[i + 1][1].replace('%p', '\\pageref{' + tag + '}')
 
             # Keep # notation for compatibility
             value[i + 1][1] = value[i + 1][1].replace('#t', stringify(information[tag]['title']).lower())
@@ -522,6 +525,11 @@ def referencingLink(value, format, meta):
                 search = '%n'
                 value[i] = walk(value[i], replacing, format, meta)
 
+                # replace all '%p' with the corresponding page number
+                replace = [RawInline('tex', '\\pageref{' + tag + '}')]
+                search = '%p'
+                value[i] = walk(value[i], replacing, format, meta)
+
                 # Keep # notation for compatibility
 
                 # replace all '#t' with the title in lower case
@@ -563,7 +571,6 @@ def referencingLink(value, format, meta):
                 replace = [Str(information[tag]['local'])]
                 search = '#n'
                 value[i] = walk(value[i], replacing, format, meta)
-
 
                 # replace all '#' with the corresponding number
                 replace = [Str(information[tag]['local'])]

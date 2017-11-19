@@ -144,7 +144,7 @@ def test_numbering_latex():
         RawInline(u'tex', u'\\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces Exercise}}'),
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
-            [Strong(createListStr(u'Exercise 1'))]
+            [RawInline('tex', '\\label{exercise:1}'), Strong(createListStr(u'Exercise 1'))]
         )
     ])
 
@@ -158,6 +158,7 @@ def test_numbering_latex():
         Span(
             [u'exercise:1', ['pandoc-numbering-text', 'exercise'], []],
             [
+                RawInline('tex', '\\label{exercise:1}'),
                 Strong(createListStr(u'Exercise 1')),
                 Space(),
                 Emph(createListStr(u'(') + createListStr(u'The title') + createListStr(u')'))
