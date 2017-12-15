@@ -192,7 +192,7 @@ def numberingEffective(match, value, format, meta):
     tag = computeTag(match, basicCategory, category, number)
     localNumber = computeLocalNumber(levelInf, levelSup, number)
     globalNumber = computeGlobalNumber(sectionNumber, number)
-    [text, link, toc] = computeTextLinkToc(meta, basicCategory, description, title, localNumber, globalNumber, sectionNumber)
+    [text, link, toc] = computeTextLinkToc(meta, basicCategory, description, title, tag, localNumber, globalNumber, sectionNumber)
 
     # Store the numbers and the label for automatic numbering (See referencing function)
     information[tag] = {
@@ -300,7 +300,7 @@ def computeGlobalNumber(sectionNumber, number):
     else:
         return number
 
-def computeTextLinkToc(meta, basicCategory, description, title, localNumber, globalNumber, sectionNumber):
+def computeTextLinkToc(meta, basicCategory, description, title, tag, localNumber, globalNumber, sectionNumber):
     global replace, search
 
     # Is the automatic formatting required for this category?
@@ -376,6 +376,10 @@ def computeTextLinkToc(meta, basicCategory, description, title, localNumber, glo
 
         replace = [Str(localNumber)]
         search = '%n'
+        link = walk(link, replacing, format, meta)
+
+        replace = [RawInline('tex', '\\pageref{' + tag + '}')]
+        search = '%p'
         link = walk(link, replacing, format, meta)
 
         replace = [Str(localNumber)]
