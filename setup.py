@@ -82,7 +82,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='pandoc, filters, numbering',
+    keywords='pandoc filters numbering',
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
