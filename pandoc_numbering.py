@@ -292,7 +292,7 @@ def replace_page_number(where, tag):
     where.walk(partial(replacing, search='%p', replace=[RawInline('\\pageref{' + tag + '}', 'tex')]))
 
 def to_latex(elem):
-    return convert_text(Plain(elem), input_format='panflute', output_format='latex')
+    return convert_text(Plain(elem), input_format='panflute', output_format='latex', extra_args=['--no-highlight'])
 
 def define(category, doc):
     doc.defined[category] = {
