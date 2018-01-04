@@ -103,7 +103,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'panflute>=1.10',
+        'pandocfilters>=1.4',
         'pypandoc>=1.4'
     ],
 
