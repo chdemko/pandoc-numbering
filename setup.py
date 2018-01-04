@@ -28,7 +28,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='2.3.1',
+    version='3.0.0-beta1',
 
     # The project's description
     description='A pandoc filter for automatic numbering',
@@ -57,7 +57,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
 
         # Specify the OS
         'Operating System :: OS Independent',
@@ -103,7 +103,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'pandocfilters>=1.4',
+        'panflute>=1.10',
         'pypandoc>=1.4'
     ],
 

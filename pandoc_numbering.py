@@ -4,877 +4,604 @@
 Pandoc filter to number all kinds of things.
 """
 
-from pandocfilters import walk, stringify, Str, Space, Para, BulletList, Plain, Strong, Span, Link, Emph, RawInline, RawBlock, Header, DefinitionList
-from functools import reduce
-import json
-import io
-import sys
-import codecs
+from panflute import *
+from functools import partial
 import re
 import unicodedata
-import subprocess
 import copy
+import itertools
 
-count = {}
-information = {}
-collections = {}
-headers = [0, 0, 0, 0, 0, 0]
-headerRegex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
+class Numbered(object):
+    __slots__ = [
+        '_elem',
+        '_doc',
+        '_match',
+        '_tag',
+        '_entry',
+        '_link',
+        '_title',
+        '_description',
+        '_category',
+        '_basic_category',
+        '_first_section_level',
+        '_last_section_level',
+        '_leading',
+        '_number',
+        '_global_number',
+        '_section_number',
+        '_local_number',
+    ]
 
-replace = None
-search = None
+    @property
+    def tag(self):
+        return self._tag
 
-def toJSONFilters(actions):
-    """Generate a JSON-to-JSON filter from stdin to stdout
+    @property
+    def entry(self):
+        return self._entry
 
-    The filter:
+    @property
+    def link(self):
+        return self._link
 
-    * reads a JSON-formatted pandoc document from stdin
-    * transforms it by walking the tree and performing the actions
-    * returns a new JSON-formatted pandoc document to stdout
+    @property
+    def title(self):
+        return self._title
 
-    The argument `actions` is a list of functions of the form
-    `action(key, value, format, meta)`, as described in more
-    detail under `walk`.
+    @property
+    def description(self):
+        return self._description
 
-    This function calls `applyJSONFilters`, with the `format`
-    argument provided by the first command-line argument,
-    if present.  (Pandoc sets this by default when calling
-    filters.)
-    """
-    try:
-        input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-    except AttributeError:
-        # Python 2 does not have sys.stdin.buffer.
-        # REF: https://stackoverflow.com/questions/2467928/python-unicodeencode
-        input_stream = codecs.getreader("utf-8")(sys.stdin)
+    @property
+    def global_number(self):
+        return self._global_number
 
-    source = input_stream.read()
-    if len(sys.argv) > 1:
-        format = sys.argv[1]
-    else:
-        format = ""
+    @property
+    def section_number(self):
+        return self._section_number
 
-    sys.stdout.write(applyJSONFilters(actions, source, format))
+    @property
+    def local_number(self):
+        return self._local_number
 
-def applyJSONFilters(actions, source, format=""):
-    """Walk through JSON structure and apply filters
+    number_regex = '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?'
+    _regex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
+    header_regex = '^' + _regex + '$'
+    marker_regex = '^' + _regex + number_regex + '$'
+    double_sharp_regex = '^' + _regex + '#' + number_regex + '$'
 
-    This:
+    @staticmethod
+    def _remove_accents(string):
+        nfkd_form = unicodedata.normalize('NFKD', string)
+        return u''.join([c for c in nfkd_form if not unicodedata.combining(c)])
 
-    * reads a JSON-formatted pandoc document from a source string
-    * transforms it by walking the tree and performing the actions
-    * returns a new JSON-formatted pandoc document as a string
+    @staticmethod
+    def _identifier(string):
+        # replace invalid characters by dash
+        string = re.sub('[^0-9a-zA-Z_-]+', '-', Numbered._remove_accents(string.lower()))
 
-    The `actions` argument is a list of functions (see `walk`
-    for a full description).
+        # Remove leading digits
+        string = re.sub('^[^a-zA-Z]+', '', string)
 
-    The argument `source` is a string encoded JSON object.
+        return string
 
-    The argument `format` is a string describing the output format.
+    def __init__(self, elem, doc):
+        self._elem = elem
+        self._doc = doc
+        self._entry = Span(classes=['pandoc-numbering-entry'])
+        self._link = Span(classes=['pandoc-numbering-link'])
+        self._tag = None
+        if len(self._get_content()) > 0 and isinstance(self._get_content()[-1], Str):
+            self._match = re.match(Numbered.marker_regex, self._get_content()[-1].text)
+            if self._match:
+                self._replace_marker()
+            elif re.match(Numbered.double_sharp_regex, self._get_content()[-1].text):
+                self._replace_double_sharp()
 
-    Returns a the new JSON-formatted pandoc document.
-    """
+    def _set_content(self, content):
+        if isinstance(self._elem, Para):
+            self._elem.content = content
+        elif isinstance(self._elem, DefinitionItem):
+            self._elem.term = content
 
-    doc = json.loads(source)
+    def _get_content(self):
+        if isinstance(self._elem, Para):
+            return self._elem.content
+        elif isinstance(self._elem, DefinitionItem):
+            return self._elem.term
 
-    if 'pandoc-api-version' in doc:
-        pandocVersion.value = '.'.join(map(str, doc['pandoc-api-version']))
+    def _replace_double_sharp(self):
+        self._get_content()[-1].text = self._get_content()[-1].text.replace('##', '#', 1)
 
-    if 'meta' in doc:
-        meta = doc['meta']
-    elif doc[0]:  # old API
-        meta = doc[0]['unMeta']
-    else:
-        meta = {}
+    def _replace_marker(self):
+        self._compute_title()
+        self._compute_description()
+        self._compute_basic_category()
+        self._compute_levels()
+        self._compute_section_number()
+        self._compute_leading()
+        self._compute_category()
+        self._compute_number()
+        self._compute_tag()
+        self._compute_local_number()
+        self._compute_global_number()
+        self._compute_data()
 
-    altered = doc
-    for action in actions:
-        altered = walk(altered, action, format, meta)
+    def _compute_title(self):
+        self._title = []
+        if isinstance(self._get_content()[-3], Str) and self._get_content()[-3].text[-1:] == ')':
+            for (i, item) in enumerate(self._get_content()):
+                if isinstance(item, Str) and item.text[0] == '(':
+                    self._title = self._get_content()[i:-2]
+                    # Detach from original parent
+                    self._title.parent = None
+                    self._title[0].text = self._title[0].text[1:]
+                    self._title[-1].text = self._title[-1].text[:-1]
+                    del self._get_content()[i-1:-2]
+                    break
+        self._title = list(self._title)
+        
+    def _compute_description(self):
+        self._description = self._get_content()[:-2]
+        # Detach from original parent
+        self._description.parent = None
+        self._description = list(self._description)
 
-    if 'meta' in altered:
-        meta = altered['meta']
-    elif meta[0]:  # old API
-        meta = altered[0]['unMeta']
-    else:
-        meta = {}
+    def _compute_basic_category(self):
+        if self._match.group('prefix') == None:
+            self._basic_category = Numbered._identifier(''.join(map(stringify, self._description)))
+        else:
+            self._basic_category = self._match.group('prefix')
+        if self._basic_category not in self._doc.defined:
+            define(self._basic_category, self._doc)
 
-    addListings(altered, format, meta)
+    def _compute_levels(self):
+        # Compute the first and last section level values
+        self._first_section_level = len(self._match.group('hidden')) // 2
+        self._last_section_level = len(self._match.group('header')) // 2
 
-    return json.dumps(altered)
+        # Get the default first and last section level
+        if self._first_section_level == 0 and self._last_section_level == 0:
+            self._first_section_level = self._doc.defined[self._basic_category]['first-section-level']
+            self._last_section_level = self._doc.defined[self._basic_category]['last-section-level']
 
-def removeAccents(string):
-    nfkd_form = unicodedata.normalize('NFKD', string)
-    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    def _compute_section_number(self):
+        self._section_number = '.'.join(map(str, self._doc.headers[:self._last_section_level]))
 
-def toIdentifier(string):
-    # replace invalid characters by dash
-    string = re.sub('[^0-9a-zA-Z_-]+', '-', removeAccents(string.lower()))
+    def _compute_leading(self):
+        # Compute the leading (composed of the section numbering and a dot)
+        if self._last_section_level != 0:
+            self._leading = self._section_number + '.'
+        else:
+            self._leading =  ''
 
-    # Remove leading digits
-    string = re.sub('^[^a-zA-Z]+', '', string)
+    def _compute_category(self):
+        self._category = self._basic_category + ':' + self._leading
 
-    return string
+        # Is it a new category?
+        if self._category not in self._doc.count:
+            self._doc.count[self._category] = 0
 
-def toLatex(x):
-    """Walks the tree x and returns concatenated string content,
-    leaving out all formatting.
-    """
-    result = []
+        self._doc.count[self._category] = self._doc.count[self._category] + 1
 
-    def go(key, val, format, meta):
-        if key in ['Str', 'MetaString']:
-            result.append(val)
-        elif key == 'Code':
-            result.append(val[1])
-        elif key == 'Math':
-            # Modified from the stringify function in the pandocfilter package
-            if format == 'latex':
-                result.append('$' + val[1] + '$')
-            else:
-                result.append(val[1])
-        elif key == 'LineBreak':
-            result.append(" ")
-        elif key == 'Space':
-            result.append(" ")
-        elif key == 'Note':
-            # Do not stringify value from Note node
-            del val[:]
+    def _compute_number(self):
+        self._number = str(self._doc.count[self._category])
 
-    walk(x, go, 'latex', {})
-    return ''.join(result)
+    def _compute_tag(self):
+        # Determine the final tag
+        if self._match.group('name') == None:
+            self._tag = self._category + self._number
+        else:
+            self._tag = self._basic_category + ':' + self._match.group('name')
 
-def numbering(key, value, format, meta):
-    if key == 'Header':
-        return numberingHeader(value)
-    elif key == 'Para':
-        return numberingPara(value, format, meta)
-    elif key == 'DefinitionList':
-        return numberingDefinitionList(value, format, meta)
+        # Compute collections
+        if self._basic_category not in self._doc.collections:
+            self._doc.collections[self._basic_category] = []
 
-def numberingHeader(value):
-    [level, [id, classes, attributes], content] = value
-    if 'unnumbered' not in classes:
-        headers[level - 1] = headers[level - 1] + 1
-        for index in range(level, 6):
-            headers[index] = 0
+        self._doc.collections[self._basic_category].append(self._tag)
 
-def numberingInlines(value, format, meta):
-    if len(value) >= 3 and value[-2]['t'] == 'Space' and value[-1]['t'] == 'Str':
-        last = value[-1]['c']
-        match = re.match('^' + headerRegex + '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?$', last)
-        if match:
-            # Is the last element an identifier beginning with '#'
-            return numberingEffective(match, value, format, meta)
-        elif re.match('^' + headerRegex + '##(?P<prefix>[a-zA-Z][\w.-]*:)?(?P<name>[a-zA-Z][\w:.-]*)?$', last):
-            # Special case where the last element is '...##...'
-            return numberingSharpSharp(value)
-    return value
+    def _compute_local_number(self):
+        # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
+        self._local_number = '.'.join(map(str, self._doc.headers[self._first_section_level:self._last_section_level] + [self._number]))
 
-def numberingPara(value, format, meta):
-    return Para(numberingInlines(value, format, meta))
+    def _compute_global_number(self):
+        # Compute the global number
+        if self._section_number:
+            self._global_number = self._section_number + '.' + self._number
+        else:
+            self._global_number = self._number
 
-def numberingDefinitionList(value, format, meta):
-    return DefinitionList([
-        [numberingInlines(term, format, meta), defs]
-        for [term, defs] in value
-    ])
+    def _compute_data(self):
+        classes = self._doc.defined[self._basic_category]['classes']
+        self._set_content([Span(
+            classes=['pandoc-numbering-text'] + classes,
+            identifier=self._tag
+        )])
+        self._link.classes = self._link.classes + classes
+        self._entry.classes = self._entry.classes + classes
 
-def numberingEffective(match, value, format, meta):
-    title = computeTitle(value)
-    description = computeDescription(value)
-    basicCategory = computeBasicCategory(match, description)
-    [levelInf, levelSup] = computeLevels(match, basicCategory, meta)
-    sectionNumber = computeSectionNumber(levelSup)
-    leading = computeLeading(levelSup, sectionNumber)
-    category = computeCategory(basicCategory, leading)
-    number = str(count[category])
-    tag = computeTag(match, basicCategory, category, number)
-    localNumber = computeLocalNumber(levelInf, levelSup, number)
-    globalNumber = computeGlobalNumber(sectionNumber, number)
-    [text, link, toc] = computeTextLinkToc(meta, basicCategory, description, title, tag, localNumber, globalNumber, sectionNumber)
+        # Prepare the final data
+        if self._title: 
+            self._get_content()[0].content = copy.deepcopy(self._doc.defined[self._basic_category]['format-text-title'])
+            self._link.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-link-title'])
+            self._entry.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-entry-title'])
+        else:
+            self._get_content()[0].content = copy.deepcopy(self._doc.defined[self._basic_category]['format-text-classic'])
+            self._link.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-link-classic'])
+            self._entry.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-entry-classic'])
 
-    # Store the numbers and the label for automatic numbering (See referencing function)
-    information[tag] = {
-        'section': sectionNumber,
-        'local': localNumber,
-        'global': globalNumber,
-        'count': number,
-        'description': description,
-        'title': title,
-        'link': link,
-        'toc': [Str(globalNumber), Space()] + toc
+        # Compute content
+        replace_description(self._elem, self._description)
+        replace_title(self._elem, self._title)
+        replace_global_number(self._elem, self._global_number)
+        replace_section_number(self._elem, self._section_number)
+        replace_local_number(self._elem, self._local_number)
+
+        ## Compute link
+        replace_description(self._link, self._description)
+        replace_title(self._link, self._title)
+        replace_global_number(self._link, self._global_number)
+        replace_section_number(self._link, self._section_number)
+        replace_local_number(self._link, self._local_number)
+        if self._doc.format == 'latex':
+            replace_page_number(self._link, self._tag)
+
+        # Compute entry
+        replace_description(self._entry, self._description)
+        replace_title(self._entry, self._title)
+        replace_global_number(self._entry, self._global_number)
+        replace_section_number(self._entry, self._section_number)
+        replace_local_number(self._entry, self._local_number)
+        
+        # Finalize the content
+        if self._doc.format == 'latex':
+            self._get_content()[0].content.insert(0, RawInline('\\label{' + self._tag + '}', 'tex'))
+
+            latex_category = re.sub('[^a-z]+', '', self._basic_category)
+            latex = '\\phantomsection\\addcontentsline{' + \
+                latex_category + \
+                '}{' + \
+                latex_category + \
+                '}{\\protect\\numberline {' + \
+                self._leading + \
+                self._number + \
+                '}{\ignorespaces ' + \
+                to_latex(self._entry) + \
+                '}}'
+            self._get_content().insert(0, RawInline(latex, 'tex'))
+
+def replace_description(where, description):
+    where.walk(partial(replacing, search='%D', replace=copy.deepcopy(description)))
+    where.walk(partial(replacing, search='%d', replace=list(item.walk(lowering) for item in copy.deepcopy(description))))
+
+def replace_title(where, title):
+    where.walk(partial(replacing, search='%T', replace=copy.deepcopy(title)))
+    where.walk(partial(replacing, search='%t', replace=list(item.walk(lowering) for item in copy.deepcopy(title))))
+
+def replace_section_number(where, section_number):
+    where.walk(partial(replacing, search='%s', replace=[Str(section_number)]))
+
+def replace_global_number(where, global_number):
+    where.walk(partial(replacing, search='%g', replace=[Str(global_number)]))
+
+def replace_local_number(where, local_number):
+    where.walk(partial(replacing, search='%n', replace=[Str(local_number)]))
+    where.walk(partial(replacing, search='#', replace=[Str(local_number)]))
+
+def replace_page_number(where, tag):
+    where.walk(partial(replacing, search='%p', replace=[RawInline('\\pageref{' + tag + '}', 'tex')]))
+
+def to_latex(elem):
+    return convert_text(Plain(elem), input_format='panflute', output_format='latex')
+
+def define(category, doc):
+    doc.defined[category] = {
+        'first-section-level':  0,
+        'last-section-level':   0,
+        'format-text-classic':  [Strong(Str('%D'), Space(), Str('%n'))],
+        'format-text-title':    [Strong(Str('%D'), Space(), Str('%n')), Space(), Emph(Str('(%T)'))],
+        'format-link-classic':  [Str('%D'), Space(), Str('%n')],
+        'format-link-title':    [Str('%D'), Space(), Str('%n'), Space(), Str('(%T)')],
+        'format-entry-title':   [Str('%T')],
+        'classes':              [category],
+        'cite-shortcut':        False,
+        'listing-title':        None,
+        'entry-tab':            1.5,
+        'entry-space':          2.3,
     }
-
-    # Compute collections
-    if basicCategory not in collections:
-        collections[basicCategory] = []
-
-    collections[basicCategory].append(tag)
-
-    # Prepare the contents
-    if format == 'latex':
-        pageRef = [RawInline('tex', '\\label{' + tag + '}')]
-        if getFormat(basicCategory, meta):
-            latexCategory = re.sub('[^a-z]+', '', basicCategory)
-            latex = '\\phantomsection\\addcontentsline{' + latexCategory + '}{' + latexCategory + '}{\\protect\\numberline {' + \
-                leading + number + '}{\ignorespaces ' + toLatex(toc) + '}}'
-            latexToc = [RawInline('tex', latex)]
-        else:
-            latexToc=[]
+    if doc.format == 'latex':
+        doc.defined[category]['format-entry-classic'] = [Str('%D')]
+        doc.defined[category]['entry-tab'] = 1.5
+        doc.defined[category]['entry-space'] = 2.3
     else:
-        pageRef = []
-        latexToc=[]
-    contents = latexToc + [Span([tag, ['pandoc-numbering-text'] + getClasses(basicCategory, meta), []], pageRef + text)]
-
-    return contents
-
-def computeTitle(value):
-    title = []
-    if value[-3]['t'] == 'Str' and value[-3]['c'][-1:] == ')':
-        for (i, item) in enumerate(value):
-            if item['t'] == 'Str' and item['c'][0] == '(':
-                title = value[i:-2]
-                title[0]['c'] = title[0]['c'][1:]
-                title[-1]['c'] = title[-1]['c'][:-1]
-                del value[i-1:-2]
-                break
-    return title
-
-def computeDescription(value):
-    return value[:-2]
-
-def computeBasicCategory(match, description):
-    if match.group('prefix') == None:
-        return toIdentifier(stringify(description))
-    else:
-        return match.group('prefix')
-
-def computeLevels(match, basicCategory, meta):
-    # Compute the levelInf and levelSup values
-    levelInf = len(match.group('hidden')) // 2
-    levelSup = len(match.group('header')) // 2
-
-    # Get the default inf and sup level
-    if levelInf == 0 and levelSup == 0:
-        [levelInf, levelSup] = getDefaultLevels(basicCategory, meta)
-
-    return [levelInf, levelSup]
-
-def computeSectionNumber(levelSup):
-    return '.'.join(map(str, headers[:levelSup]))
-
-def computeLeading(levelSup, sectionNumber):
-    # Compute the leading (composed of the section numbering and a dot)
-    if levelSup != 0:
-        return sectionNumber + '.'
-    else:
-        return ''
-
-def computeCategory(basicCategory, leading):
-    category = basicCategory + ':' + leading
-
-    # Is it a new category?
-    if category not in count:
-        count[category] = 0
-
-    count[category] = count[category] + 1
-
-    return category
-
-def computeTag(match, basicCategory, category, number):
-    # Determine the final tag
-    if match.group('name') == None:
-        return category + number
-    else:
-        return basicCategory + ':' + match.group('name')
-
-def computeLocalNumber(levelInf, levelSup, number):
-    # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
-    return '.'.join(map(str, headers[levelInf:levelSup] + [number]))
-
-def computeGlobalNumber(sectionNumber, number):
-    # Compute the globalNumber
-    if sectionNumber:
-        return sectionNumber + '.' + number
-    else:
-        return number
-
-def computeTextLinkToc(meta, basicCategory, description, title, tag, localNumber, globalNumber, sectionNumber):
-    global replace, search
-
-    # Is the automatic formatting required for this category?
-    if getFormat(basicCategory, meta):
-
-        # Prepare the final text
-        if title:
-            text = copy.deepcopy(getTextTitle(basicCategory, meta))
-        else:
-            text = copy.deepcopy(getText(basicCategory, meta))
-
-        replace = description
-        search = '%D'
-        text = walk(text, replacing, format, meta)
-
-        replace = walk(description, lowering, format, meta)
-        search = '%d'
-        text = walk(text, replacing, format, meta)
-
-        replace = title
-        search = '%T'
-        text = walk(text, replacing, format, meta)
-
-        replace = walk(title, lowering, format, meta)
-        search = '%t'
-        text = walk(text, replacing, format, meta)
-
-        replace = [Str(sectionNumber)]
-        search = '%s'
-        text = walk(text, replacing, format, meta)
-
-        replace = [Str(globalNumber)]
-        search = '%g'
-        text = walk(text, replacing, format, meta)
-
-        replace = [Str(localNumber)]
-        search = '%n'
-        text = walk(text, replacing, format, meta)
-
-        replace = [Str(localNumber)]
-        search = '#'
-        text = walk(text, replacing, format, meta)
-
-        # Prepare the final link
-        if title:
-            link = copy.deepcopy(getLinkTitle(basicCategory, meta))
-        else:
-            link = copy.deepcopy(getLink(basicCategory, meta))
-
-        replace = description
-        search = '%D'
-        link = walk(link, replacing, format, meta)
-
-        replace = walk(description, lowering, format, meta)
-        search = '%d'
-        link = walk(link, replacing, format, meta)
-
-        replace = title
-        search = '%T'
-        link = walk(link, replacing, format, meta)
-
-        replace = walk(title, lowering, format, meta)
-        search = '%t'
-        link = walk(link, replacing, format, meta)
-
-        replace = [Str(sectionNumber)]
-        search = '%s'
-        link = walk(link, replacing, format, meta)
-
-        replace = [Str(globalNumber)]
-        search = '%g'
-        link = walk(link, replacing, format, meta)
-
-        replace = [Str(localNumber)]
-        search = '%n'
-        link = walk(link, replacing, format, meta)
-
-        replace = [RawInline('tex', '\\pageref{' + tag + '}')]
-        search = '%p'
-        link = walk(link, replacing, format, meta)
-
-        replace = [Str(localNumber)]
-        search = '#'
-        link = walk(link, replacing, format, meta)
-
-        # Prepare the final toc
-        if title:
-            toc = copy.deepcopy(getTocTitle(basicCategory, meta))
-        else:
-            toc = copy.deepcopy(getToc(basicCategory, meta))
-
-        replace = description
-        search = '%D'
-        toc = walk(toc, replacing, format, meta)
-
-        replace = walk(description, lowering, format, meta)
-        search = '%d'
-        toc = walk(toc, replacing, format, meta)
-
-        replace = title
-        search = '%T'
-        toc = walk(toc, replacing, format, meta)
-
-        replace = walk(title, lowering, format, meta)
-        search = '%t'
-        toc = walk(toc, replacing, format, meta)
-
-    else:
-        # Prepare the final text
-        text = [
-            Span(['', ['description'], []], description),
-            Span(['', ['title'], []], title),
-            Span(['', ['local'], []], [Str(localNumber)]),
-            Span(['', ['global'], []], [Str(globalNumber)]),
-            Span(['', ['section'], []], [Str(sectionNumber)]),
-        ]
-
-        # Compute the link
-        link = [Span(['', ['pandoc-numbering-link'] + getClasses(basicCategory, meta), []], text)]
-
-        # Compute the toc
-        toc = [Span(['', ['pandoc-numbering-toc'] + getClasses(basicCategory, meta), []], text)]
-    return [text, link, toc]
-
-def numberingSharpSharp(value):
-    value[-1]['c'] = value[-1]['c'].replace('##', '#', 1)
-    return value
-
-def lowering(key, value, format, meta):
-    if key == 'Str':
-        return Str(value.lower())
-
-def referencing(key, value, format, meta):
-    if key == 'Link':
-        return referencingLink(value, format, meta)
-    elif key == 'Cite':
-        return referencingCite(value, format, meta)
-
-def referencingLink(value, format, meta):
-    global replace, search
-    if pandocVersion() < '1.16':
-        # pandoc 1.15
-        [text, [reference, title]] = value
-    else:
-        # pandoc > 1.15
-        [attributes, text, [reference, title]] = value
-
-    if re.match('^(#([a-zA-Z][\w:.-]*))$', reference):
-        # Compute the name
-        tag = reference[1:]
-
-        if tag in information:
-            if pandocVersion() < '1.16':
-                # pandoc 1.15
-                i = 0
-            else:
-                # pandoc > 1.15
-                i = 1
-
-            # Replace all '%t', '%T', '%d', '%D', '%s', '%g', '%c', '%n', '%p', '#' with the corresponding text in the title
-            value[i + 1][1] = value[i + 1][1].replace('%t', stringify(information[tag]['title']).lower())
-            value[i + 1][1] = value[i + 1][1].replace('%T', stringify(information[tag]['title']))
-            value[i + 1][1] = value[i + 1][1].replace('%d', stringify(information[tag]['description']).lower())
-            value[i + 1][1] = value[i + 1][1].replace('%D', stringify(information[tag]['description']))
-            value[i + 1][1] = value[i + 1][1].replace('%s', information[tag]['section'])
-            value[i + 1][1] = value[i + 1][1].replace('%g', information[tag]['global'])
-            value[i + 1][1] = value[i + 1][1].replace('%c', information[tag]['count'])
-            value[i + 1][1] = value[i + 1][1].replace('%n', information[tag]['local'])
-            value[i + 1][1] = value[i + 1][1].replace('%p', '\\pageref{' + tag + '}')
-
-            # Keep # notation for compatibility
-            value[i + 1][1] = value[i + 1][1].replace('#t', stringify(information[tag]['title']).lower())
-            value[i + 1][1] = value[i + 1][1].replace('#T', stringify(information[tag]['title']))
-            value[i + 1][1] = value[i + 1][1].replace('#d', stringify(information[tag]['description']).lower())
-            value[i + 1][1] = value[i + 1][1].replace('#D', stringify(information[tag]['description']))
-            value[i + 1][1] = value[i + 1][1].replace('#s', information[tag]['section'])
-            value[i + 1][1] = value[i + 1][1].replace('#g', information[tag]['global'])
-            value[i + 1][1] = value[i + 1][1].replace('#c', information[tag]['count'])
-            value[i + 1][1] = value[i + 1][1].replace('#n', information[tag]['local'])
-
-            value[i + 1][1] = value[i + 1][1].replace('#', information[tag]['local'])
-
-            if text == []:
-                # The link text is empty, replace it with the default label
-                value[i] = information[tag]['link']
-            else:
-                # The link text is not empty
-
-                # replace all '%t' with the title in lower case
-                replace = walk(information[tag]['title'], lowering, format, meta)
-                search = '%t'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%T' with the title
-                replace = information[tag]['title']
-                search = '%T'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%d' with the description in lower case
-                replace = walk(information[tag]['description'], lowering, format, meta)
-                search = '%d'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%D' with the description
-                replace = information[tag]['description']
-                search = '%D'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%s' with the corresponding number
-                replace = [Str(information[tag]['section'])]
-                search = '%s'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%g' with the corresponding number
-                replace = [Str(information[tag]['global'])]
-                search = '%g'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%c' with the corresponding number
-                replace = [Str(information[tag]['count'])]
-                search = '%c'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%n' with the corresponding number
-                replace = [Str(information[tag]['local'])]
-                search = '%n'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '%p' with the corresponding page number
-                replace = [RawInline('tex', '\\pageref{' + tag + '}')]
-                search = '%p'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # Keep # notation for compatibility
-
-                # replace all '#t' with the title in lower case
-                replace = walk(information[tag]['title'], lowering, format, meta)
-                search = '#t'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#T' with the title
-                replace = information[tag]['title']
-                search = '#T'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#d' with the description in lower case
-                replace = walk(information[tag]['description'], lowering, format, meta)
-                search = '#d'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#D' with the description
-                replace = information[tag]['description']
-                search = '#D'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#s' with the corresponding number
-                replace = [Str(information[tag]['section'])]
-                search = '#s'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#g' with the corresponding number
-                replace = [Str(information[tag]['global'])]
-                search = '#g'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#c' with the corresponding number
-                replace = [Str(information[tag]['count'])]
-                search = '#c'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#n' with the corresponding number
-                replace = [Str(information[tag]['local'])]
-                search = '#n'
-                value[i] = walk(value[i], replacing, format, meta)
-
-                # replace all '#' with the corresponding number
-                replace = [Str(information[tag]['local'])]
-                search = '#'
-                value[i] = walk(value[i], replacing, format, meta)
-
-def referencingCite(value, format, meta):
-    match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', value[1][0]['c'])
-    if match != None and getCiteShortCut(match.group('category'), meta):
-
-        # Deal with @prefix:name shortcut
-        tag = match.group('tag')
-        if tag in information:
-            if pandocVersion() < '1.16':
-                # pandoc 1.15
-                return Link([Str(information[tag]['local'])], ['#' + tag, ''])
-            else:
-                # pandoc > 1.15
-                return Link(['', [], []], [Str(information[tag]['local'])], ['#' + tag, ''])
-
-def replacing(key, value, format, meta):
-    if key == 'Str':
-        prepare = value.split(search)
+        doc.defined[category]['format-entry-classic'] = [Str('%D'), Space(), Str('%g')]
+
+def lowering(elem, doc):
+    if isinstance(elem, Str):
+        elem.text = elem.text.lower()
+
+def replacing(elem, doc, search=None, replace=None):
+    if isinstance(elem, Str):
+        prepare = elem.text.split(search)
         if len(prepare) > 1:
 
-            ret = []
+            text = []
 
             if prepare[0] != '':
-                ret.append(Str(prepare[0]))
+                text.append(Str(prepare[0]))
 
             for string in prepare[1:]:
-                ret.extend(replace)
+                text.extend(replace)
                 if string != '':
-                    ret.append(Str(string))
+                    text.append(Str(string))
 
-            return ret
+            return text
 
-def hasMeta(meta):
-    return 'pandoc-numbering' in meta and meta['pandoc-numbering']['t'] == 'MetaList'
+    return [elem]
 
-def isCorrect(definition):
-    return definition['t'] == 'MetaMap' and\
-        'category' in definition['c'] and\
-        definition['c']['category']['t'] == 'MetaInlines' and\
-        len(definition['c']['category']['c']) == 1 and\
-        definition['c']['category']['c'][0]['t'] == 'Str'
+def numbering(elem, doc):
+    if isinstance(elem, Header):
+        update_header_numbers(elem, doc)
+    elif isinstance(elem, (Para, DefinitionItem)):
+        numbered = Numbered(elem, doc)
+        if numbered.tag is not None:
+            doc.information[numbered.tag] = numbered
 
-def hasProperty(definition, name, type):
-    return name in definition['c'] and definition['c'][name]['t'] == type
+def referencing(elem, doc):
+    if isinstance(elem, Link):
+        return referencing_link(elem, doc)
+    elif isinstance(elem, Cite):
+        return referencing_cite(elem, doc)
 
-def getProperty(definition, name):
-    return definition['c'][name]['c']
+def referencing_link(elem, doc):
+    match = re.match('^#(?P<tag>([a-zA-Z][\w:.-]*))$', elem.url)
+    if match:
+        tag = match.group('tag')
+        if tag in doc.information:
+            if bool(elem.content):
+                replace_title(elem, doc.information[tag].title)
+                replace_description(elem, doc.information[tag].description)
+                replace_global_number(elem, doc.information[tag].global_number)
+                replace_section_number(elem, doc.information[tag].section_number)
+                replace_local_number(elem, doc.information[tag].local_number)
+            else:
+                elem.content = [doc.information[tag].link]
 
-def getFirstValue(definition, name):
-    return getProperty(definition, name)[0]['c']
+def referencing_cite(elem, doc):
+    if len(elem.content) == 1 and isinstance(elem.content[0], Str):
+        match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', elem.content[0].text)
+        if match:
+            category = match.group('category')
+            if category in doc.defined and doc.defined[category]['cite-shortcut']:
+                # Deal with @prefix:name shortcut
+                tag = match.group('tag')
+                if tag in doc.information:
+                    return Link(doc.information[tag].link, url = '#' + tag)
 
-def addListings(doc, format, meta):
-    if hasMeta(meta):
-        listings = []
+def update_header_numbers(elem, doc):
+    if 'unnumbered' not in elem.classes:
+        doc.headers[elem.level - 1] = doc.headers[elem.level - 1] + 1
+        for index in range(elem.level, 6):
+            doc.headers[index] = 0
 
-        # Loop on all listings definition
-        for definition in meta['pandoc-numbering']['c']:
-            if isCorrect(definition) and hasProperty(definition, 'listing', 'MetaInlines'):
+def prepare(doc):
+    doc.headers = [0, 0, 0, 0, 0, 0]
+    doc.information = {}
+    doc.defined = {}
 
-                # Get the category name
-                category = getFirstValue(definition, 'category')
+    if 'pandoc-numbering' in doc.metadata.content and isinstance(doc.metadata.content['pandoc-numbering'], MetaMap):
+        for category, definition in doc.metadata.content['pandoc-numbering'].content.items():
+            if isinstance(definition, MetaMap):
+                add_definition(category, definition, doc)
 
-                # Get the title
-                title = getProperty(definition, 'listing')
+    doc.count = {}
+    doc.collections = {}
 
-                listings.append(Header(1, ['', ['unnumbered'], []], title))
+def add_definition(category, definition, doc):
+    # Create the category with options by default
+    define(category, doc)
 
-                if format == 'latex':
-                    extendListingsLaTeX(listings, meta, definition, category)
-                else:
-                    extendListingsOther(listings, meta, definition, category)
+    # Detect general options
+    if 'general' in definition:
+        meta_cite(category, definition['general'], doc.defined)
+        meta_listing_title(category, definition['general'], doc.defined)
+        meta_levels(category, definition['general'], doc.defined)
+        meta_classes(category, definition['general'], doc.defined)
 
-        # Add listings to the document
-        if 'blocks' in doc:
-            doc['blocks'][0:0] = listings
-        else:  # old API
-            doc[1][0:0] = listings
+    # Detect LaTeX options
+    if doc.format == 'latex':
+        if 'latex' in definition:
+            meta_format_text(category, definition['latex'], doc.defined)
+            meta_format_link(category, definition['latex'], doc.defined)
+            meta_format_entry(category, definition['latex'], doc.defined)
+            meta_entry_tab(category, definition['latex'], doc.defined)
+            meta_entry_space(category, definition['latex'], doc.defined)            
+    # Detect standard options
+    else:
+        if 'standard' in definition:
+            meta_format_text(category, definition['standard'], doc.defined)
+            meta_format_link(category, definition['standard'], doc.defined)
+            meta_format_entry(category, definition['standard'], doc.defined)
 
-def extendListingsLaTeX(listings, meta, definition, category):
-    space = getSpace(definition, category)
-    tab = getTab(definition, category)
-    # Add a RawBlock
-    latexCategory = re.sub('[^a-z]+', '', category)
+def meta_cite(category, definition, defined):
+    if 'cite-shortcut' in definition:
+        if isinstance(definition['cite-shortcut'], MetaBool):
+            defined[category]['cite-shortcut'] = definition['cite-shortcut'].boolean
+        else:
+            debug('[WARNING] pandoc-numbering: cite-shortcut is not correct for category ' + category)
+
+def meta_listing_title(category, definition, defined):
+    if 'listing-title' in definition:
+        if isinstance(definition['listing-title'], MetaInlines):
+            defined[category]['listing-title'] = definition['listing-title'].content
+            # Detach from original parent
+            defined[category]['listing-title'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: listing-title is not correct for category ' + category)
+
+def meta_format_text(category, definition, defined):
+    if 'format-text-classic' in definition:
+        if isinstance(definition['format-text-classic'], MetaInlines):
+            defined[category]['format-text-classic'] = definition['format-text-classic'].content
+            # Detach from original parent
+            defined[category]['format-text-classic'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: format-text-classic is not correct for category ' + category)
+
+    if 'format-text-title' in definition:
+        if isinstance(definition['format-text-title'], MetaInlines):
+            defined[category]['format-text-title'] = definition['format-text-title'].content
+            # Detach from original parent
+            defined[category]['format-text-title'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: format-text-title is not correct for category ' + category)
+
+def meta_format_link(category, definition, defined):
+    if 'format-link-classic' in definition:
+        if isinstance(definition['format-link-classic'], MetaInlines):
+            defined[category]['format-link-classic'] = definition['format-link-classic'].content
+            # Detach from original parent
+            defined[category]['format-link-classic'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: format-link-classic is not correct for category ' + category)
+
+    if 'format-link-title' in definition:
+        if isinstance(definition['format-link-title'], MetaInlines):
+            defined[category]['format-link-title'] = definition['format-link-title'].content
+            # Detach from original parent
+            defined[category]['format-link-title'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: format-link-title is not correct for category ' + category)
+
+def meta_format_entry(category, definition, defined):
+    if 'format-entry-classic' in definition:
+        if isinstance(definition['format-entry-classic'], MetaInlines):
+            defined[category]['format-entry-classic'] = definition['format-entry-classic'].content
+            # Detach from original parent
+            defined[category]['format-entry-classic'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: format-entry-classic is not correct for category ' + category)
+
+    if 'format-entry-title' in definition:
+        if isinstance(definition['format-entry-title'], MetaInlines):
+            defined[category]['format-entry-title'] = definition['format-entry-title'].content
+            # Detach from original parent
+            defined[category]['format-entry-title'].parent = None
+        else:
+            debug('[WARNING] pandoc-numbering: format-entry-title is not correct for category ' + category)
+
+def meta_entry_tab(category, definition, defined):
+    if 'entry-tab' in definition and isinstance(definition['entry-tab'], MetaString):
+        # Get the tab
+        try:
+            tab = float(definition['entry-tab'].text)
+            if tab > 0:
+                defined[category]['entry-tab'] = tab
+            else:
+                debug('[WARNING] pandoc-numbering: entry-tab must be positive for category ' + category)
+        except ValueError:
+            debug('[WARNING] pandoc-numbering: entry-tab is not correct for category ' + category)
+
+def meta_entry_space(category, definition, defined):
+    if 'entry-space' in definition and isinstance(definition['entry-space'], MetaString):
+        # Get the space
+        try:
+            space = float(definition['entry-space'].text)
+            if space > 0:
+                defined[category]['entry-space'] = space
+            else:
+                debug('[WARNING] pandoc-numbering: entry-space must be positive for category ' + category)
+        except ValueError:
+            debug('[WARNING] pandoc-numbering: entry-space is not correct for category ' + category)
+
+def meta_levels(category, definition, defined):
+    if 'sectioning-levels' in definition and isinstance(definition['sectioning-levels'], MetaInlines) and len(definition['sectioning-levels'].content) == 1:
+        match = re.match(Numbered.header_regex, definition['sectioning-levels'].content[0].text)
+        if match:
+            # Compute the first and last levels section
+            defined[category]['first-section-level'] =  len(match.group('hidden')) // 2
+            defined[category]['last-section-level'] = len(match.group('header')) // 2
+    if 'first-section-level' in definition and isinstance(definition['first-section-level'], MetaString):
+        # Get the level
+        try:
+            level = int(definition['first-section-level'].text) - 1
+            if level >= 0 and level <= 6 :
+                defined[category]['first-section-level'] = level
+            else:
+                debug('[WARNING] pandoc-numbering: first-section-level must be positive or zero for category ' + category)
+        except ValueError:
+            debug('[WARNING] pandoc-numbering: first-section-level is not correct for category ' + category)
+    if 'last-section-level' in definition and isinstance(definition['last-section-level'], MetaString):
+        # Get the level
+        try:
+            level = int(definition['last-section-level'].text)
+            if level >= 0 and level <= 6 :
+                defined[category]['last-section-level'] = level
+            else:
+                debug('[WARNING] pandoc-numbering: last-section-level must be positive or zero for category ' + category)
+        except ValueError:
+            debug('[WARNING] pandoc-numbering: last-section-level is not correct for category ' + category)
+
+def meta_classes(category, definition, defined):
+    if 'classes' in definition and isinstance(definition['classes'], MetaList):
+        classes = []
+        for elt in definition['classes'].content:
+            classes.append(stringify(elt))
+        defined[category]['classes'] = classes
+
+def finalize(doc):
+    listings = []
+    # Loop on all listings definition
+    i = 0
+    for category, definition in doc.defined.items():
+        if definition['listing-title'] is not None:
+            doc.content.insert(i, Header(*definition['listing-title'], level=1, classes=['pandoc-numbering-listing'] + definition['classes']))
+            i = i + 1
+
+            if doc.format == 'latex':
+                table = table_latex(doc, category, definition)
+            else:
+                table = table_other(doc, category, definition)
+
+            if table:
+                doc.content.insert(i, table)
+                i = i + 1
+
+def table_other(doc, category, definition):
+    if category in doc.collections:
+        # Prepare the list
+        elements = []
+        # Loop on the collection
+        for tag in doc.collections[category]:
+            # Add an item to the list
+            elements.append(ListItem(Plain(Link(doc.information[tag].entry, url='#' + tag))))
+        # Return a bullet list
+        return BulletList(*elements)
+    else:
+        return None
+
+def table_latex(doc, category, definition):
+    latex_category = re.sub('[^a-z]+', '', category)
     latex = [
-        getLinkColor(meta),
+        link_color(doc),
         '\\makeatletter',
-        '\\newcommand*\\l@' + latexCategory + '{\\@dottedtocline{1}{' + str(tab) + 'em}{'+ str(space) +'em}}',
-        '\\@starttoc{' + latexCategory + '}',
+        '\\newcommand*\\l@' + latex_category + '{\\@dottedtocline{1}{' + str(definition['entry-tab']) + 'em}{'+ str(definition['entry-space']) +'em}}',
+        '\\@starttoc{' + latex_category + '}',
         '\\makeatother'
     ]
-    listings.append(RawBlock('tex', ''.join(latex)))
+    # Return a RawBlock
+    return RawBlock(''.join(latex), 'tex')
 
-def getLinkColor(meta):
+def link_color(doc):
     # Get the link color
-    if 'toccolor' in meta:
-        return '\\hypersetup{linkcolor=' + stringify(meta['toccolor']['c']) + '}'
+    metadata = doc.get_metadata()
+    if 'toccolor' in metadata:
+        return '\\hypersetup{linkcolor=' + str(metadata['toccolor']) + '}'
     else:
         return '\\hypersetup{linkcolor=black}'
 
-def getTab(definition, category):
-    # Get the tab
-    if hasProperty(definition, 'tab', 'MetaString'):
-        try:
-            tab = float(getProperty(definition, 'tab'))
-        except ValueError:
-            tab = None
-    else:
-        tab = None
-
-    # Deal with default tab length
-    if tab == None:
-        return 1.5
-    else:
-        return tab
-
-def getSpace(definition, category):
-    # Get the space
-    if hasProperty(definition, 'space', 'MetaString'):
-        try:
-            space = float(getProperty(definition, 'space'))
-        except ValueError:
-            space = None
-    else:
-        space = None
-
-    # Deal with default space length
-    if space == None:
-        level = 0
-        if category in collections:
-            # Loop on the collection
-            for tag in collections[category]:
-                level = max(level, information[tag]['section'].count('.'))
-        return level + 2.3
-    else:
-        return space
-
-def extendListingsOther(listings, meta, definition, category):
-    if category in collections:
-        # Prepare the list
-        elements = []
-
-        # Loop on the collection
-        for tag in collections[category]:
-
-            # Add an item to the list
-            text = information[tag]['toc']
-
-            if pandocVersion() < '1.16':
-                # pandoc 1.15
-                link = Link(text, ['#' + tag, ''])
-            else:
-                # pandoc 1.16
-                link = Link(['', [], []], text, ['#' + tag, ''])
-
-            elements.append([Plain([link])])
-
-        # Add a bullet list
-        listings.append(BulletList(elements))
-
-def getValue(category, meta, fct, default, analyzeDefinition):
-    if not hasattr(fct, 'value'):
-        fct.value = {}
-        if hasMeta(meta):
-            # Loop on all listings definition
-            for definition in meta['pandoc-numbering']['c']:
-                if isCorrect(definition):
-                    analyzeDefinition(definition)
-
-    if not category in fct.value:
-        fct.value[category] = default
-
-    return fct.value[category]
-
-def getFormat(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'format', 'MetaBool'):
-            getFormat.value[getFirstValue(definition, 'category')] = getProperty(definition, 'format')
-
-    return getValue(category, meta, getFormat, True, analyzeDefinition)
-
-def getText(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'text', 'MetaInlines'):
-            getText.value[getFirstValue(definition, 'category')] = getProperty(definition, 'text')
-        elif hasProperty(definition, 'text', 'MetaBlocks') and getProperty(definition, 'text') == []:
-            getText.value[getFirstValue(definition, 'category')] = []
-
-    return getValue(category, meta, getText, [Strong([Str('%D'), Space(), Str('%n')])], analyzeDefinition)
-
-def getTextTitle(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'text-title', 'MetaInlines'):
-            getTextTitle.value[getFirstValue(definition, 'category')] = getProperty(definition, 'text-title')
-        elif hasProperty(definition, 'text-title', 'MetaBlocks') and getProperty(definition, 'text-title') == []:
-            getTextTitle.value[getFirstValue(definition, 'category')] = []
-
-    return getValue(category, meta, getTextTitle, [Strong([Str('%D'), Space(), Str('%n')]), Space(), Emph([Str('('), Str('%T'), Str(')')])], analyzeDefinition)
-
-def getLink(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'link', 'MetaInlines'):
-            getLink.value[getFirstValue(definition, 'category')] = getProperty(definition, 'link')
-        elif hasProperty(definition, 'link', 'MetaBlocks') and getProperty(definition, 'link') == []:
-            getLink.value[getFirstValue(definition, 'category')] = []
-
-    return getValue(category, meta, getLink, [Str('%D'), Space(), Str('%n')], analyzeDefinition)
-
-def getLinkTitle(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'link-title', 'MetaInlines'):
-            getLinkTitle.value[getFirstValue(definition, 'category')] = getProperty(definition, 'link-title')
-        elif hasProperty(definition, 'link-title', 'MetaBlocks') and getProperty(definition, 'link-title') == []:
-            getLinkTitle.value[getFirstValue(definition, 'category')] = []
-
-    return getValue(category, meta, getLinkTitle, [Str('%D'), Space(), Str('%n')], analyzeDefinition)
-
-def getToc(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'toc', 'MetaInlines'):
-            getToc.value[getFirstValue(definition, 'category')] = getProperty(definition, 'toc')
-        elif hasProperty(definition, 'toc', 'MetaBlocks') and getProperty(definition, 'toc') == []:
-            getToc.value[getFirstValue(definition, 'category')] = []
-
-    return getValue(category, meta, getToc, [Str('%D')], analyzeDefinition)
-
-def getTocTitle(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'toc-title', 'MetaInlines'):
-            getTocTitle.value[getFirstValue(definition, 'category')] = getProperty(definition, 'toc-title')
-        elif hasProperty(definition, 'toc-title', 'MetaBlocks') and getProperty(definition, 'toc-title') == []:
-            getTocTitle.value[getFirstValue(definition, 'category')] = []
-
-    return getValue(category, meta, getTocTitle, [Str('%T')], analyzeDefinition)
-
-def getCiteShortCut(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'cite-shortcut', 'MetaBool'):
-            getCiteShortCut.value[getFirstValue(definition, 'category')] = getProperty(definition, 'cite-shortcut')
-
-    return getValue(category, meta, getCiteShortCut, False, analyzeDefinition)
-
-def getLevelsFromYaml(definition):
-    levelInf = 0
-    levelSup = 0
-    if hasProperty(definition, 'first', 'MetaString'):
-        try:
-            levelInf = max(min(int(getProperty(definition, 'first')) - 1, 6), 0)
-        except ValueError:
-            pass
-    if hasProperty(definition, 'last', 'MetaString'):
-        try:
-            levelSup = max(min(int(getProperty(definition, 'last')), 6), levelInf)
-        except ValueError:
-            pass
-    return [levelInf, levelSup]
-
-def getLevelsFromRegex(definition):
-    match = re.match('^' + headerRegex + '$', getFirstValue(definition, 'sectioning'))
-    if match:
-        # Compute the levelInf and levelSup values
-        return [len(match.group('hidden')) // 2, len(match.group('header')) // 2]
-    else:
-        return [0, 0]
-
-def getDefaultLevels(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'sectioning', 'MetaInlines') and\
-           len(getProperty(definition, 'sectioning')) == 1 and\
-           getProperty(definition, 'sectioning')[0]['t'] == 'Str':
-
-            getDefaultLevels.value[getFirstValue(definition, 'category')] = getLevelsFromRegex(definition)
-        else:
-            getDefaultLevels.value[getFirstValue(definition, 'category')] = getLevelsFromYaml(definition)
-
-    return getValue(category, meta, getDefaultLevels, [0, 0], analyzeDefinition)
-
-def getClasses(category, meta):
-    def analyzeDefinition(definition):
-        if hasProperty(definition, 'classes', 'MetaList'):
-            classes = []
-            for elt in getProperty(definition, 'classes'):
-                classes.append(stringify(elt))
-            getClasses.value[getFirstValue(definition, 'category')] = classes
-
-    return getValue(category, meta, getClasses, [category], analyzeDefinition)
-
-def pandocVersion():
-    if not hasattr(pandocVersion, 'value'):
-        p = subprocess.Popen(['pandoc', '-v'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        out, err = p.communicate()
-        pandocVersion.value = re.search(b'pandoc (?P<version>.*)', out).group('version').decode('utf-8')
-    return pandocVersion.value
-
-def main():
-    toJSONFilters([numbering, referencing])
+def main(doc = None):
+    run_filters([numbering, referencing], prepare = prepare, doc = doc, finalize = finalize)
 
 if __name__ == '__main__':
     main()
