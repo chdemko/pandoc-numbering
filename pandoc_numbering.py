@@ -306,6 +306,8 @@ def define(category, doc):
         'classes':              [category],
         'cite-shortcut':        False,
         'listing-title':        None,
+        'listing-unnumbered':   True,
+        'listing-unlisted':     True,
         'entry-tab':            1.5,
         'entry-space':          2.3,
     }
@@ -404,7 +406,7 @@ def add_definition(category, definition, doc):
     # Detect general options
     if 'general' in definition:
         meta_cite(category, definition['general'], doc.defined)
-        meta_listing_title(category, definition['general'], doc.defined)
+        meta_listing(category, definition['general'], doc.defined)
         meta_levels(category, definition['general'], doc.defined)
         meta_classes(category, definition['general'], doc.defined)
 
@@ -430,7 +432,7 @@ def meta_cite(category, definition, defined):
         else:
             debug('[WARNING] pandoc-numbering: cite-shortcut is not correct for category ' + category)
 
-def meta_listing_title(category, definition, defined):
+def meta_listing(category, definition, defined):
     if 'listing-title' in definition:
         if isinstance(definition['listing-title'], MetaInlines):
             defined[category]['listing-title'] = definition['listing-title'].content
@@ -438,6 +440,16 @@ def meta_listing_title(category, definition, defined):
             defined[category]['listing-title'].parent = None
         else:
             debug('[WARNING] pandoc-numbering: listing-title is not correct for category ' + category)
+    if 'listing-unnumbered' in definition:
+        if isinstance(definition['listing-unnumbered'], MetaBool):
+            defined[category]['listing-unnumbered'] = definition['listing-unnumbered'].boolean
+        else:
+            debug('[WARNING] pandoc-numbering: listing-unnumbered is not correct for category ' + category)
+    if 'listing-unlisted' in definition:
+        if isinstance(definition['listing-unlisted'], MetaBool):
+            defined[category]['listing-unlisted'] = definition['listing-unlisted'].boolean
+        else:
+            debug('[WARNING] pandoc-numbering: listing-unlisted is not correct for category ' + category)
 
 def meta_format_text(category, definition, defined):
     if 'format-text-classic' in definition:
@@ -555,7 +567,11 @@ def finalize(doc):
     i = 0
     for category, definition in doc.defined.items():
         if definition['listing-title'] is not None:
-            classes = ['pandoc-numbering-listing', 'unnumbered', 'unlisted'] + definition['classes']
+            classes = ['pandoc-numbering-listing'] + definition['classes']
+            if definition['listing-unnumbered']:
+                classes.append('unnumbered')
+            if definition['listing-unlisted']:
+                classes.append('unlisted')
             doc.content.insert(i, Header(*definition['listing-title'], level=1, classes=classes))
             i = i + 1
 
