@@ -555,7 +555,8 @@ def finalize(doc):
     i = 0
     for category, definition in doc.defined.items():
         if definition['listing-title'] is not None:
-            doc.content.insert(i, Header(*definition['listing-title'], level=1, classes=['pandoc-numbering-listing'] + definition['classes']))
+            classes = ['pandoc-numbering-listing', 'unnumbered', 'unlisted'] + definition['classes']
+            doc.content.insert(i, Header(*definition['listing-title'], level=1, classes=classes))
             i = i + 1
 
             if doc.format == 'latex':

@@ -28,7 +28,7 @@ pandoc-numbering:
       listing-title: List of exercises
 ---
 
-List of exercises {.pandoc-numbering-listing .exercise}
+List of exercises {.pandoc-numbering-listing .unnumbered .unlisted .exercise}
 =================
 
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
@@ -62,7 +62,7 @@ pandoc-numbering:
       listing-title: List of exercises
 ---
 
-List of exercises {.pandoc-numbering-listing .exercise}
+List of exercises {.pandoc-numbering-listing .unnumbered .unlisted .exercise}
 =================
 
 \\hypersetup{linkcolor=black}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{1.5em}{2.3em}}\\@starttoc{exercise}\\makeatother
@@ -101,7 +101,7 @@ pandoc-numbering:
       format-entry-title: '\%g %D (%T)'
 ---
 
-List of exercises {.pandoc-numbering-listing .exercise}
+List of exercises {.pandoc-numbering-listing .unnumbered .unlisted .exercise}
 =================
 
 -   [[1 Exercise]{.pandoc-numbering-entry .exercise}](#exercise:1)
@@ -147,7 +147,7 @@ pandoc-numbering:
 toccolor: blue
 ---
 
-List of exercises {.pandoc-numbering-listing .exercise}
+List of exercises {.pandoc-numbering-listing .unnumbered .unlisted .exercise}
 =================
 
 \\hypersetup{linkcolor=blue}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{2.0em}{3.0em}}\\@starttoc{exercise}\\makeatother
