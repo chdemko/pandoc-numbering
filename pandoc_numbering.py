@@ -618,7 +618,7 @@ def link_color(doc):
         return '\\hypersetup{linkcolor=black}'
 
 def main(doc = None):
-    run_filters([numbering, referencing], prepare = prepare, doc = doc, finalize = finalize)
+    return run_filters([numbering, referencing], prepare = prepare, doc = doc, finalize = finalize)
 
 if __name__ == '__main__':
     main()
