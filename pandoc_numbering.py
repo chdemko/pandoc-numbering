@@ -19,6 +19,7 @@ class Numbered(object):
         '_tag',
         '_entry',
         '_link',
+        '_caption',
         '_title',
         '_description',
         '_category',
@@ -63,6 +64,14 @@ class Numbered(object):
     @property
     def local_number(self):
         return self._local_number
+
+    @property
+    def category(self):
+        return self._category
+
+    @property
+    def caption(self):
+        return self._caption
 
     number_regex = '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?'
     _regex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
@@ -140,7 +149,7 @@ class Numbered(object):
                     del self._get_content()[i-1:-2]
                     break
         self._title = list(self._title)
-        
+
     def _compute_description(self):
         self._description = self._get_content()[:-2]
         # Detach from original parent
@@ -221,14 +230,30 @@ class Numbered(object):
         self._entry.classes = self._entry.classes + classes
 
         # Prepare the final data
-        if self._title: 
+        if self._title:
             self._get_content()[0].content = copy.deepcopy(self._doc.defined[self._basic_category]['format-text-title'])
             self._link.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-link-title'])
             self._entry.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-entry-title'])
+            self._caption = self._doc.defined[self._basic_category]['format-caption-title']
         else:
             self._get_content()[0].content = copy.deepcopy(self._doc.defined[self._basic_category]['format-text-classic'])
             self._link.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-link-classic'])
             self._entry.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-entry-classic'])
+            self._caption = self._doc.defined[self._basic_category]['format-caption-classic']
+
+        # Compute caption (report replacing %c at the end since it is not known for the moment)
+        title = stringify(Span(*self._title))
+        description = stringify(Span(*self._description))
+        self._caption = self._caption.replace('%t', title.lower())
+        self._caption = self._caption.replace('%T', title)
+        self._caption = self._caption.replace('%d', description.lower())
+        self._caption = self._caption.replace('%D', description)
+        self._caption = self._caption.replace('%s', self._section_number)
+        self._caption = self._caption.replace('%g', self._global_number)
+        self._caption = self._caption.replace('%n', self._local_number)
+        self._caption = self._caption.replace('#', self._local_number)
+        if self._doc.format == 'latex':
+            self._caption = self._caption.replace('%p', '\\pageref{' + self._tag + '}')
 
         # Compute content
         replace_description(self._elem, self._description)
@@ -252,7 +277,7 @@ class Numbered(object):
         replace_global_number(self._entry, self._global_number)
         replace_section_number(self._entry, self._section_number)
         replace_local_number(self._entry, self._local_number)
-        
+
         # Finalize the content
         if self._doc.format == 'latex':
             self._get_content()[0].content.insert(0, RawInline('\\label{' + self._tag + '}', 'tex'))
@@ -291,25 +316,30 @@ def replace_local_number(where, local_number):
 def replace_page_number(where, tag):
     where.walk(partial(replacing, search='%p', replace=[RawInline('\\pageref{' + tag + '}', 'tex')]))
 
+def replace_count(where, count):
+    where.walk(partial(replacing, search='%c', replace=[Str(count)]))
+
 def to_latex(elem):
     return convert_text(Plain(elem), input_format='panflute', output_format='latex', extra_args=['--no-highlight'])
 
 def define(category, doc):
     doc.defined[category] = {
-        'first-section-level':  0,
-        'last-section-level':   0,
-        'format-text-classic':  [Strong(Str('%D'), Space(), Str('%n'))],
-        'format-text-title':    [Strong(Str('%D'), Space(), Str('%n')), Space(), Emph(Str('(%T)'))],
-        'format-link-classic':  [Str('%D'), Space(), Str('%n')],
-        'format-link-title':    [Str('%D'), Space(), Str('%n'), Space(), Str('(%T)')],
-        'format-entry-title':   [Str('%T')],
-        'classes':              [category],
-        'cite-shortcut':        False,
-        'listing-title':        None,
-        'listing-unnumbered':   True,
-        'listing-unlisted':     True,
-        'entry-tab':            1.5,
-        'entry-space':          2.3,
+        'first-section-level':    0,
+        'last-section-level':     0,
+        'format-text-classic':    [Strong(Str('%D'), Space(), Str('%n'))],
+        'format-text-title':      [Strong(Str('%D'), Space(), Str('%n')), Space(), Emph(Str('(%T)'))],
+        'format-link-classic':    [Str('%D'), Space(), Str('%n')],
+        'format-link-title':      [Str('%D'), Space(), Str('%n'), Space(), Str('(%T)')],
+        'format-caption-classic': '%D %n',
+        'format-caption-title':   '%D %n (%T)',
+        'format-entry-title':     [Str('%T')],
+        'classes':                [category],
+        'cite-shortcut':          False,
+        'listing-title':          None,
+        'listing-unnumbered':     True,
+        'listing-unlisted':       True,
+        'entry-tab':              1.5,
+        'entry-space':            2.3,
     }
     if doc.format == 'latex':
         doc.defined[category]['format-entry-classic'] = [Str('%D')]
@@ -354,20 +384,36 @@ def referencing(elem, doc):
         return referencing_link(elem, doc)
     elif isinstance(elem, Cite):
         return referencing_cite(elem, doc)
+    elif isinstance(elem, Span) and elem.identifier in doc.information:
+        replace_count(elem, str(doc.count[doc.information[elem.identifier].category]))
 
 def referencing_link(elem, doc):
     match = re.match('^#(?P<tag>([a-zA-Z][\w:.-]*))$', elem.url)
     if match:
         tag = match.group('tag')
         if tag in doc.information:
-            if bool(elem.content):
-                replace_title(elem, doc.information[tag].title)
-                replace_description(elem, doc.information[tag].description)
-                replace_global_number(elem, doc.information[tag].global_number)
-                replace_section_number(elem, doc.information[tag].section_number)
-                replace_local_number(elem, doc.information[tag].local_number)
-            else:
-                elem.content = [doc.information[tag].link]
+            replace_title(elem, doc.information[tag].title)
+            replace_description(elem, doc.information[tag].description)
+            replace_global_number(elem, doc.information[tag].global_number)
+            replace_section_number(elem, doc.information[tag].section_number)
+            replace_local_number(elem, doc.information[tag].local_number)
+            replace_count(elem, str(doc.count[doc.information[tag].category]))
+            if doc.format == 'latex':
+                replace_page_number(elem, tag)
+
+            title = stringify(Span(*doc.information[tag].title))
+            description = stringify(Span(*doc.information[tag].description))
+            elem.title = elem.title.replace('%t', title.lower())
+            elem.title = elem.title.replace('%T', title)
+            elem.title = elem.title.replace('%d', description.lower())
+            elem.title = elem.title.replace('%D', description)
+            elem.title = elem.title.replace('%s', doc.information[tag].section_number)
+            elem.title = elem.title.replace('%g', doc.information[tag].global_number)
+            elem.title = elem.title.replace('%n', doc.information[tag].local_number)
+            elem.title = elem.title.replace('#', doc.information[tag].local_number)
+            elem.title = elem.title.replace('%c', str(doc.count[doc.information[tag].category]))
+            if doc.format == 'latex':
+                elem.title = elem.title.replace('%p', '\\pageref{' + tag + '}')
 
 def referencing_cite(elem, doc):
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
@@ -378,7 +424,14 @@ def referencing_cite(elem, doc):
                 # Deal with @prefix:name shortcut
                 tag = match.group('tag')
                 if tag in doc.information:
-                    return Link(doc.information[tag].link, url = '#' + tag)
+                    ret = Link(
+                        doc.information[tag].link,
+                        url = '#' + tag,
+                        title = doc.information[tag].caption.replace('%c', str(doc.count[doc.information[tag].category]))
+                    )
+                    replace_count(ret, str(doc.count[doc.information[tag].category]))
+                    return ret
+
 
 def update_header_numbers(elem, doc):
     if 'unnumbered' not in elem.classes:
@@ -415,14 +468,16 @@ def add_definition(category, definition, doc):
         if 'latex' in definition:
             meta_format_text(category, definition['latex'], doc.defined)
             meta_format_link(category, definition['latex'], doc.defined)
+            meta_format_caption(category, definition['latex'], doc.defined)
             meta_format_entry(category, definition['latex'], doc.defined)
             meta_entry_tab(category, definition['latex'], doc.defined)
-            meta_entry_space(category, definition['latex'], doc.defined)            
+            meta_entry_space(category, definition['latex'], doc.defined)
     # Detect standard options
     else:
         if 'standard' in definition:
             meta_format_text(category, definition['standard'], doc.defined)
             meta_format_link(category, definition['standard'], doc.defined)
+            meta_format_caption(category, definition['standard'], doc.defined)
             meta_format_entry(category, definition['standard'], doc.defined)
 
 def meta_cite(category, definition, defined):
@@ -484,6 +539,19 @@ def meta_format_link(category, definition, defined):
             defined[category]['format-link-title'].parent = None
         else:
             debug('[WARNING] pandoc-numbering: format-link-title is not correct for category ' + category)
+
+def meta_format_caption(category, definition, defined):
+    if 'format-caption-classic' in definition:
+        if isinstance(definition['format-caption-classic'], MetaInlines):
+            defined[category]['format-caption-classic'] = stringify(definition['format-caption-classic'])
+        else:
+            debug('[WARNING] pandoc-numbering: format-caption-classic is not correct for category ' + category)
+
+    if 'format-caption-title' in definition:
+        if isinstance(definition['format-caption-title'], MetaInlines):
+            defined[category]['format-caption-title'] = stringify(definition['format-caption-title'])
+        else:
+            debug('[WARNING] pandoc-numbering: format-caption-title is not correct for category ' + category)
 
 def meta_format_entry(category, definition, defined):
     if 'format-entry-classic' in definition:

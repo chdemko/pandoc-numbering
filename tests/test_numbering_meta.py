@@ -36,15 +36,15 @@ pandoc-numbering:
         '''
     )
 
-def test_numbering_cite():
+def test_numbering_text():
     verify_conversion(
         '''
 ---
 pandoc-numbering:
   exercise:
     standard:
-      format-text-classic: '**%D %d %n**'
-      format-text-title: '**%D %d %n: %T %t**'
+      format-text-classic: '**%D %d %n/%c**'
+      format-text-title: '**%D %d %n/%c: %T %t**'
 ---
 
 Exercise #
@@ -56,13 +56,13 @@ Exercise (Title) #
 pandoc-numbering:
   exercise:
     standard:
-      format-text-classic: '**%D %d %n**'
-      format-text-title: '**%D %d %n: %T %t**'
+      format-text-classic: '**%D %d %n/%c**'
+      format-text-title: '**%D %d %n/%c: %T %t**'
 ---
 
-[**Exercise exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise exercise 1/2**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise exercise 2: Title title**]{#exercise:2 .pandoc-numbering-text .exercise}
+[**Exercise exercise 2/2: Title title**]{#exercise:2 .pandoc-numbering-text .exercise}
         '''
     )
 
