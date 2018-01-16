@@ -21,7 +21,6 @@ except (IOError, ImportError):
     with open(path.join(here, 'README.md'), encoding='utf-8') as f:
         long_description = f.read()
 
-
 setup(
     name='pandoc-numbering',
 

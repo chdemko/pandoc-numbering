@@ -334,7 +334,7 @@ def define(category, doc):
         'format-caption-title':   '%D %n (%T)',
         'format-entry-title':     [Str('%T')],
         'classes':                [category],
-        'cite-shortcut':          False,
+        'cite-shortcut':          True,
         'listing-title':          None,
         'listing-unnumbered':     True,
         'listing-unlisted':       True,
