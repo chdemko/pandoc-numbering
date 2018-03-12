@@ -319,8 +319,12 @@ def replace_page_number(where, tag):
 def replace_count(where, count):
     where.walk(partial(replacing, search='%c', replace=[Str(count)]))
 
+def remove_useless_latex(elem, doc):
+    if isinstance(elem, (BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, ListItem, Note, Para, RawBlock, RawInline, SoftBreak, Table, TableCell, TableRow)):
+        return []
+
 def to_latex(elem):
-    return convert_text(Plain(elem), input_format='panflute', output_format='latex', extra_args=['--no-highlight'])
+    return convert_text(run_filters([remove_useless_latex], doc=Plain(elem)), input_format='panflute', output_format='latex', extra_args=['--no-highlight'])
 
 def define(category, doc):
     doc.defined[category] = {
