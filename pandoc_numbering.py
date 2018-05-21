@@ -11,6 +11,7 @@ import re
 import unicodedata
 import copy
 
+
 class Numbered(object):
     __slots__ = [
         '_elem',
@@ -295,36 +296,46 @@ class Numbered(object):
                 '}}'
             self._get_content().insert(0, RawInline(latex, 'tex'))
 
+
 def replace_description(where, description):
     where.walk(partial(replacing, search='%D', replace=copy.deepcopy(description)))
     where.walk(partial(replacing, search='%d', replace=list(item.walk(lowering) for item in copy.deepcopy(description))))
+
 
 def replace_title(where, title):
     where.walk(partial(replacing, search='%T', replace=copy.deepcopy(title)))
     where.walk(partial(replacing, search='%t', replace=list(item.walk(lowering) for item in copy.deepcopy(title))))
 
+
 def replace_section_number(where, section_number):
     where.walk(partial(replacing, search='%s', replace=[Str(section_number)]))
 
+
 def replace_global_number(where, global_number):
     where.walk(partial(replacing, search='%g', replace=[Str(global_number)]))
+
 
 def replace_local_number(where, local_number):
     where.walk(partial(replacing, search='%n', replace=[Str(local_number)]))
     where.walk(partial(replacing, search='#', replace=[Str(local_number)]))
 
+
 def replace_page_number(where, tag):
     where.walk(partial(replacing, search='%p', replace=[RawInline('\\pageref{' + tag + '}', 'tex')]))
 
+
 def replace_count(where, count):
     where.walk(partial(replacing, search='%c', replace=[Str(count)]))
+
 
 def remove_useless_latex(elem, doc):
     if isinstance(elem, (BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, ListItem, Note, Para, RawBlock, RawInline, SoftBreak, Table, TableCell, TableRow)):
         return []
 
+
 def to_latex(elem):
     return convert_text(run_filters([remove_useless_latex], doc=Plain(elem)), input_format='panflute', output_format='latex', extra_args=['--no-highlight'])
+
 
 def define(category, doc):
     doc.defined[category] = {
@@ -352,9 +363,11 @@ def define(category, doc):
     else:
         doc.defined[category]['format-entry-classic'] = [Str('%D'), Space(), Str('%g')]
 
+
 def lowering(elem, doc):
     if isinstance(elem, Str):
         elem.text = elem.text.lower()
+
 
 def replacing(elem, doc, search=None, replace=None):
     if isinstance(elem, Str):
@@ -375,6 +388,7 @@ def replacing(elem, doc, search=None, replace=None):
 
     return [elem]
 
+
 def numbering(elem, doc):
     if isinstance(elem, Header):
         update_header_numbers(elem, doc)
@@ -383,6 +397,7 @@ def numbering(elem, doc):
         if numbered.tag is not None:
             doc.information[numbered.tag] = numbered
 
+
 def referencing(elem, doc):
     if isinstance(elem, Link):
         return referencing_link(elem, doc)
@@ -390,6 +405,7 @@ def referencing(elem, doc):
         return referencing_cite(elem, doc)
     elif isinstance(elem, Span) and elem.identifier in doc.information:
         replace_count(elem, str(doc.count[doc.information[elem.identifier].category]))
+
 
 def referencing_link(elem, doc):
     match = re.match('^#(?P<tag>([a-zA-Z][\w:.-]*))$', elem.url)
@@ -419,6 +435,7 @@ def referencing_link(elem, doc):
             if doc.format == 'latex':
                 elem.title = elem.title.replace('%p', '\\pageref{' + tag + '}')
 
+
 def referencing_cite(elem, doc):
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
         match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', elem.content[0].text)
@@ -437,11 +454,13 @@ def referencing_cite(elem, doc):
                     return ret
 
 
+
 def update_header_numbers(elem, doc):
     if 'unnumbered' not in elem.classes:
         doc.headers[elem.level - 1] = doc.headers[elem.level - 1] + 1
         for index in range(elem.level, 6):
             doc.headers[index] = 0
+
 
 def prepare(doc):
     doc.headers = [0, 0, 0, 0, 0, 0]
@@ -455,6 +474,7 @@ def prepare(doc):
 
     doc.count = {}
     doc.collections = {}
+
 
 def add_definition(category, definition, doc):
     # Create the category with options by default
@@ -484,12 +504,14 @@ def add_definition(category, definition, doc):
             meta_format_caption(category, definition['standard'], doc.defined)
             meta_format_entry(category, definition['standard'], doc.defined)
 
+
 def meta_cite(category, definition, defined):
     if 'cite-shortcut' in definition:
         if isinstance(definition['cite-shortcut'], MetaBool):
             defined[category]['cite-shortcut'] = definition['cite-shortcut'].boolean
         else:
             debug('[WARNING] pandoc-numbering: cite-shortcut is not correct for category ' + category)
+
 
 def meta_listing(category, definition, defined):
     if 'listing-title' in definition:
@@ -510,6 +532,7 @@ def meta_listing(category, definition, defined):
         else:
             debug('[WARNING] pandoc-numbering: listing-unlisted is not correct for category ' + category)
 
+
 def meta_format_text(category, definition, defined):
     if 'format-text-classic' in definition:
         if isinstance(definition['format-text-classic'], MetaInlines):
@@ -526,6 +549,7 @@ def meta_format_text(category, definition, defined):
             defined[category]['format-text-title'].parent = None
         else:
             debug('[WARNING] pandoc-numbering: format-text-title is not correct for category ' + category)
+
 
 def meta_format_link(category, definition, defined):
     if 'format-link-classic' in definition:
@@ -544,6 +568,7 @@ def meta_format_link(category, definition, defined):
         else:
             debug('[WARNING] pandoc-numbering: format-link-title is not correct for category ' + category)
 
+
 def meta_format_caption(category, definition, defined):
     if 'format-caption-classic' in definition:
         if isinstance(definition['format-caption-classic'], MetaInlines):
@@ -556,6 +581,7 @@ def meta_format_caption(category, definition, defined):
             defined[category]['format-caption-title'] = stringify(definition['format-caption-title'])
         else:
             debug('[WARNING] pandoc-numbering: format-caption-title is not correct for category ' + category)
+
 
 def meta_format_entry(category, definition, defined):
     if 'format-entry-classic' in definition:
@@ -574,6 +600,7 @@ def meta_format_entry(category, definition, defined):
         else:
             debug('[WARNING] pandoc-numbering: format-entry-title is not correct for category ' + category)
 
+
 def meta_entry_tab(category, definition, defined):
     if 'entry-tab' in definition and isinstance(definition['entry-tab'], MetaString):
         # Get the tab
@@ -586,6 +613,7 @@ def meta_entry_tab(category, definition, defined):
         except ValueError:
             debug('[WARNING] pandoc-numbering: entry-tab is not correct for category ' + category)
 
+
 def meta_entry_space(category, definition, defined):
     if 'entry-space' in definition and isinstance(definition['entry-space'], MetaString):
         # Get the space
@@ -597,6 +625,7 @@ def meta_entry_space(category, definition, defined):
                 debug('[WARNING] pandoc-numbering: entry-space must be positive for category ' + category)
         except ValueError:
             debug('[WARNING] pandoc-numbering: entry-space is not correct for category ' + category)
+
 
 def meta_levels(category, definition, defined):
     if 'sectioning-levels' in definition and isinstance(definition['sectioning-levels'], MetaInlines) and len(definition['sectioning-levels'].content) == 1:
@@ -626,12 +655,14 @@ def meta_levels(category, definition, defined):
         except ValueError:
             debug('[WARNING] pandoc-numbering: last-section-level is not correct for category ' + category)
 
+
 def meta_classes(category, definition, defined):
     if 'classes' in definition and isinstance(definition['classes'], MetaList):
         classes = []
         for elt in definition['classes'].content:
             classes.append(stringify(elt))
         defined[category]['classes'] = classes
+
 
 def finalize(doc):
     listings = []
@@ -656,6 +687,7 @@ def finalize(doc):
                 doc.content.insert(i, table)
                 i = i + 1
 
+
 def table_other(doc, category, definition):
     if category in doc.collections:
         # Prepare the list
@@ -669,6 +701,7 @@ def table_other(doc, category, definition):
     else:
         return None
 
+
 def table_latex(doc, category, definition):
     latex_category = re.sub('[^a-z]+', '', category)
     latex = [
@@ -681,6 +714,7 @@ def table_latex(doc, category, definition):
     # Return a RawBlock
     return RawBlock(''.join(latex), 'tex')
 
+
 def link_color(doc):
     # Get the link color
     metadata = doc.get_metadata()
@@ -689,8 +723,10 @@ def link_color(doc):
     else:
         return '\\hypersetup{linkcolor=black}'
 
+
 def main(doc = None):
     return run_filters([numbering, referencing], prepare = prepare, doc = doc, finalize = finalize)
+
 
 if __name__ == '__main__':
     main()
