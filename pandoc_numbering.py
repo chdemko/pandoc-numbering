@@ -158,7 +158,7 @@ class Numbered(object):
         self._description = list(self._description)
 
     def _compute_basic_category(self):
-        if self._match.group('prefix') == None:
+        if self._match.group('prefix') is None:
             self._basic_category = Numbered._identifier(''.join(map(stringify, self._description)))
         else:
             self._basic_category = self._match.group('prefix')
@@ -199,7 +199,7 @@ class Numbered(object):
 
     def _compute_tag(self):
         # Determine the final tag
-        if self._match.group('name') == None:
+        if self._match.group('name') is None:
             self._tag = self._category + self._number
         else:
             self._tag = self._basic_category + ':' + self._match.group('name')
