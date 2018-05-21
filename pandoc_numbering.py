@@ -183,7 +183,7 @@ class Numbered(object):
         if self._last_section_level != 0:
             self._leading = self._section_number + '.'
         else:
-            self._leading =  ''
+            self._leading = ''
 
     def _compute_category(self):
         self._category = self._basic_category + ':' + self._leading
