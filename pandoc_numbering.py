@@ -263,7 +263,7 @@ class Numbered(object):
         replace_section_number(self._elem, self._section_number)
         replace_local_number(self._elem, self._local_number)
 
-        ## Compute link
+        # Compute link
         replace_description(self._link, self._description)
         replace_title(self._link, self._title)
         replace_global_number(self._link, self._global_number)
