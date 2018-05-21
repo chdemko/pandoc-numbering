@@ -454,7 +454,6 @@ def referencing_cite(elem, doc):
                     return ret
 
 
-
 def update_header_numbers(elem, doc):
     if 'unnumbered' not in elem.classes:
         doc.headers[elem.level - 1] = doc.headers[elem.level - 1] + 1
