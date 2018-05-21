@@ -632,7 +632,7 @@ def meta_levels(category, definition, defined):
         match = re.match(Numbered.header_regex, definition['sectioning-levels'].content[0].text)
         if match:
             # Compute the first and last levels section
-            defined[category]['first-section-level'] =  len(match.group('hidden')) // 2
+            defined[category]['first-section-level'] = len(match.group('hidden')) // 2
             defined[category]['last-section-level'] = len(match.group('header')) // 2
     if 'first-section-level' in definition and isinstance(definition['first-section-level'], MetaString):
         # Get the level
