@@ -665,7 +665,6 @@ def meta_classes(category, definition, defined):
 
 
 def finalize(doc):
-    listings = []
     # Loop on all listings definition
     i = 0
     for category, definition in doc.defined.items():
