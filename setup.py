@@ -110,7 +110,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'dev': ['check-manifest'],
+        'dev': ['check-manifest', 'pylint', 'flake8'],
         'test': ['coverage'],
     },
 
