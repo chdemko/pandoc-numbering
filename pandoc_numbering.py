@@ -4,12 +4,12 @@
 Pandoc filter to number all kinds of things.
 """
 
-from panflute import BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Emph, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, Link, ListItem, Note, Para, Plain, RawBlock, RawInline, SoftBreak, Space, Span, Str, Strong, Table, TableCell, TableRow, MetaBool, MetaInlines, MetaList, MetaMap, MetaString, run_filters, stringify, convert_text, debug
-
 from functools import partial
 import re
 import unicodedata
 import copy
+
+from panflute import BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Emph, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, Link, ListItem, Note, Para, Plain, RawBlock, RawInline, SoftBreak, Space, Span, Str, Strong, Table, TableCell, TableRow, MetaBool, MetaInlines, MetaList, MetaMap, MetaString, run_filters, stringify, convert_text, debug
 
 
 class Numbered(object):
@@ -74,8 +74,8 @@ class Numbered(object):
     def caption(self):
         return self._caption
 
-    number_regex = '#((?P<prefix>[a-zA-Z][\w.-]*):)?(?P<name>[a-zA-Z][\w:.-]*)?'
-    _regex = '(?P<header>(?P<hidden>(-\.)*)(\+\.)*)'
+    number_regex = '#((?P<prefix>[a-zA-Z][\\w.-]*):)?(?P<name>[a-zA-Z][\\w:.-]*)?'
+    _regex = '(?P<header>(?P<hidden>(-\\.)*)(\\+\\.)*)'
     header_regex = '^' + _regex + '$'
     marker_regex = '^' + _regex + number_regex + '$'
     double_sharp_regex = '^' + _regex + '#' + number_regex + '$'
@@ -101,7 +101,7 @@ class Numbered(object):
         self._entry = Span(classes=['pandoc-numbering-entry'])
         self._link = Span(classes=['pandoc-numbering-link'])
         self._tag = None
-        if len(self._get_content()) > 0 and isinstance(self._get_content()[-1], Str):
+        if self._get_content() and isinstance(self._get_content()[-1], Str):
             self._match = re.match(Numbered.marker_regex, self._get_content()[-1].text)
             if self._match:
                 self._replace_marker()
@@ -119,6 +119,7 @@ class Numbered(object):
             return self._elem.content
         elif isinstance(self._elem, DefinitionItem):
             return self._elem.term
+        return None
 
     def _replace_double_sharp(self):
         self._get_content()[-1].text = self._get_content()[-1].text.replace('##', '#', 1)
@@ -291,7 +292,7 @@ class Numbered(object):
                 '}{\\protect\\numberline {' + \
                 self._leading + \
                 self._number + \
-                '}{\ignorespaces ' + \
+                '}{\\ignorespaces ' + \
                 to_latex(self._entry) + \
                 '}}'
             self._get_content().insert(0, RawInline(latex, 'tex'))
@@ -328,9 +329,10 @@ def replace_count(where, count):
     where.walk(partial(replacing, search='%c', replace=[Str(count)]))
 
 
-def remove_useless_latex(elem, doc):
+def remove_useless_latex(elem, _):
     if isinstance(elem, (BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, ListItem, Note, Para, RawBlock, RawInline, SoftBreak, Table, TableCell, TableRow)):
         return []
+    return None
 
 
 def to_latex(elem):
@@ -364,22 +366,22 @@ def define(category, doc):
         doc.defined[category]['format-entry-classic'] = [Str('%D'), Space(), Str('%g')]
 
 
-def lowering(elem, doc):
+def lowering(elem, _):
     if isinstance(elem, Str):
         elem.text = elem.text.lower()
 
 
-def replacing(elem, doc, search=None, replace=None):
+def replacing(elem, _, search=None, replace=None):
     if isinstance(elem, Str):
-        prepare = elem.text.split(search)
-        if len(prepare) > 1:
+        search_splitted = elem.text.split(search)
+        if len(search_splitted) > 1:
 
             text = []
 
-            if prepare[0] != '':
-                text.append(Str(prepare[0]))
+            if search_splitted[0] != '':
+                text.append(Str(search_splitted[0]))
 
-            for string in prepare[1:]:
+            for string in search_splitted[1:]:
                 text.extend(replace)
                 if string != '':
                     text.append(Str(string))
@@ -405,10 +407,11 @@ def referencing(elem, doc):
         return referencing_cite(elem, doc)
     elif isinstance(elem, Span) and elem.identifier in doc.information:
         replace_count(elem, str(doc.count[doc.information[elem.identifier].category]))
+    return None
 
 
 def referencing_link(elem, doc):
-    match = re.match('^#(?P<tag>([a-zA-Z][\w:.-]*))$', elem.url)
+    match = re.match('^#(?P<tag>([a-zA-Z][\\w:.-]*))$', elem.url)
     if match:
         tag = match.group('tag')
         if tag in doc.information:
@@ -438,7 +441,7 @@ def referencing_link(elem, doc):
 
 def referencing_cite(elem, doc):
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
-        match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\w.-]*):(([a-zA-Z][\w.-]*)|(\d*(\.\d*)*))))$', elem.content[0].text)
+        match = re.match('^(@(?P<tag>(?P<category>[a-zA-Z][\\w.-]*):(([a-zA-Z][\\w.-]*)|(\\d*(\\.\\d*)*))))$', elem.content[0].text)
         if match:
             category = match.group('category')
             if category in doc.defined and doc.defined[category]['cite-shortcut']:
@@ -452,6 +455,7 @@ def referencing_cite(elem, doc):
                     )
                     replace_count(ret, str(doc.count[doc.information[tag].category]))
                     return ret
+    return None
 
 
 def update_header_numbers(elem, doc):
@@ -686,7 +690,7 @@ def finalize(doc):
                 i = i + 1
 
 
-def table_other(doc, category, definition):
+def table_other(doc, category, _):
     if category in doc.collections:
         # Prepare the list
         elements = []
@@ -696,8 +700,7 @@ def table_other(doc, category, definition):
             elements.append(ListItem(Plain(Link(doc.information[tag].entry, url='#' + tag))))
         # Return a bullet list
         return BulletList(*elements)
-    else:
-        return None
+    return None
 
 
 def table_latex(doc, category, definition):
@@ -718,8 +721,7 @@ def link_color(doc):
     metadata = doc.get_metadata()
     if 'toccolor' in metadata:
         return '\\hypersetup{linkcolor=' + str(metadata['toccolor']) + '}'
-    else:
-        return '\\hypersetup{linkcolor=black}'
+    return '\\hypersetup{linkcolor=black}'
 
 
 def main(doc=None):
