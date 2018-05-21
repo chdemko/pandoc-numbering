@@ -447,8 +447,8 @@ def referencing_cite(elem, doc):
                 if tag in doc.information:
                     ret = Link(
                         doc.information[tag].link,
-                        url = '#' + tag,
-                        title = doc.information[tag].caption.replace('%c', str(doc.count[doc.information[tag].category]))
+                        url='#' + tag,
+                        title=doc.information[tag].caption.replace('%c', str(doc.count[doc.information[tag].category]))
                     )
                     replace_count(ret, str(doc.count[doc.information[tag].category]))
                     return ret
@@ -724,8 +724,8 @@ def link_color(doc):
         return '\\hypersetup{linkcolor=black}'
 
 
-def main(doc = None):
-    return run_filters([numbering, referencing], prepare = prepare, doc = doc, finalize = finalize)
+def main(doc=None):
+    return run_filters([numbering, referencing], prepare=prepare, doc=doc, finalize=finalize)
 
 
 if __name__ == '__main__':
