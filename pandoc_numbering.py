@@ -147,7 +147,7 @@ class Numbered(object):
                     self._title.parent = None
                     self._title[0].text = self._title[0].text[1:]
                     self._title[-1].text = self._title[-1].text[:-1]
-                    del self._get_content()[i-1:-2]
+                    del self._get_content()[i - 1:-2]
                     break
         self._title = list(self._title)
 
