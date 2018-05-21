@@ -11,13 +11,9 @@ before_install:
 install:
   - pip install coveralls
   - pip install tox-travis
-  - pip install flake8
-  - pip install pylint
   - pip install panflute
 script:
   - tox
-  - flake8 pandoc_numbering.py
-  - pylint pandoc_numbering.py
   - coverage run --source=pandoc_numbering setup.py test
   - coverage report -m
 after_success:
