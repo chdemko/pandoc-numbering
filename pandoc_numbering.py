@@ -707,7 +707,7 @@ def table_latex(doc, category, definition):
     latex = [
         link_color(doc),
         '\\makeatletter',
-        '\\newcommand*\\l@' + latex_category + '{\\@dottedtocline{1}{' + str(definition['entry-tab']) + 'em}{'+ str(definition['entry-space']) +'em}}',
+        '\\newcommand*\\l@' + latex_category + '{\\@dottedtocline{1}{' + str(definition['entry-tab']) + 'em}{' + str(definition['entry-space']) + 'em}}',
         '\\@starttoc{' + latex_category + '}',
         '\\makeatother'
     ]
