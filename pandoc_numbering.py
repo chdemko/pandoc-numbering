@@ -638,7 +638,7 @@ def meta_levels(category, definition, defined):
         # Get the level
         try:
             level = int(definition['first-section-level'].text) - 1
-            if level >= 0 and level <= 6 :
+            if level >= 0 and level <= 6:
                 defined[category]['first-section-level'] = level
             else:
                 debug('[WARNING] pandoc-numbering: first-section-level must be positive or zero for category ' + category)
@@ -648,7 +648,7 @@ def meta_levels(category, definition, defined):
         # Get the level
         try:
             level = int(definition['last-section-level'].text)
-            if level >= 0 and level <= 6 :
+            if level >= 0 and level <= 6:
                 defined[category]['last-section-level'] = level
             else:
                 debug('[WARNING] pandoc-numbering: last-section-level must be positive or zero for category ' + category)
