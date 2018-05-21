@@ -10,7 +10,6 @@ from functools import partial
 import re
 import unicodedata
 import copy
-import itertools
 
 class Numbered(object):
     __slots__ = [
