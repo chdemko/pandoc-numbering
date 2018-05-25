@@ -677,7 +677,12 @@ def finalize(doc):
                 classes.append('unnumbered')
             if definition['listing-unlisted']:
                 classes.append('unlisted')
-            doc.content.insert(i, Header(*definition['listing-title'], level=1, classes=classes))
+            header = Header(*definition['listing-title'], level=1, classes=classes)
+            header = convert_text(
+                convert_text(header, input_format='panflute', output_format='markdown'),
+                output_format='panflute'
+            )
+            doc.content.insert(i, header[0])
             i = i + 1
 
             if doc.format == 'latex':
