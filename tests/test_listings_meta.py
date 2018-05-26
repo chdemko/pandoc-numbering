@@ -40,6 +40,78 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
         '''
     )
 
+def test_listing_identifier_false():
+    verify_conversion(
+        '''
+---
+pandoc-numbering:
+  exercise:
+    general:
+      listing-identifier: False
+      listing-title: List of exercises
+---
+
+Exercise #
+
+Exercise (Title) #
+        ''',
+        '''
+---
+pandoc-numbering:
+  exercise:
+    general:
+      listing-identifier: False
+      listing-title: List of exercises
+---
+
+List of exercises {.pandoc-numbering-listing .exercise .unnumbered .unlisted}
+=================
+
+-   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
+-   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
+
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+
+[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+        '''
+    )
+
+def test_listing_identifier():
+    verify_conversion(
+        '''
+---
+pandoc-numbering:
+  exercise:
+    general:
+      listing-identifier: myident
+      listing-title: List of exercises
+---
+
+Exercise #
+
+Exercise (Title) #
+        ''',
+        '''
+---
+pandoc-numbering:
+  exercise:
+    general:
+      listing-identifier: myident
+      listing-title: List of exercises
+---
+
+List of exercises {#myident .pandoc-numbering-listing .exercise .unnumbered .unlisted}
+=================
+
+-   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
+-   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
+
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+
+[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+        '''
+    )
+
 def test_listing_options():
     verify_conversion(
         '''

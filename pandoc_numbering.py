@@ -355,6 +355,7 @@ def define(category, doc):
         'listing-title':          None,
         'listing-unnumbered':     True,
         'listing-unlisted':       True,
+        'listing-identifier':     True,
         'entry-tab':              1.5,
         'entry-space':            2.3,
     }
@@ -516,6 +517,7 @@ def meta_cite(category, definition, defined):
             debug('[WARNING] pandoc-numbering: cite-shortcut is not correct for category ' + category)
 
 
+# pylint:disable=too-many-branches
 def meta_listing(category, definition, defined):
     if 'listing-title' in definition:
         if isinstance(definition['listing-title'], MetaInlines):
@@ -534,6 +536,13 @@ def meta_listing(category, definition, defined):
             defined[category]['listing-unlisted'] = definition['listing-unlisted'].boolean
         else:
             debug('[WARNING] pandoc-numbering: listing-unlisted is not correct for category ' + category)
+    if 'listing-identifier' in definition:
+        if isinstance(definition['listing-identifier'], MetaBool):
+            defined[category]['listing-identifier'] = definition['listing-identifier'].boolean
+        elif isinstance(definition['listing-identifier'], MetaInlines) and len(definition['listing-identifier'].content) == 1 and isinstance(definition['listing-identifier'].content[0], Str):
+            defined[category]['listing-identifier'] = definition['listing-identifier'].content[0].text
+        else:
+            debug('[WARNING] pandoc-numbering: listing-identifier is not correct for category ' + category)
 
 
 def meta_format_text(category, definition, defined):
@@ -677,12 +686,22 @@ def finalize(doc):
                 classes.append('unnumbered')
             if definition['listing-unlisted']:
                 classes.append('unlisted')
-            header = Header(*definition['listing-title'], level=1, classes=classes)
-            header = convert_text(
-                convert_text(header, input_format='panflute', output_format='markdown'),
-                output_format='panflute'
-            )
-            doc.content.insert(i, header[0])
+            if definition['listing-identifier'] is False:
+                header = Header(*definition['listing-title'], level=1, classes=classes)
+            elif definition['listing-identifier'] is True:
+                header = Header(*definition['listing-title'], level=1, classes=classes)
+                header = convert_text(
+                    convert_text(header, input_format='panflute', output_format='markdown'),
+                    output_format='panflute'
+                )[0]
+            else:
+                header = Header(
+                    *definition['listing-title'],
+                    level=1,
+                    classes=classes,
+                    identifier=definition['listing-identifier']
+                )
+            doc.content.insert(i, header)
             i = i + 1
 
             if doc.format == 'latex':
