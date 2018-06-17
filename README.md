@@ -5,7 +5,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 [![PyPI format](https://img.shields.io/pypi/format/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 [![License](https://img.shields.io/pypi/l/pandoc-numbering.svg)](https://raw.githubusercontent.com/chdemko/pandoc-numbering/master/LICENSE)
-[![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 [![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 [![Development Status](https://img.shields.io/pypi/status/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
 
