@@ -213,7 +213,10 @@ class Numbered(object):
 
     def _compute_local_number(self):
         # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
-        self._local_number = '.'.join(map(str, self._doc.headers[self._first_section_level:self._last_section_level] + [self._number]))
+        self._local_number = '.'.join(map(
+            str,
+            self._doc.headers[self._first_section_level:self._last_section_level] + [self._number]
+        ))
 
     def _compute_global_number(self):
         # Compute the global number
@@ -243,7 +246,7 @@ class Numbered(object):
             self._entry.content = copy.deepcopy(self._doc.defined[self._basic_category]['format-entry-classic'])
             self._caption = self._doc.defined[self._basic_category]['format-caption-classic']
 
-        # Compute caption (report replacing %c at the end since it is not known for the moment)
+        # Compute caption (delay replacing %c at the end since it is not known for the moment)
         title = stringify(Span(*self._title))
         description = stringify(Span(*self._description))
         self._caption = self._caption.replace('%t', title.lower())
