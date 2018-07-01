@@ -685,10 +685,13 @@ def finalize(doc):
     for category, definition in doc.defined.items():
         if definition['listing-title'] is not None:
             classes = ['pandoc-numbering-listing'] + definition['classes']
+
             if definition['listing-unnumbered']:
                 classes.append('unnumbered')
+
             if definition['listing-unlisted']:
                 classes.append('unlisted')
+
             if definition['listing-identifier'] is False:
                 header = Header(*definition['listing-title'], level=1, classes=classes)
             elif definition['listing-identifier'] is True:
@@ -704,6 +707,7 @@ def finalize(doc):
                     classes=classes,
                     identifier=definition['listing-identifier']
                 )
+
             doc.content.insert(i, header)
             i = i + 1
 
