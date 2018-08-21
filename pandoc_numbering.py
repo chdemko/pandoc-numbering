@@ -654,7 +654,7 @@ def meta_entry_space(category, definition, defined):
                 debug('[WARNING] pandoc-numbering: entry-space must be positive for category ' + category)
         except ValueError:
             debug('[WARNING] pandoc-numbering: entry-space is not correct for category ' + category)
-            
+
 
 def meta_levels(category, definition, defined):
     if 'sectioning-levels' in definition and isinstance(definition['sectioning-levels'], MetaInlines) and len(definition['sectioning-levels'].content) == 1:
