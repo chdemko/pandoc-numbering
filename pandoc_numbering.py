@@ -12,7 +12,7 @@ import copy
 from panflute import BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Emph, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, Link, ListItem, Note, Para, Plain, RawBlock, RawInline, SoftBreak, Space, Span, Str, Strong, Table, TableCell, TableRow, MetaBool, MetaInlines, MetaList, MetaMap, MetaString, run_filters, stringify, convert_text, debug
 
 
-# pylint: disable=useless-object-inheritance
+# pylint: disable=bad-option-value,useless-object-inheritance
 class Numbered(object):
     __slots__ = [
         '_elem',
