@@ -12,7 +12,7 @@ import copy
 from panflute import BlockQuote, BulletList, Citation, Cite, CodeBlock, Definition, DefinitionItem, DefinitionList, Div, Emph, Header, HorizontalRule, Image, LineBlock, LineBreak, LineItem, Link, ListItem, Note, Para, Plain, RawBlock, RawInline, SoftBreak, Space, Span, Str, Strong, Table, TableCell, TableRow, MetaBool, MetaInlines, MetaList, MetaMap, MetaString, run_filters, stringify, convert_text, debug
 
 
-class Numbered(object):
+class Numbered:
     __slots__ = [
         '_elem',
         '_doc',
@@ -117,7 +117,7 @@ class Numbered(object):
     def _get_content(self):
         if isinstance(self._elem, Para):
             return self._elem.content
-        elif isinstance(self._elem, DefinitionItem):
+        if isinstance(self._elem, DefinitionItem):
             return self._elem.term
         return None
 
@@ -407,9 +407,9 @@ def numbering(elem, doc):
 def referencing(elem, doc):
     if isinstance(elem, Link):
         return referencing_link(elem, doc)
-    elif isinstance(elem, Cite):
+    if isinstance(elem, Cite):
         return referencing_cite(elem, doc)
-    elif isinstance(elem, Span) and elem.identifier in doc.information:
+    if isinstance(elem, Span) and elem.identifier in doc.information:
         replace_count(elem, str(doc.count[doc.information[elem.identifier].category]))
     return None
 
@@ -678,7 +678,7 @@ def meta_levels(category, definition, defined):
         except ValueError:
             debug('[WARNING] pandoc-numbering: first-section-level is not correct for category ' + category)
 
-        if level >= 0 and level <= 6:
+        if 0 <= level <= 6:
             defined[category]['first-section-level'] = level
         else:
             debug('[WARNING] pandoc-numbering: first-section-level must be positive or zero for category ' + category)
@@ -698,7 +698,7 @@ def meta_levels(category, definition, defined):
         except ValueError:
             debug('[WARNING] pandoc-numbering: last-section-level is not correct for category ' + category)
 
-        if level >= 0 and level <= 6:
+        if 0 <= level <= 6:
             defined[category]['last-section-level'] = level
         else:
             debug('[WARNING] pandoc-numbering: last-section-level must be positive or zero for category ' + category)
