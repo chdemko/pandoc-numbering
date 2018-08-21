@@ -617,10 +617,17 @@ def meta_format_entry(category, definition, defined):
 
 
 def meta_entry_tab(category, definition, defined):
-    if 'entry-tab' in definition and isinstance(definition['entry-tab'], MetaString):
+    if 'entry-tab' in definition:
+        if isinstance(definition['entry-tab'], MetaString):
+            value = definition['entry-tab'].text
+        elif isinstance(definition['entry-tab'], MetaInlines) and len(definition['entry-tab'].content) == 1:
+            value = definition['entry-tab'].content[0].text
+        else:
+            debug('[WARNING] pandoc-numbering: entry-tab is not correct for category ' + category)
+            return
         # Get the tab
         try:
-            tab = float(definition['entry-tab'].text)
+            tab = float(value)
             if tab > 0:
                 defined[category]['entry-tab'] = tab
             else:
@@ -630,17 +637,24 @@ def meta_entry_tab(category, definition, defined):
 
 
 def meta_entry_space(category, definition, defined):
-    if 'entry-space' in definition and isinstance(definition['entry-space'], MetaString):
+    if 'entry-space' in definition:
+        if isinstance(definition['entry-space'], MetaString):
+            value = definition['entry-space'].text
+        elif isinstance(definition['entry-space'], MetaInlines) and len(definition['entry-space'].content) == 1:
+            value = definition['entry-space'].content[0].text
+        else:
+            debug('[WARNING] pandoc-numbering: entry-space is not correct for category ' + category)
+            return
         # Get the space
         try:
-            space = float(definition['entry-space'].text)
+            space = float(value)
             if space > 0:
                 defined[category]['entry-space'] = space
             else:
                 debug('[WARNING] pandoc-numbering: entry-space must be positive for category ' + category)
         except ValueError:
             debug('[WARNING] pandoc-numbering: entry-space is not correct for category ' + category)
-
+            
 
 def meta_levels(category, definition, defined):
     if 'sectioning-levels' in definition and isinstance(definition['sectioning-levels'], MetaInlines) and len(definition['sectioning-levels'].content) == 1:
@@ -649,26 +663,45 @@ def meta_levels(category, definition, defined):
             # Compute the first and last levels section
             defined[category]['first-section-level'] = len(match.group('hidden')) // 2
             defined[category]['last-section-level'] = len(match.group('header')) // 2
-    if 'first-section-level' in definition and isinstance(definition['first-section-level'], MetaString):
+    if 'first-section-level' in definition:
+        if isinstance(definition['first-section-level'], MetaString):
+            value = definition['first-section-level'].text
+        elif isinstance(definition['first-section-level'], MetaInlines) and len(definition['first-section-level'].content) == 1:
+            value = definition['first-section-level'].content[0].text
+        else:
+            debug('[WARNING] pandoc-numbering: first-section-level is not correct for category ' + category)
+            return
+
         # Get the level
         try:
-            level = int(definition['first-section-level'].text) - 1
-            if level >= 0 and level <= 6:
-                defined[category]['first-section-level'] = level
-            else:
-                debug('[WARNING] pandoc-numbering: first-section-level must be positive or zero for category ' + category)
+            level = int(value) - 1
         except ValueError:
             debug('[WARNING] pandoc-numbering: first-section-level is not correct for category ' + category)
-    if 'last-section-level' in definition and isinstance(definition['last-section-level'], MetaString):
+
+        if level >= 0 and level <= 6:
+            defined[category]['first-section-level'] = level
+        else:
+            debug('[WARNING] pandoc-numbering: first-section-level must be positive or zero for category ' + category)
+
+    if 'last-section-level' in definition:
+        if isinstance(definition['last-section-level'], MetaString):
+            value = definition['last-section-level'].text
+        elif isinstance(definition['last-section-level'], MetaInlines) and len(definition['last-section-level'].content) == 1:
+            value = definition['last-section-level'].content[0].text
+        else:
+            debug('[WARNING] pandoc-numbering: last-section-level is not correct for category ' + category)
+            return
+
         # Get the level
         try:
-            level = int(definition['last-section-level'].text)
-            if level >= 0 and level <= 6:
-                defined[category]['last-section-level'] = level
-            else:
-                debug('[WARNING] pandoc-numbering: last-section-level must be positive or zero for category ' + category)
+            level = int(value)
         except ValueError:
             debug('[WARNING] pandoc-numbering: last-section-level is not correct for category ' + category)
+
+        if level >= 0 and level <= 6:
+            defined[category]['last-section-level'] = level
+        else:
+            debug('[WARNING] pandoc-numbering: last-section-level must be positive or zero for category ' + category)
 
 
 def meta_classes(category, definition, defined):
