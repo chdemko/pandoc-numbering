@@ -1,5 +1,5 @@
 # pandoc-numbering
-[![Build Status](https://img.shields.io/travis/chdemko/pandoc-numbering/master.svg)](https://travis-ci.org/chdemko/pandoc-numbering/branches)
+[![Build Status](https://img.shields.io/travis/chdemko/pandoc-numbering/master.svg&logo=travis)](https://travis-ci.org/chdemko/pandoc-numbering/branches)
 [![Coveralls](https://img.shields.io/coveralls/github/chdemko/pandoc-numbering/master.svg)](https://coveralls.io/github/chdemko/pandoc-numbering?branch=master)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
 [![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg)](https://pypi.org/project/pandoc-numbering/)
