@@ -176,6 +176,7 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
 =================
 
 \\hypersetup{linkcolor=black}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{1.5em}{2.3em}}\\@starttoc{exercise}\\makeatother
+
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces {Exercise}}}[\\label{exercise:1}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {2}{\\ignorespaces {Title}}}[\\label{exercise:2}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
@@ -207,8 +208,8 @@ pandoc-numbering:
     general:
       listing-title: List of exercises
     standard:
-      format-entry-classic: '\%g %D'
-      format-entry-title: '\%g %D (%T)'
+      format-entry-classic: '\\%g %D'
+      format-entry-title: '\\%g %D (%T)'
 ---
 
 List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
@@ -252,8 +253,8 @@ pandoc-numbering:
     latex:
       entry-space: 3
       entry-tab: 2
-      format-entry-classic: '\%D'
-      format-entry-title: '\%D (%T)'
+      format-entry-classic: '\\%D'
+      format-entry-title: '\\%D (%T)'
 toccolor: blue
 ---
 
@@ -261,6 +262,7 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
 =================
 
 \\hypersetup{linkcolor=blue}\\makeatletter\\newcommand*\\l@exercise{\\@dottedtocline{1}{2.0em}{3.0em}}\\@starttoc{exercise}\\makeatother
+
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces {Exercise}}}[\\label{exercise:1}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {2}{\\ignorespaces {Exercise (Title)}}}[\\label{exercise:2}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
