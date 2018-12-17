@@ -1,0 +1,73 @@
+---
+author:
+- 'Ch. Demko <chdemko@gmail.com>'
+date: '04/11/2015'
+title: Sample use of automatic numbering
+pandoc-numbering:
+  - category: theorem
+    text-title: '*%D #: %T*'
+    text: '*%D #*'
+    sectioning: +.
+    cite-shortcut: true
+    listing: List of theorems
+  - category: example
+    listing: List of examples
+    cite-shortcut: true
+  - category: exercise
+    link: '%d #'
+    link-title: '%d #'
+    toc: ''
+    toc-title: ''
+    listing: List of exercises
+    cite-shortcut: true
+    tab: 2
+    space: 3
+---
+
+
+This is the first section
+=========================
+
+Exercise #
+
+This is the first exercise. Have also a look at the [](#theorem:first), the
+[](#exercise:second) and the exercise @exercise:last.
+
+> Theorem (Needed for the [second exercise](#exercise:second)) #first
+>
+> This is a the first theorem. Look at the
+> [exercise](#exercise:second "Go to the exercise #").
+
+Exercise (This is the second exercise) #exercise:second
+
+Use [*%d %g* page %p](#theorem:first)
+
+Example -.#
+ ~ This is the first example of the first section
+
+Example -.#
+ ~ This is the second example of the first section
+
+This is the second section
+==========================
+
+Example -.#
+ ~ This is the first example of the second section
+
+> Theorem #
+>
+> Another theorem. Can be useful in [](#exercise:1)
+
+> Theorem #
+>
+> A last theorem.
+
+Example -.#
+ ~ This is the second example of the second section
+
+Exercise #last
+
+This is the third exercise.
+
+Unnumbered ##
+

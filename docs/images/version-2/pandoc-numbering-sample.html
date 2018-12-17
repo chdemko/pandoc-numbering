@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Ch. Demko chdemko@gmail.com" />
+  <meta name="dcterms.date" content="2015-04-11" />
+  <title>Sample use of automatic numbering</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.line-block{white-space: pre-line;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">Sample use of automatic numbering</h1>
+<p class="author">Ch. Demko <a href="mailto:chdemko@gmail.com">chdemko@gmail.com</a></p>
+<p class="date">04/11/2015</p>
+</header>
+<h1 class="unnumbered">List of theorems</h1>
+<ul>
+<li><a href="#theorem:first">1.1 Needed for the <a href="#exercise:second">second exercise</a></a></li>
+<li><a href="#theorem:2.1">2.1 Theorem</a></li>
+<li><a href="#theorem:2.2">2.2 Theorem</a></li>
+</ul>
+<h1 class="unnumbered">List of examples</h1>
+<ul>
+<li><a href="#example:1.1">1.1 Example</a></li>
+<li><a href="#example:1.2">1.2 Example</a></li>
+<li><a href="#example:2.1">2.1 Example</a></li>
+<li><a href="#example:2.2">2.2 Example</a></li>
+</ul>
+<h1 class="unnumbered">List of exercises</h1>
+<ul>
+<li><a href="#exercise:1">1 </a></li>
+<li><a href="#exercise:second">2 </a></li>
+<li><a href="#exercise:last">3 </a></li>
+</ul>
+<h1 id="this-is-the-first-section">This is the first section</h1>
+<p><span id="exercise:1" class="pandoc-numbering-text exercise"><strong>Exercise 1</strong></span></p>
+<p>This is the first exercise. Have also a look at the <a href="#theorem:first">Theorem 1.1</a>, the <a href="#exercise:second">exercise 2</a> and the exercise <a href="#exercise:last">3</a>.</p>
+<blockquote>
+<p><span id="theorem:first" class="pandoc-numbering-text theorem"><em>Theorem 1.1: Needed for the <a href="#exercise:second">second exercise</a></em></span></p>
+<p>This is a the first theorem. Look at the <a href="#exercise:second" title="Go to the exercise 2">exercise</a>.</p>
+</blockquote>
+<p><span id="exercise:second" class="pandoc-numbering-text exercise"><strong>Exercise 2</strong> <em>(This is the second exercise)</em></span></p>
+<p>Use <a href="#theorem:first"><em>theorem 1.1</em> page </a></p>
+<dl>
+<dt><span id="example:1.1" class="pandoc-numbering-text example"><strong>Example 1</strong></span></dt>
+<dd>This is the first example of the first section
+</dd>
+<dt><span id="example:1.2" class="pandoc-numbering-text example"><strong>Example 2</strong></span></dt>
+<dd>This is the second example of the first section
+</dd>
+</dl>
+<h1 id="this-is-the-second-section">This is the second section</h1>
+<dl>
+<dt><span id="example:2.1" class="pandoc-numbering-text example"><strong>Example 1</strong></span></dt>
+<dd>This is the first example of the second section
+</dd>
+</dl>
+<blockquote>
+<p><span id="theorem:2.1" class="pandoc-numbering-text theorem"><em>Theorem 2.1</em></span></p>
+<p>Another theorem. Can be useful in <a href="#exercise:1">exercise 1</a></p>
+</blockquote>
+<blockquote>
+<p><span id="theorem:2.2" class="pandoc-numbering-text theorem"><em>Theorem 2.2</em></span></p>
+<p>A last theorem.</p>
+</blockquote>
+<dl>
+<dt><span id="example:2.2" class="pandoc-numbering-text example"><strong>Example 2</strong></span></dt>
+<dd>This is the second example of the second section
+</dd>
+</dl>
+<p><span id="exercise:last" class="pandoc-numbering-text exercise"><strong>Exercise 3</strong></span></p>
+<p>This is the third exercise.</p>
+<p>Unnumbered #</p>
+</body>
+</html>

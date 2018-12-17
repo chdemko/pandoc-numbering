@@ -1,0 +1,15 @@
+automatic-numbering ::= description-category ("(" title ")")? numbering-marker
+
+numbering-marker::= sectioning? "#" (prefix ":")? name?
+
+sectioning::= hidden-sectioning visible-sectioning
+
+hidden-sectioning::= "-."*
+
+visible-sectioning::= "+."*
+
+prefix::= identifier
+
+name ::= identifier
+
+identifier ::= letter (letter | digit | "-")*

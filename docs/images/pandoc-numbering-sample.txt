@@ -1,0 +1,81 @@
+---
+author:
+- 'Ch. Demko <chdemko@gmail.com>'
+date: '09/01/2018'
+title: Sample use of automatic numbering
+pandoc-numbering:
+  theorem:
+    general:
+      sectioning-levels: +.
+      cite-shortcut: true
+      listing-title: List of theorems
+    standard:
+      format-text-classic: '*%D #*'
+      format-text-title: '*%D #: %T*'
+    latex:
+      format-text-classic: '*%D #*'
+      format-text-title: '*%D #: %T*'
+  example:
+    general:
+      listing-title: List of examples
+      cite-shortcut: true
+  exercise:
+    general:
+	  listing-title: List of exercises
+      cite-shortcut: true
+    latex:
+      format-link-classic: '%d #'
+      format-link-title: '%d #'
+      format-entry-classic: ''
+      format-entry-title: ''
+      entry-tab: 2
+      entry-space: 3
+---
+
+
+This is the first section
+=========================
+
+Exercise #
+
+This is the first exercise. Have also a look at the @theorem:first, the
+@exercise:second and the @exercise:last.
+
+> Theorem (Needed for the [second exercise](#exercise:second)) #first
+>
+> This is a the first theorem. Look at the
+> [exercise](#exercise:second "Go to the exercise #").
+
+Exercise (This is the second exercise) #exercise:second
+
+Use [*%d %g* page %p](#theorem:first)
+
+Example -.#
+ ~ This is the first example of the first section
+
+Example -.#
+ ~ This is the second example of the first section
+
+This is the second section
+==========================
+
+Example -.#
+ ~ This is the first example of the second section
+
+> Theorem #
+>
+> Another theorem. Can be useful in [](#exercise:1)
+
+> Theorem #
+>
+> A last theorem.
+
+Example -.#
+ ~ This is the second example of the second section
+
+Exercise #last
+
+This is the third exercise.
+
+Unnumbered ##
+

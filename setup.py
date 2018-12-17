@@ -72,8 +72,7 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3',
 
         # Natural language used
         'Natural Language :: English',
@@ -110,7 +109,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'dev': ['check-manifest'],
+        'dev': ['check-manifest', 'Sphinx>=1.8.0', 'sphinx_rtd_theme>=0.4'],
         'test': ['tox'],
     },
 
