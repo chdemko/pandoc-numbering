@@ -19,10 +19,3 @@ Welcome to pandoc-numbering's documentation!
    classes
    example
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
