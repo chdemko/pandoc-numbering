@@ -19,7 +19,7 @@ status icon by [Just Icon](https://www.iconfinder.com/icons/2672768/app_battery_
 Documentation
 -------------
 
-See the [wiki pages](https://github.com/chdemko/pandoc-numbering/wiki).
+See the [Read the docs pages](http://pandoc-numbering.readthedocs.io/en/latest/).
 
 Usage
 -----
