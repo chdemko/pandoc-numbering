@@ -85,8 +85,10 @@ It’s also possible not to have an identifier using the ``False`` value:
    Exercise (The second exercise) #
 
 For controlling the format used in the pdf output, you can precise two
-things: \* the tab before each entry (expressed in ``em`` LaTeX size) \*
-the space used by the numbering part (expressed in ``em`` LaTeX size)
+things:
+
+* the tab before each entry (expressed in ``em`` LaTeX size)
+* the space used by the numbering part (expressed in ``em`` LaTeX size)
 
 .. code-block:: md
 
