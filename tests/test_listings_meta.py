@@ -6,9 +6,10 @@ from panflute import *
 import pandoc_numbering
 from helper import verify_conversion
 
+
 def test_listing_classic():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -19,8 +20,8 @@ pandoc-numbering:
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -37,12 +38,13 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 [**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        '''
+        """,
     )
+
 
 def test_listing_identifier_false():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -54,8 +56,8 @@ pandoc-numbering:
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -73,12 +75,13 @@ List of exercises {.pandoc-numbering-listing .exercise .unnumbered .unlisted}
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 [**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        '''
+        """,
     )
+
 
 def test_listing_identifier():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -90,8 +93,8 @@ pandoc-numbering:
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -109,12 +112,13 @@ List of exercises {#myident .pandoc-numbering-listing .exercise .unnumbered .unl
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 [**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        '''
+        """,
     )
+
 
 def test_listing_options():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -127,8 +131,8 @@ pandoc-numbering:
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -147,12 +151,13 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise}
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 [**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        '''
+        """,
     )
+
 
 def test_listing_latex():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -163,8 +168,8 @@ pandoc-numbering:
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -180,13 +185,14 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces {Exercise}}}[\\label{exercise:1}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {2}{\\ignorespaces {Title}}}[\\label{exercise:2}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        ''',
-        'latex'
+        """,
+        "latex",
     )
-    
+
+
 def test_listing_classic_format():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -200,8 +206,8 @@ pandoc-numbering:
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -221,12 +227,13 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 [**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        '''
+        """,
     )
+
 
 def test_listing_latex_format():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -243,8 +250,8 @@ toccolor: blue
 Exercise #
 
 Exercise (Title) #
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -266,6 +273,6 @@ List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnum
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {1}{\\ignorespaces {Exercise}}}[\\label{exercise:1}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 \\phantomsection\\addcontentsline{exercise}{exercise}{\\protect\\numberline {2}{\\ignorespaces {Exercise (Title)}}}[\\label{exercise:2}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
-        ''',
-        'latex'
+        """,
+        "latex",
     )

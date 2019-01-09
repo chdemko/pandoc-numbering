@@ -6,9 +6,10 @@ from panflute import *
 import pandoc_numbering
 from helper import verify_conversion
 
+
 def test_referencing_link_standard():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -29,8 +30,8 @@ Exercise (Title) -.#second
 See @exercise:first
 
 See @exercise:second
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -51,12 +52,13 @@ Title
 See [[**Exercise exercise 1.1 1 1 2**]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise 1")
 
 See [[**Exercise exercise Title title 1.2 1 2 2**]{.pandoc-numbering-link .exercise}](#exercise:second "Exercise 2 (Title)")
-        '''
+        """,
     )
+
 
 def test_referencing_link_latex():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -77,8 +79,8 @@ Exercise (Title) -.#second
 See @exercise:first
 
 See @exercise:second
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -99,13 +101,14 @@ Title
 See [[**Exercise exercise 1.1 1 1 \\pageref{exercise:first}**]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise 1")
 
 See [[**Exercise exercise Title title 1.2 1 2 \\pageref{exercise:second}**]{.pandoc-numbering-link .exercise}](#exercise:second "Exercise 2 (Title)")
-        ''',
-        'latex'
-   )
+        """,
+        "latex",
+    )
+
 
 def test_referencing_caption_standard():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -126,8 +129,8 @@ Exercise (Title) -.#second
 See @exercise:first
 
 See @exercise:second
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -148,12 +151,13 @@ Title
 See [[Exercise 1]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise exercise 1.1 1 1 2")
 
 See [[Exercise 2 (Title)]{.pandoc-numbering-link .exercise}](#exercise:second "Exercise exercise Title title 1.2 1 2 2")
-        '''
+        """,
     )
+
 
 def test_referencing_caption_latex():
     verify_conversion(
-        '''
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -174,8 +178,8 @@ Exercise (Title) -.#second
 See @exercise:first
 
 See @exercise:second
-        ''',
-        '''
+        """,
+        """
 ---
 pandoc-numbering:
   exercise:
@@ -196,6 +200,6 @@ Title
 See [[Exercise 1]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise exercise 1.1 1 1 2 \pageref{exercise:first}")
 
 See [[Exercise 2 (Title)]{.pandoc-numbering-link .exercise}](#exercise:second "Exercise exercise Title title 1.2 1 2 2 \pageref{exercise:second}")
-        ''',
-        'latex'
+        """,
+        "latex",
     )

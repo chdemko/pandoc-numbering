@@ -8,7 +8,7 @@ If the **sectioning** part is empty, it is possible to use a default
 .. code-block:: md
 
    ---
-   pandoc-numbering: 
+   pandoc-numbering:
      ex:
        general:
          sectioning-levels: -.+.
@@ -39,7 +39,7 @@ key (first section level to appear, last section level to appear):
 .. code-block:: md
 
    ---
-   pandoc-numbering: 
+   pandoc-numbering:
      ex:
        general:
          sectioning-levels: -.+.

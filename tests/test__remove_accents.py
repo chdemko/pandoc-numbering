@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from pandoc_numbering import Numbered
 
+
 def test__remove_accents():
-    assert Numbered._remove_accents(u'Êà') == 'Ea'
-
-
+    assert Numbered._remove_accents(u"Êà") == "Ea"

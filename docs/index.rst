@@ -9,7 +9,7 @@ Welcome to pandoc-numbering's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
    numbering
    referencing
    list-of-things

@@ -6,9 +6,10 @@ from panflute import *
 import pandoc_numbering
 from helper import verify_conversion
 
+
 def test_referencing_standard():
     verify_conversion(
-        '''
+        """
 Header
 ======
 
@@ -22,8 +23,8 @@ Exercise (Second title) -.+.#exercise:second
 See [%D %d %T %t %g %s %n # %c](#exercise:first)
 
 See [%D %d %T %t %g %s %n # %c](#exercise:second)
-        ''',
-        '''
+        """,
+        """
 Header
 ======
 
@@ -37,13 +38,13 @@ Section
 See [Exercise exercise First title first title 1.1.1 1.1 1.1 1.1 2](#exercise:first)
 
 See [Exercise exercise Second title second title 1.1.2 1.1 1.2 1.2 2](#exercise:second)
-        '''
+        """,
     )
 
 
 def test_referencing_latex():
     verify_conversion(
-        '''
+        """
 Title
 =====
 
@@ -54,8 +55,8 @@ Exercise (Title) -.#second
 See [%D %d %T %t %g %s %n # %c %p](#exercise:first)
 
 See [%D %d %T %t %g %s %n # %c %p](#exercise:second)
-        ''',
-        '''
+        """,
+        """
 Title
 =====
 
@@ -66,6 +67,6 @@ Title
 See [Exercise exercise 1.1 1 1 1 2 \pageref{exercise:first}](#exercise:first)
 
 See [Exercise exercise Title title 1.2 1 2 2 2 \pageref{exercise:second}](#exercise:second)
-        ''',
-        'latex'
-   )
+        """,
+        "latex",
+    )

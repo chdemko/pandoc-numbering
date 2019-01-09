@@ -5,11 +5,11 @@ from panflute import *
 
 import pandoc_numbering
 
+
 def test_sharp_sharp():
-    definition = '''
+    definition = """
 Example ##
-'''
+"""
     doc = Doc(*convert_text(definition))
     pandoc_numbering.main(doc)
-    assert doc.content[0].content[-1].text == '#'
-
+    assert doc.content[0].content[-1].text == "#"

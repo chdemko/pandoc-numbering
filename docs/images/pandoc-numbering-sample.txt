@@ -21,7 +21,7 @@ pandoc-numbering:
       cite-shortcut: true
   exercise:
     general:
-	  listing-title: List of exercises
+      listing-title: List of exercises
       cite-shortcut: true
     latex:
       format-link-classic: '%d #'
