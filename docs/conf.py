@@ -25,7 +25,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # -- Project information -----------------------------------------------------
 
 project = 'pandoc-numbering'
-copyright = '2018, Christophe Demko'
+copyright = '2015-2019, Christophe Demko'
 author = 'Christophe Demko'
 
 # The short X.Y version
