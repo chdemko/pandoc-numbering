@@ -25,6 +25,13 @@ These behaviors can be changed by adding metadata for a given category.
    present using the cite shortcut notation (you can use special
    characters ``%D``, ``%d``, ``%T``, ``%t``, ``%s``, ``%g``, ``%n``,
    ``#``, ``%c``, ``%p``)
+-  ``format-caption-classic`` is for the text displayed in the captions
+   (you can use special characters ``%D``, ``%d``, ``%s``,
+   ``%g``, ``%n``, ``#`` and ``%p`` for LaTeX)
+-  ``format-caption-title`` is for the text displayed in the captions
+   when a title is present (you can use special characters
+   ``%D``, ``%d``, ``%T``, ``%t``, ``%s``, ``%g``, ``%n``, ``#`` and ``%p``
+   for LaTeX)
 -  ``format-entry-classic`` is for the entry displayed in the table of
    contents (you can use special characters ``%D``, ``%d``, ``%s``,
    ``%g``, ``%n``, ``#``)
@@ -46,6 +53,8 @@ By default these values are equal to
          format-link-title: '%D %n (%T)'
          format-caption-classic: '%D %n'
          format-caption-title': '%D %n (%T)'
+         format-entry-title': '%T'
+         format-entry-classic': '%D %g'
        latex:
          format-text-classic: '**%D %n**'
          format-text-title: '**%D %n** *(%T)*'
@@ -53,5 +62,7 @@ By default these values are equal to
          format-link-title: '%D %n (%T)'
          format-caption-classic: '%D %n'
          format-caption-title: '%D %n (%T)'
+         format-entry-title': '%T'
+         format-entry-classic': '%D'
    ---
 
