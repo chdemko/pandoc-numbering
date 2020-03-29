@@ -7,8 +7,8 @@ before_install:
   - virtualenv --python=python3 venv
   - source venv/bin/activate
 install:
-  - pip install coveralls
-  - pip install .[test]
+  - pip3 install coveralls
+  - pip3 install .[test]
 script:
   - tox
   - coverage report -m
