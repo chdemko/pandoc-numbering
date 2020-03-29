@@ -9,9 +9,8 @@ install:
   - pip install tox
   - pip install coveralls
   - pip install pytest-cov
-  - pip install .
 script:
   - tox
-  - pytest --cov=pandoc_numbering
+  - pytest --cov=./pandoc_numbering
 after_success:
   - coveralls
