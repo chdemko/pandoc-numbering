@@ -8,7 +8,8 @@ before_install:
   - source venv/bin/activate
 install:
   - pip install coveralls
-  - pip install -e .[test]
+  - pip install black
+  - pip install .[test]
 script:
   - tox
   - coverage report -m
