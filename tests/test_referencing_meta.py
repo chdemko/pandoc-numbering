@@ -82,6 +82,8 @@ See @exercise:second
             """,
             r"""
 ---
+header-includes:
+- '`\usepackage{tocloft}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -90,6 +92,8 @@ pandoc-numbering:
       format-link-classic: '**%D %d %g %s %n %p**'
       format-link-title: '**%D %d %T %t %g %s %n %p**'
 ---
+
+`\usepackage{tocloft}`{=tex}
 
 Title
 =====
@@ -181,6 +185,8 @@ See @exercise:second
             """,
             r"""
 ---
+header-includes:
+- '`\usepackage{tocloft}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -189,6 +195,8 @@ pandoc-numbering:
       format-caption-classic: '%D %d %g %s %n %c %p'
       format-caption-title: '%D %d %T %t %g %s %n %c %p'
 ---
+
+`\usepackage{tocloft}`{=tex}
 
 Title
 =====

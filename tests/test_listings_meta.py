@@ -168,17 +168,21 @@ Exercise (Title) #
             """,
             r"""
 ---
+header-includes:
+- '`\usepackage{tocloft}`{=tex}'
+- '`\newlistof{exercise}{exercise}{List of exercises}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
       listing-title: List of exercises
 ---
 
-List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
-=================
+`\usepackage{tocloft}`{=tex}
+
+`\newlistof{exercise}{exercise}{List of exercises}`{=tex}
 
 ```{=tex}
-\hypersetup{linkcolor=black}\makeatletter\newcommand*\l@exercise{\@dottedtocline{1}{1.5em}{2.3em}}\@starttoc{exercise}\makeatother
+\ifdef{\frontmatter}{\frontmatter\listofexercise\mainmatter}{\listofexercise}
 ```
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
@@ -251,6 +255,9 @@ Exercise (Title) #
             """,
             r"""
 ---
+header-includes:
+- '`\usepackage{tocloft}`{=tex}'
+- '`\newlistof{exercise}{exercise}{List of exercises}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -263,11 +270,12 @@ pandoc-numbering:
 toccolor: blue
 ---
 
-List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
-=================
+`\usepackage{tocloft}`{=tex}
+
+`\newlistof{exercise}{exercise}{List of exercises}`{=tex}
 
 ```{=tex}
-\hypersetup{linkcolor=blue}\makeatletter\newcommand*\l@exercise{\@dottedtocline{1}{2.0em}{3.0em}}\@starttoc{exercise}\makeatother
+\ifdef{\frontmatter}{\frontmatter\listofexercise\mainmatter}{\listofexercise}
 ```
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 

@@ -55,6 +55,16 @@ To upgrade to the current code, use
     apt-get update
     apt-get install python-pip
 
+Make sure you have the
+
+* *tocloft*
+
+LaTeX package. On linux you have to install some extra libraries **before**
+*pandoc-numbering*. On a Debian-based system (including Ubuntu), you can install it as
+root using
+
+	apt-get install texlive-latex-extra
+
 [python]: https://www.python.org/
 [on Windows]: https://www.python.org/downloads/windows/
 [PyPI]: https://pypi.python.org/pypi

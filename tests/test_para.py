@@ -198,6 +198,13 @@ Second section
 Exercise (Equation $a=b$) #
             """,
             r"""
+---
+header-includes:
+- '`\usepackage{tocloft}`{=tex}'
+---
+
+`\usepackage{tocloft}`{=tex}
+
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1** *(Equation $a=b$)*]{#exercise:1 .pandoc-numbering-text .exercise}
             """,
             "latex",

@@ -57,6 +57,13 @@ See [%D %d %T %t %g %s %n # %c %p](#exercise:first)
 See [%D %d %T %t %g %s %n # %c %p](#exercise:second)
             """,
             r"""
+---
+header-includes:
+- '`\usepackage{tocloft}`{=tex}'
+---
+
+`\usepackage{tocloft}`{=tex}
+
 Title
 =====
 

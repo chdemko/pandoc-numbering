@@ -6,10 +6,10 @@
 Pandoc filter to number all kinds of things.
 """
 
-from functools import partial
+import copy
 import re
 import unicodedata
-import copy
+from functools import partial
 
 from panflute import (  # type: ignore
     BlockQuote,
@@ -575,7 +575,6 @@ def remove_useless_latex(elem, _):
             TableRow,
         ),
     ):
-
         return []
     return None
 
@@ -1291,46 +1290,84 @@ def finalize(doc):
         doc: pandoc document
     """
     # Loop on all listings definition
+
+    if doc.format == "latex":
+        # Add header-includes if necessary
+        if "header-includes" not in doc.metadata:
+            doc.metadata["header-includes"] = MetaList()
+        # Convert header-includes to MetaList if necessary
+        elif not isinstance(doc.metadata["header-includes"], MetaList):
+            doc.metadata["header-includes"] = MetaList(doc.metadata["header-includes"])
+
+        doc.metadata["header-includes"].append(
+            MetaInlines(RawInline(r"\usepackage{tocloft}", "tex"))
+        )
+
     i = 0
     for category, definition in doc.defined.items():
         if definition["listing-title"] is not None:
-            classes = ["pandoc-numbering-listing"] + definition["classes"]
-
-            if definition["listing-unnumbered"]:
-                classes.append("unnumbered")
-
-            if definition["listing-unlisted"]:
-                classes.append("unlisted")
-
-            if definition["listing-identifier"] is False:
-                header = Header(*definition["listing-title"], level=1, classes=classes)
-            elif definition["listing-identifier"] is True:
-                header = Header(*definition["listing-title"], level=1, classes=classes)
-                header = convert_text(
-                    convert_text(
-                        header, input_format="panflute", output_format="markdown"
-                    ),
-                    output_format="panflute",
-                )[0]
-            else:
-                header = Header(
-                    *definition["listing-title"],
-                    level=1,
-                    classes=classes,
-                    identifier=definition["listing-identifier"]
-                )
-
-            doc.content.insert(i, header)
-            i = i + 1
-
             if doc.format == "latex":
-                table = table_latex(doc, category, definition)
+                latex_category = re.sub("[^a-z]+", "", category)
+                latex = r"\newlistof{%s}{%s}{%s}" % (
+                    latex_category,
+                    latex_category,
+                    convert_text(
+                        Plain(*definition["listing-title"]),
+                        input_format="panflute",
+                        output_format="latex",
+                    ),
+                )
+                doc.metadata["header-includes"].append(
+                    MetaInlines(RawInline(latex, "tex"))
+                )
+                doc.content.insert(
+                    i,
+                    RawBlock(
+                        r"\ifdef{\frontmatter}{\frontmatter\listof%s\mainmatter}{\listof%s}"
+                        % (latex_category, latex_category),
+                        "tex",
+                    ),
+                )
+                i = i + 1
             else:
+                classes = ["pandoc-numbering-listing"] + definition["classes"]
+
+                if definition["listing-unnumbered"]:
+                    classes.append("unnumbered")
+
+                if definition["listing-unlisted"]:
+                    classes.append("unlisted")
+
+                if definition["listing-identifier"] is False:
+                    header = Header(
+                        *definition["listing-title"], level=1, classes=classes
+                    )
+                elif definition["listing-identifier"] is True:
+                    header = Header(
+                        *definition["listing-title"], level=1, classes=classes
+                    )
+                    header = convert_text(
+                        convert_text(
+                            header, input_format="panflute", output_format="markdown"
+                        ),
+                        output_format="panflute",
+                    )[0]
+                else:
+                    header = Header(
+                        *definition["listing-title"],
+                        level=1,
+                        classes=classes,
+                        identifier=definition["listing-identifier"]
+                    )
+
+                doc.content.insert(i, header)
+                i = i + 1
+
                 table = table_other(doc, category, definition)
 
-            if table:
-                doc.content.insert(i, table)
-                i = i + 1
+                if table:
+                    doc.content.insert(i, table)
+                    i = i + 1
 
 
 def table_other(doc, category, _):
@@ -1355,34 +1392,6 @@ def table_other(doc, category, _):
         # Return a bullet list
         return BulletList(*elements)
     return None
-
-
-def table_latex(doc, category, definition):
-    """
-    Compute LaTeX code for table.
-
-    Arguments
-    ---------
-        doc: pandoc document
-        category: category numbered
-        definition: definition
-    """
-    latex_category = re.sub("[^a-z]+", "", category)
-    latex = [
-        link_color(doc),
-        "\\makeatletter",
-        "\\newcommand*\\l@"
-        + latex_category
-        + "{\\@dottedtocline{1}{"
-        + str(definition["entry-tab"])
-        + "em}{"
-        + str(definition["entry-space"])
-        + "em}}",
-        "\\@starttoc{" + latex_category + "}",
-        "\\makeatother",
-    ]
-    # Return a RawBlock
-    return RawBlock("".join(latex), "tex")
 
 
 def link_color(doc):
