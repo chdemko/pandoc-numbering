@@ -6,6 +6,7 @@ before_install:
   - sudo apt-get install virtualenv
   - virtualenv --python=python3 venv
   - source venv/bin/activate
+  - pip -V
 install:
   - pip install coveralls
   - pip install --pre .[test]
