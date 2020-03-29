@@ -8,8 +8,9 @@ before_install:
 install:
   - pip install tox
   - pip install coveralls
+  - pip install pytest-cov
 script:
   - tox
-  - coverage report -m
+  - pytest --cov=pandoc_numbering
 after_success:
   - coveralls
