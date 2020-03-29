@@ -11,7 +11,7 @@ import re
 import unicodedata
 import copy
 
-from panflute import (
+from panflute import (  # type: ignore
     BlockQuote,
     BulletList,
     Citation,

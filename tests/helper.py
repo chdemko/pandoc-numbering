@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from panflute import *
+from panflute import convert_text
 
 import pandoc_numbering
 
@@ -12,7 +12,7 @@ def conversion(markdown, format="markdown"):
     return doc
 
 
-def verify_conversion(markdown, expected, format="markdown"):
+def verify_conversion(test, markdown, expected, format="markdown"):
     doc = conversion(markdown, format)
     text = convert_text(
         doc,
@@ -21,8 +21,8 @@ def verify_conversion(markdown, expected, format="markdown"):
         extra_args=["--wrap=none"],
         standalone=True,
     )
-    debug("**computed**")
-    debug(text.strip())
-    debug("**expected**")
-    debug(expected.strip())
-    assert text.strip() == expected.strip()
+    test.assertEqual(
+        text.strip(),
+        expected.strip(),
+        "**computed**\n%s\n**expected**%s\n".format(text.strip(), expected.strip()),
+    )
