@@ -4,13 +4,12 @@ before_install:
   - sudo dpkg -i pandoc-2.9.2.1-1-amd64.deb
   - pandoc -v
   - sudo apt-get install virtualenv
-  - sudo apt-get install python3.6
-  - virtualenv --python=python3.6 venv
+  - virtualenv --python=python3 venv
   - source venv/bin/activate
   - pip -V
 install:
+  - pip install tox
   - pip install coveralls
-  - pip install --pre .[test]
 script:
   - tox
   - coverage report -m
