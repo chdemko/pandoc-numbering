@@ -4,7 +4,7 @@ before_install:
   - sudo dpkg -i pandoc-2.9.2.1-1-amd64.deb
   - pandoc -v
   - sudo apt-get install virtualenv
-  - virtualenv --python=python3 venv
+  - virtualenv --python=python3.6 venv
   - source venv/bin/activate
   - pip -V
 install:
