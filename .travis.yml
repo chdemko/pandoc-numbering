@@ -7,10 +7,10 @@ before_install:
   - pandoc -v
 install:
   - pip install tox
+  - pip install coverage
   - pip install coveralls
-  - pip install pytest-cov
 script:
   - tox
-  - pytest --cov=./pandoc_numbering
+  - coverage run --source=pandoc_numbering setup.py test
 after_success:
   - coveralls
