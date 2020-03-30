@@ -21,5 +21,4 @@ def verify_conversion(test, markdown, expected, format="markdown"):
         extra_args=["--wrap=none"],
         standalone=True,
     )
-    print(text)
     test.assertEqual(text.strip(), expected.strip())
