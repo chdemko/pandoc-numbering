@@ -30,9 +30,9 @@ copyright = "2015-2020, Christophe Demko"
 author = "Christophe Demko"
 
 # The short X.Y version
-version = "3.1"
+version = "3.2"
 # The full version, including alpha/beta/rc tags
-release = "3.1.0.3"
+release = "3.2.0.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,7 +40,7 @@ release = "3.1.0.3"
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
-needs_sphinx = "1.8"
+needs_sphinx = "2.4"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
