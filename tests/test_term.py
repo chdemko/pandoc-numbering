@@ -31,3 +31,47 @@ Definition (This is the title) #
 :   This is the definition
             """,
         )
+
+    def test_term_issues_13(self):
+        # See https://github.com/chdemko/pandoc-numbering/issues/13
+        verify_conversion(
+            self,
+            """
+Assumption #big
+
+:   Big assumption
+
+Lemma #
+
+:   A random lemma
+
+Lemma #
+
+:   A random lemma
+
+Now we derive a result which uses [Assumption #](#assumption:big).
+
+Lemma #
+
+:   Under [Assumption #](#assumption:big), we have ... 
+            """,
+            """
+[**Assumption 1**]{#assumption:big .pandoc-numbering-text .assumption}
+
+:   Big assumption
+
+[**Lemma 1**]{#lemma:1 .pandoc-numbering-text .lemma}
+
+:   A random lemma
+
+[**Lemma 2**]{#lemma:2 .pandoc-numbering-text .lemma}
+
+:   A random lemma
+
+Now we derive a result which uses [Assumption 1](#assumption:big).
+
+[**Lemma 3**]{#lemma:3 .pandoc-numbering-text .lemma}
+
+:   Under [Assumption 1](#assumption:big), we have ...
+            """,
+        )

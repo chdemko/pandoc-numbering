@@ -336,6 +336,7 @@ class Numbered(object):
             self._global_number = self._number
 
     def _compute_data(self):
+        # pylint: disable=too-many-statements
         classes = self._doc.defined[self._basic_category]["classes"]
         self._set_content(
             [Span(classes=["pandoc-numbering-text"] + classes, identifier=self._tag)]
@@ -386,11 +387,18 @@ class Numbered(object):
             self._caption = self._caption.replace("%p", "\\pageref{" + self._tag + "}")
 
         # Compute content
-        replace_description(self._elem, self._description)
-        replace_title(self._elem, self._title)
-        replace_global_number(self._elem, self._global_number)
-        replace_section_number(self._elem, self._section_number)
-        replace_local_number(self._elem, self._local_number)
+        if isinstance(self._elem, DefinitionItem):
+            replace_description(Plain(*self._elem.term), self._description)
+            replace_title(Plain(*self._elem.term), self._title)
+            replace_global_number(Plain(*self._elem.term), self._global_number)
+            replace_section_number(Plain(*self._elem.term), self._section_number)
+            replace_local_number(Plain(*self._elem.term), self._local_number)
+        else:
+            replace_description(self._elem, self._description)
+            replace_title(self._elem, self._title)
+            replace_global_number(self._elem, self._global_number)
+            replace_section_number(self._elem, self._section_number)
+            replace_local_number(self._elem, self._local_number)
 
         # Compute link
         replace_description(self._link, self._description)
