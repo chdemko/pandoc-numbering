@@ -4,5 +4,6 @@ from unittest import TestCase
 from pandoc_numbering import Numbered
 
 
-def test__remove_accents():
-    assert Numbered._remove_accents(u"Êà") == "Ea"
+class AccentTest(TestCase):
+    def test__remove_accents(self):
+        self.assertEqual(Numbered._remove_accents(u"Êà"), "Ea")

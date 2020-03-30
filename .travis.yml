@@ -1,17 +1,16 @@
-language: generic
+language: python
+python:
+  - "3.6"
 before_install:
-  - wget https://github.com/jgm/pandoc/releases/download/2.5/pandoc-2.5-1-amd64.deb
-  - sudo dpkg -i pandoc-2.5-1-amd64.deb
+  - wget https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb
+  - sudo dpkg -i pandoc-2.9.2.1-1-amd64.deb
   - pandoc -v
-  - sudo apt-get install python2.7
-  - sudo apt-get install python
-  - sudo apt-get install python-pip
-  - pip install --user --upgrade pip
 install:
-  - pip install --user coveralls
-  - pip install --user -e .[test]
+  - pip install tox
+  - pip install coverage
+  - pip install coveralls
 script:
   - tox
-  - coverage report -m
+  - coverage run --source=pandoc_numbering setup.py test
 after_success:
   - coveralls

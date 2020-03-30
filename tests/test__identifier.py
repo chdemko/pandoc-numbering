@@ -4,5 +4,6 @@ from unittest import TestCase
 from pandoc_numbering import Numbered
 
 
-def test__identifier():
-    assert Numbered._identifier(u"0123   Ê   à") == "e-a"
+class IdentifierTest(TestCase):
+    def test__identifier(self):
+        self.assertEqual(Numbered._identifier(u"0123   Ê   à"), "e-a")
