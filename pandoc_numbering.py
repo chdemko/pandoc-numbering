@@ -1304,11 +1304,12 @@ def finalize(doc):
         )
 
     i = 0
+    listof = []
     for category, definition in doc.defined.items():
         if definition["listing-title"] is not None:
             if doc.format == "latex":
                 latex_category = re.sub("[^a-z]+", "", category)
-                latex = r"\newlistof{%s}{%s}{%s}" % (
+                latex = r"\newlistof{%s}{%s}{%s}\renewcommand{\cft%stitlefont}{\cfttoctitlefont}" % (
                     latex_category,
                     latex_category,
                     convert_text(
@@ -1316,19 +1317,12 @@ def finalize(doc):
                         input_format="panflute",
                         output_format="latex",
                     ),
+                    latex_category,
                 )
                 doc.metadata["header-includes"].append(
                     MetaInlines(RawInline(latex, "tex"))
                 )
-                doc.content.insert(
-                    i,
-                    RawBlock(
-                        r"\ifdef{\frontmatter}{\frontmatter\listof%s\mainmatter}{\listof%s}"
-                        % (latex_category, latex_category),
-                        "tex",
-                    ),
-                )
-                i = i + 1
+                listof.append(r"\listof%s" % latex_category)
             else:
                 classes = ["pandoc-numbering-listing"] + definition["classes"]
 
@@ -1368,6 +1362,18 @@ def finalize(doc):
                 if table:
                     doc.content.insert(i, table)
                     i = i + 1
+
+    header = (
+        r"\ifdef{\mainmatter}"
+        r"{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
+        r"{}"
+    )
+    doc.metadata["header-includes"].append(
+        MetaInlines(RawInline(header % "\n".join(listof), "tex"))
+    )
+
+    latex = r"\ifdef{\mainmatter}{}{%s}"
+    doc.content.insert(0, RawBlock(latex % "\n".join(listof), "tex"))
 
 
 def table_other(doc, category, _):
