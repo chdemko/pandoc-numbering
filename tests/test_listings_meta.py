@@ -170,7 +170,8 @@ Exercise (Title) #
 ---
 header-includes:
 - '`\usepackage{tocloft}`{=tex}'
-- '`\newlistof{exercise}{exercise}{List of exercises}`{=tex}'
+- '`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}'
+- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -179,10 +180,12 @@ pandoc-numbering:
 
 `\usepackage{tocloft}`{=tex}
 
-`\newlistof{exercise}{exercise}{List of exercises}`{=tex}
+`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}
+
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
 
 ```{=tex}
-\ifdef{\frontmatter}{\frontmatter\listofexercise\mainmatter}{\listofexercise}
+\ifdef{\mainmatter}{}{\listofexercise}
 ```
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
@@ -257,7 +260,8 @@ Exercise (Title) #
 ---
 header-includes:
 - '`\usepackage{tocloft}`{=tex}'
-- '`\newlistof{exercise}{exercise}{List of exercises}`{=tex}'
+- '`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}'
+- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -272,10 +276,12 @@ toccolor: blue
 
 `\usepackage{tocloft}`{=tex}
 
-`\newlistof{exercise}{exercise}{List of exercises}`{=tex}
+`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}
+
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
 
 ```{=tex}
-\ifdef{\frontmatter}{\frontmatter\listofexercise\mainmatter}{\listofexercise}
+\ifdef{\mainmatter}{}{\listofexercise}
 ```
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 

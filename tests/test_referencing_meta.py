@@ -84,6 +84,7 @@ See @exercise:second
 ---
 header-includes:
 - '`\usepackage{tocloft}`{=tex}'
+- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -95,6 +96,11 @@ pandoc-numbering:
 
 `\usepackage{tocloft}`{=tex}
 
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
+
+```{=tex}
+\ifdef{\mainmatter}{}{}
+```
 Title
 =====
 
@@ -187,6 +193,7 @@ See @exercise:second
 ---
 header-includes:
 - '`\usepackage{tocloft}`{=tex}'
+- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}'
 pandoc-numbering:
   exercise:
     general:
@@ -198,6 +205,11 @@ pandoc-numbering:
 
 `\usepackage{tocloft}`{=tex}
 
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
+
+```{=tex}
+\ifdef{\mainmatter}{}{}
+```
 Title
 =====
 

@@ -60,10 +60,16 @@ See [%D %d %T %t %g %s %n # %c %p](#exercise:second)
 ---
 header-includes:
 - '`\usepackage{tocloft}`{=tex}'
+- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}'
 ---
 
 `\usepackage{tocloft}`{=tex}
 
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
+
+```{=tex}
+\ifdef{\mainmatter}{}{}
+```
 Title
 =====
 

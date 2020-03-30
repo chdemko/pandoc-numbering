@@ -201,10 +201,16 @@ Exercise (Equation $a=b$) #
 ---
 header-includes:
 - '`\usepackage{tocloft}`{=tex}'
+- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}'
 ---
 
 `\usepackage{tocloft}`{=tex}
 
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
+
+```{=tex}
+\ifdef{\mainmatter}{}{}
+```
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1** *(Equation $a=b$)*]{#exercise:1 .pandoc-numbering-text .exercise}
             """,
             "latex",
