@@ -706,12 +706,9 @@ def numbering(elem, doc):
         elem: element to number
         doc: pandoc document
     """
-    if isinstance(elem, Header):
-        update_header_numbers(elem, doc)
-        numbered = Numbered(elem, doc)
-        if numbered.tag is not None:
-            doc.information[numbered.tag] = numbered
-    elif isinstance(elem, (Para, DefinitionItem)):
+    if isinstance(elem, (Para, DefinitionItem, Header)):
+        if isinstance(elem, Header):
+            update_header_numbers(elem, doc)
         numbered = Numbered(elem, doc)
         if numbered.tag is not None:
             doc.information[numbered.tag] = numbered
