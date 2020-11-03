@@ -203,13 +203,13 @@ class Numbered(object):
                 self._replace_double_sharp()
 
     def _set_content(self, content):
-        if isinstance(self._elem, Para):
+        if isinstance(self._elem, (Para, Header)):
             self._elem.content = content
         elif isinstance(self._elem, DefinitionItem):
             self._elem.term = content
 
     def _get_content(self):
-        if isinstance(self._elem, Para):
+        if isinstance(self._elem, (Para, Header)):
             return self._elem.content
         if isinstance(self._elem, DefinitionItem):
             return self._elem.term
@@ -349,6 +349,11 @@ class Numbered(object):
             self._get_content()[0].content = copy.deepcopy(
                 self._doc.defined[self._basic_category]["format-text-title"]
             )
+            # Check for numbering
+            if self._local_number is not None:
+                # Remove parentheses and italics from title and insert a colon before it
+                del self._get_content()[0].content[1:]
+                self._get_content()[0].content[0].content.extend([Str(":"), Space(), Str("%T")]) 
             self._link.content = copy.deepcopy(
                 self._doc.defined[self._basic_category]["format-link-title"]
             )
@@ -703,6 +708,9 @@ def numbering(elem, doc):
     """
     if isinstance(elem, Header):
         update_header_numbers(elem, doc)
+        numbered = Numbered(elem, doc)
+        if numbered.tag is not None:
+            doc.information[numbered.tag] = numbered
     elif isinstance(elem, (Para, DefinitionItem)):
         numbered = Numbered(elem, doc)
         if numbered.tag is not None:
