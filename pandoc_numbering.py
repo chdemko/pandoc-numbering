@@ -153,6 +153,11 @@ class Numbered(object):
         """
         return self._caption
 
+    @property
+    def num_tag(self): #Added for issue 15 (Automatic Generation of Identifier Based on Title) for "mixed" identoggle behavior
+        return str(self.category) + str(self._global_number) #An additional tag we can use to refer to Numbered items via their category and number 
+        #This is in addtion to the "title" identoggle behavior tag which allows the user to refer to Numbered items via their category and title (if given)
+
     number_regex = "#((?P<prefix>[a-zA-Z][\\w.-]*):)?(?P<name>[a-zA-Z][\\w:.-]*)?"
     _regex = "(?P<header>(?P<hidden>(-\\.)*)(\\+\\.)*)"
     header_regex = "^" + _regex + "$"
@@ -305,19 +310,63 @@ class Numbered(object):
     def _compute_number(self):
         self._number = str(self._doc.count[self._category])
 
+
     def _compute_tag(self):
+
+        # Different behaviors for creating an auto-identifier when no identifier is given
+        # As outlined here https://github.com/chdemko/pandoc-numbering/issues/15
+        # Behavior is determined by identoggle value in YAML header (see prepare() )
+
         # Determine the final tag
-        if self._match.group("name") is None:
-            self._tag = self._category + self._number
-        else:
-            self._tag = self._basic_category + ":" + self._match.group("name")
 
-        # Compute collections
-        if self._basic_category not in self._doc.collections:
-            self._doc.collections[self._basic_category] = []
+        if identoggle == "default": #original/default code 
+            if self._match.group("name") is None:
+                self._tag = self._category + self._number
+            else:
+                self._tag = self._basic_category + ":" + self._match.group("name")
 
-        self._doc.collections[self._basic_category].append(self._tag)
+            # Compute collections
+            if self._basic_category not in self._doc.collections:
+                self._doc.collections[self._basic_category] = []
 
+            self._doc.collections[self._basic_category].append(self._tag)
+            
+        elif identoggle == "title": #Code written by aubertc for determining final tag based off of category and title if no numbering-marker name is given
+            if self._match.group("name") is None:
+                if not self._title:
+                    self._tag = self._category + self._number
+                else:
+                    self._tag = self._basic_category + ":" + Numbered._identifier(stringify(Span(*self._title)))
+            else:
+                self._tag = self._basic_category + ":" + self._match.group("name")
+
+            # Compute collections
+            if self._basic_category not in self._doc.collections:
+                self._doc.collections[self._basic_category] = []
+
+            self._doc.collections[self._basic_category].append(self._tag)
+
+        elif identoggle == "mixed": #Mixed behavior that allows user to refer to Numbered objects via category:number (default behavior) AND category:title (title behavior) if no numbering-marker name is given
+            if self._match.group("name") is None:
+                if not self._title:
+                    self._tag = self._category + self._number # no title so just the number is in the identifier  
+                    Numtag = self._category + self._number # (the "optimal" use of Numtag is in the following else. This is just a placeholder value)
+                    # Numtag has to be set to something otherwise the append(Numtag) will cause an UnboundLocalError
+                else:
+                    self._tag = self._basic_category + ":" + Numbered._identifier(stringify(Span(*self._title))) # tag identifier based off of title  
+                    Numtag = self._category + self._number # a second tag (where the identifier is based off of the number) so that you can refer to Numbered objects by number as well as title
+            else:
+                self._tag = self._basic_category + ":" + self._match.group("name")
+                Numtag = self._category + self._number # (the "optimal" use of Numtag is in the previous nested else. This will allow you to refer to Numbered objects using numbering-marker prefix then :number)
+            
+            # Compute collections
+            if self._basic_category not in self._doc.collections:
+                self._doc.collections[self._basic_category] = []
+
+            self._doc.collections[self._basic_category].append(self._tag)
+            self._doc.collections[self._basic_category].append(Numtag) #For mixed behavior we also append Numtag
+
+        
     def _compute_local_number(self):
         # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
         self._local_number = ".".join(
@@ -338,9 +387,17 @@ class Numbered(object):
     def _compute_data(self):
         # pylint: disable=too-many-statements
         classes = self._doc.defined[self._basic_category]["classes"]
-        self._set_content(
-            [Span(classes=["pandoc-numbering-text"] + classes, identifier=self._tag)]
-        )
+
+        if identoggle == "mixed":
+            self._set_content(
+                [Span(classes=["pandoc-numbering-text"] + classes, identifier=self._tag), Span(classes=["pandoc-numbering-text"] + classes, identifier=self.num_tag)]   # For Identoggle "mixed" Behavior
+                # title id span is first(if provided, otherwise it is also number id) , followed by number id span. Both correspond to the same Numbered object in document
+            )
+        else: #previous/original behavior
+            self._set_content(
+                [Span(classes=["pandoc-numbering-text"] + classes, identifier=self.num_tag)]  # "default" and "title" Identoggle Behavior 
+            )
+
         self._link.classes = self._link.classes + classes
         self._entry.classes = self._entry.classes + classes
 
@@ -707,6 +764,12 @@ def numbering(elem, doc):
         numbered = Numbered(elem, doc)
         if numbered.tag is not None:
             doc.information[numbered.tag] = numbered
+            if identoggle == "mixed": # If the user decides to use mixed behavior, we want both title based tag identifiers and number based tag identifiers.
+                doc.information[numbered.num_tag] = numbered
+                doc.information[numbered.tag] = doc.information[numbered.num_tag] #This makes both tags capable of being referenced in the document
+
+        
+            
 
 
 def referencing(elem, doc):
@@ -825,13 +888,25 @@ def prepare(doc):
     doc.information = {}
     doc.defined = {}
 
+
+    #addresses issue 15 for https://github.com/chdemko/pandoc-numbering/issues/15
+    global identoggle # In the YAML header of the input document, the user can specify by which means they would like to deal with automatic generation of identifiers 
+    #This is for when no name and prefix are provided for the numbering-marker
+    #How these behaviors act is specified here https://github.com/chdemko/pandoc-numbering/issues/15#issuecomment-614810888 
+    identoggle = "default" # "default behavior" by default. The user has to explicitly state which behavior they want
+
+
     if "pandoc-numbering" in doc.metadata.content and isinstance(
         doc.metadata.content["pandoc-numbering"], MetaMap
     ):
         for category, definition in doc.metadata.content[
             "pandoc-numbering"
         ].content.items():
-            if isinstance(definition, MetaMap):
+            if category == "identoggle" and "title" in str(definition):  # "title behavior"
+                identoggle = "title"
+            elif category == "identoggle" and "mixed" in str(definition): # "mixed behavior"
+                identoggle = "mixed"
+            if isinstance(definition, MetaMap): 
                 add_definition(category, definition, doc)
 
     doc.count = {}
@@ -1443,3 +1518,10 @@ def main(doc=None):
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
