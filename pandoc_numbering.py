@@ -442,7 +442,7 @@ class Numbered(object):
         self._caption = self._caption.replace("%g", self._global_number)
         self._caption = self._caption.replace("%n", self._local_number)
         self._caption = self._caption.replace("#", self._local_number)
-        if self._doc.format == "latex":
+        if self._doc.format in {"tex", "latex"}:
             self._caption = self._caption.replace("%p", "\\pageref{" + self._tag + "}")
 
         # Compute content
@@ -465,7 +465,7 @@ class Numbered(object):
         replace_global_number(self._link, self._global_number)
         replace_section_number(self._link, self._section_number)
         replace_local_number(self._link, self._local_number)
-        if self._doc.format == "latex":
+        if self._doc.format in {"tex", "latex"}:
             replace_page_number(self._link, self._tag)
 
         # Compute entry
@@ -476,7 +476,7 @@ class Numbered(object):
         replace_local_number(self._entry, self._local_number)
 
         # Finalize the content
-        if self._doc.format == "latex":
+        if self._doc.format in {"tex", "latex"}:
             self._get_content()[1].content.insert(
                 0, RawInline("\\label{" + self._alias + "}", "tex")
             )
@@ -809,7 +809,7 @@ def referencing_link(elem, doc):
             replace_section_number(elem, doc.information[tag].section_number)
             replace_local_number(elem, doc.information[tag].local_number)
             replace_count(elem, str(doc.count[doc.information[tag].category]))
-            if doc.format == "latex":
+            if doc.format in {"tex", "latex"}:
                 replace_page_number(elem, tag)
 
             title = stringify(Span(*doc.information[tag].title))
@@ -825,7 +825,7 @@ def referencing_link(elem, doc):
             elem.title = elem.title.replace(
                 "%c", str(doc.count[doc.information[tag].category])
             )
-            if doc.format == "latex":
+            if doc.format in {"tex", "latex"}:
                 elem.title = elem.title.replace("%p", "\\pageref{" + tag + "}")
 
 
@@ -937,7 +937,7 @@ def add_definition(category, definition, doc):
         meta_classes(category, definition["general"], doc.defined)
 
     # Detect LaTeX options
-    if doc.format == "latex":
+    if doc.format in {"tex", "latex"}:
         if "latex" in definition:
             meta_format_text(category, definition["latex"], doc.defined)
             meta_format_link(category, definition["latex"], doc.defined)
@@ -1377,7 +1377,7 @@ def finalize(doc):
     """
     # Loop on all listings definition
 
-    if doc.format == "latex":
+    if doc.format in {"tex", "latex"}:
         # Add header-includes if necessary
         if "header-includes" not in doc.metadata:
             doc.metadata["header-includes"] = MetaList()
@@ -1396,11 +1396,13 @@ def finalize(doc):
     listof = []
     for category, definition in doc.defined.items():
         if definition["listing-title"] is not None:
-            if doc.format == "latex":
+            if doc.format in {"tex", "latex"}:
                 latex_category = re.sub("[^a-z]+", "", category)
                 latex = (
                     r"\newlistof{%s}{%s}{%s}"
                     r"\renewcommand{\cft%stitlefont}{\cfttoctitlefont}"
+                    r"\setlength{\cft%snumwidth}{\cftfignumwidth}"
+                    r"\setlength{\cft%sindent}{\cftfigindent}"
                     % (
                         latex_category,
                         latex_category,
@@ -1409,6 +1411,8 @@ def finalize(doc):
                             input_format="panflute",
                             output_format="latex",
                         ),
+                        latex_category,
+                        latex_category,
                         latex_category,
                     )
                 )
@@ -1456,7 +1460,7 @@ def finalize(doc):
                     doc.content.insert(i, table)
                     i = i + 1
 
-    if doc.format == "latex":
+    if doc.format in {"tex", "latex"}:
         header = (
             r"\ifdef{\mainmatter}"
             r"{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
