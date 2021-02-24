@@ -170,7 +170,7 @@ Exercise (Title) #
 header-includes:
 - "`\\usepackage{tocloft}`{=tex}"
 - "`\\usepackage{etoolbox}`{=tex}"
-- "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}`{=tex}"
+- "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}\\setlength{\\cftexercisenumwidth}{\\cftfignumwidth}\\setlength{\\cftexerciseindent}{\\cftfigindent}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
   exercise:
@@ -182,7 +182,7 @@ pandoc-numbering:
 
 `\usepackage{etoolbox}`{=tex}
 
-`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}
+`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}\setlength{\cftexercisenumwidth}{\cftfignumwidth}\setlength{\cftexerciseindent}{\cftfigindent}`{=tex}
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
 
@@ -262,7 +262,7 @@ Exercise (Title) #
 header-includes:
 - "`\\usepackage{tocloft}`{=tex}"
 - "`\\usepackage{etoolbox}`{=tex}"
-- "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}`{=tex}"
+- "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}\\setlength{\\cftexercisenumwidth}{\\cftfignumwidth}\\setlength{\\cftexerciseindent}{\\cftfigindent}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
   exercise:
@@ -280,7 +280,7 @@ toccolor: blue
 
 `\usepackage{etoolbox}`{=tex}
 
-`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}
+`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}\setlength{\cftexercisenumwidth}{\cftfignumwidth}\setlength{\cftexerciseindent}{\cftfigindent}`{=tex}
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
 
