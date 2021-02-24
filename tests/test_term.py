@@ -14,7 +14,7 @@ Definition #
 :   This is the definition
             """,
             r"""
-[**Definition 1**]{#definition:1 .pandoc-numbering-text .definition}
+[]{#definition:1}[**Definition 1**]{#definition:1 .pandoc-numbering-text .definition}
 :   This is the definition
             """,
         )
@@ -27,7 +27,7 @@ Definition (This is the title) #
 :   This is the definition
             """,
             r"""
-[**Definition 1** *(This is the title)*]{#definition:1 .pandoc-numbering-text .definition}
+[]{#definition:this-is-the-title}[**Definition 1** *(This is the title)*]{#definition:1 .pandoc-numbering-text .definition}
 :   This is the definition
             """,
         )
@@ -56,21 +56,21 @@ Lemma #
 :   Under [Assumption #](#assumption:big), we have ... 
             """,
             """
-[**Assumption 1**]{#assumption:big .pandoc-numbering-text .assumption}
+[]{#assumption:1}[**Assumption 1**]{#assumption:big .pandoc-numbering-text .assumption}
 
 :   Big assumption
 
-[**Lemma 1**]{#lemma:1 .pandoc-numbering-text .lemma}
+[]{#lemma:1}[**Lemma 1**]{#lemma:1 .pandoc-numbering-text .lemma}
 
 :   A random lemma
 
-[**Lemma 2**]{#lemma:2 .pandoc-numbering-text .lemma}
+[]{#lemma:2}[**Lemma 2**]{#lemma:2 .pandoc-numbering-text .lemma}
 
 :   A random lemma
 
 Now we derive a result which uses [Assumption 1](#assumption:big).
 
-[**Lemma 3**]{#lemma:3 .pandoc-numbering-text .lemma}
+[]{#lemma:3}[**Lemma 3**]{#lemma:3 .pandoc-numbering-text .lemma}
 
 :   Under [Assumption 1](#assumption:big), we have ...
             """,

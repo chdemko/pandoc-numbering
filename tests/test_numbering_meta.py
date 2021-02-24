@@ -31,9 +31,9 @@ pandoc-numbering:
       - myclass
 ---
 
-[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .myclass}
+[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .myclass}
 
-[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .myclass}
+[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .myclass}
             """,
         )
 
@@ -58,13 +58,13 @@ Exercise (Title) #
 pandoc-numbering:
   exercise:
     standard:
-      format-text-classic: '**%D %d %n/%c**'
-      format-text-title: '**%D %d %n/%c: %T %t**'
+      format-text-classic: "**%D %d %n/%c**"
+      format-text-title: "**%D %d %n/%c: %T %t**"
 ---
 
-[**Exercise exercise 1/2**]{#exercise:1 .pandoc-numbering-text .exercise}
+[]{#exercise:1}[**Exercise exercise 1/2**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise exercise 2/2: Title title**]{#exercise:2 .pandoc-numbering-text .exercise}
+[]{#exercise:title}[**Exercise exercise 2/2: Title title**]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -105,21 +105,17 @@ pandoc-numbering:
       last-section-level: 2
 ---
 
-First chapter
-=============
+# First chapter
 
-Second chapter
-==============
+# Second chapter
 
-First section
--------------
+## First section
 
-Second section
---------------
+## Second section
 
-[**Exercise 2.1**]{#exercise:2.2.1 .pandoc-numbering-text .exercise}
+[]{#exercise:second-chapter.second-section.1}[**Exercise 2.1**]{#exercise:2.2.1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2.2** *(Title)*]{#exercise:2.2.2 .pandoc-numbering-text .exercise}
+[]{#exercise:second-chapter.second-section.title}[**Exercise 2.2** *(Title)*]{#exercise:2.2.2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -155,23 +151,19 @@ Exercise (Title) #
 pandoc-numbering:
   exercise:
     general:
-      sectioning-levels: '-.+.'
+      sectioning-levels: "-.+."
 ---
 
-First chapter
-=============
+# First chapter
 
-Second chapter
-==============
+# Second chapter
 
-First section
--------------
+## First section
 
-Second section
---------------
+## Second section
 
-[**Exercise 2.1**]{#exercise:2.2.1 .pandoc-numbering-text .exercise}
+[]{#exercise:second-chapter.second-section.1}[**Exercise 2.1**]{#exercise:2.2.1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2.2** *(Title)*]{#exercise:2.2.2 .pandoc-numbering-text .exercise}
+[]{#exercise:second-chapter.second-section.title}[**Exercise 2.2** *(Title)*]{#exercise:2.2.2 .pandoc-numbering-text .exercise}
             """,
         )

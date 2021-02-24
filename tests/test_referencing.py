@@ -25,15 +25,13 @@ See [%D %d %T %t %g %s %n # %c](#exercise:first)
 See [%D %d %T %t %g %s %n # %c](#exercise:second)
             """,
             r"""
-Header
-======
+# Header
 
-Section
--------
+## Section
 
-[**Exercise 1.1** *(First title)*]{#exercise:first .pandoc-numbering-text .exercise}
+[]{#exercise:header.section.first-title}[**Exercise 1.1** *(First title)*]{#exercise:first .pandoc-numbering-text .exercise}
 
-[**Exercise 1.2** *(Second title)*]{#exercise:second .pandoc-numbering-text .exercise}
+[]{#exercise:header.section.second-title}[**Exercise 1.2** *(Second title)*]{#exercise:second .pandoc-numbering-text .exercise}
 
 See [Exercise exercise First title first title 1.1.1 1.1 1.1 1.1 2](#exercise:first)
 
@@ -59,23 +57,25 @@ See [%D %d %T %t %g %s %n # %c %p](#exercise:second)
             r"""
 ---
 header-includes:
-- '`\usepackage{tocloft}`{=tex}'
-- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}'
+- "`\\usepackage{tocloft}`{=tex}"
+- "`\\usepackage{etoolbox}`{=tex}"
+- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\oldmainmatter}}{}`{=tex}"
 ---
 
 `\usepackage{tocloft}`{=tex}
+
+`\usepackage{etoolbox}`{=tex}
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
 
 ```{=tex}
 \ifdef{\mainmatter}{}{}
 ```
-Title
-=====
+# Title
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:first}`{=tex}**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:title.1}[`\label{exercise:first}`{=tex}`\label{exercise:title.1}`{=tex}**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.2}{\ignorespaces {Title}}}`{=tex}[`\label{exercise:second}`{=tex}**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title.title}[`\label{exercise:second}`{=tex}`\label{exercise:title.title}`{=tex}**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise}
 
 See [Exercise exercise 1.1 1 1 1 2 `\pageref{exercise:first}`{=tex}](#exercise:first)
 
