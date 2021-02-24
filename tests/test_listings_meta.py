@@ -29,15 +29,14 @@ pandoc-numbering:
       listing-title: List of exercises
 ---
 
-List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
-=================
+# List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -62,18 +61,18 @@ Exercise (Title) #
 pandoc-numbering:
   exercise:
     general:
+      listing-identifier: false
       listing-title: List of exercises
 ---
 
-List of exercises {.pandoc-numbering-listing .exercise .unnumbered .unlisted}
-=================
+# List of exercises {.pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -102,15 +101,14 @@ pandoc-numbering:
       listing-title: List of exercises
 ---
 
-List of exercises {#myident .pandoc-numbering-listing .exercise .unnumbered .unlisted}
-=================
+# List of exercises {#myident .pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -137,17 +135,18 @@ pandoc-numbering:
   exercise:
     general:
       listing-title: List of exercises
+      listing-unlisted: false
+      listing-unnumbered: false
 ---
 
-List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise}
-=================
+# List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise}
 
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -169,9 +168,10 @@ Exercise (Title) #
             r"""
 ---
 header-includes:
-- '`\usepackage{tocloft}`{=tex}'
-- '`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}'
-- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}'
+- "`\\usepackage{tocloft}`{=tex}"
+- "`\\usepackage{etoolbox}`{=tex}"
+- "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}`{=tex}"
+- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
   exercise:
     general:
@@ -180,6 +180,8 @@ pandoc-numbering:
 
 `\usepackage{tocloft}`{=tex}
 
+`\usepackage{etoolbox}`{=tex}
+
 `\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
@@ -187,9 +189,9 @@ pandoc-numbering:
 ```{=tex}
 \ifdef{\mainmatter}{}{\listofexercise}
 ```
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:1}[`\label{exercise:1}`{=tex}`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Title}}}`{=tex}[`\label{exercise:2}`{=tex}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title}[`\label{exercise:2}`{=tex}`\label{exercise:title}`{=tex}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
             "latex",
         )
@@ -219,19 +221,18 @@ pandoc-numbering:
     general:
       listing-title: List of exercises
     standard:
-      format-entry-classic: '%g %D'
-      format-entry-title: '%g %D (%T)'
+      format-entry-classic: "%g %D"
+      format-entry-title: %g %D (%T)
 ---
 
-List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
-=================
+# List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
 -   [[1 Exercise]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[2 Exercise (Title)]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
         )
 
@@ -259,9 +260,10 @@ Exercise (Title) #
             r"""
 ---
 header-includes:
-- '`\usepackage{tocloft}`{=tex}'
-- '`\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}'
-- '`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}'
+- "`\\usepackage{tocloft}`{=tex}"
+- "`\\usepackage{etoolbox}`{=tex}"
+- "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}`{=tex}"
+- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
   exercise:
     general:
@@ -269,12 +271,14 @@ pandoc-numbering:
     latex:
       entry-space: 3
       entry-tab: 2
-      format-entry-classic: '%D'
-      format-entry-title: '%D (%T)'
+      format-entry-classic: "%D"
+      format-entry-title: %D (%T)
 toccolor: blue
 ---
 
 `\usepackage{tocloft}`{=tex}
+
+`\usepackage{etoolbox}`{=tex}
 
 `\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}`{=tex}
 
@@ -283,9 +287,9 @@ toccolor: blue
 ```{=tex}
 \ifdef{\mainmatter}{}{\listofexercise}
 ```
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:1}[`\label{exercise:1}`{=tex}`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Exercise (Title)}}}`{=tex}[`\label{exercise:2}`{=tex}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Exercise (Title)}}}`{=tex}[]{#exercise:title}[`\label{exercise:2}`{=tex}`\label{exercise:title}`{=tex}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
             "latex",
         )
