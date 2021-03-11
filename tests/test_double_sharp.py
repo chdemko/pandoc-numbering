@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from panflute import *
+from panflute import Doc, convert_text
 
 import pandoc_numbering
 

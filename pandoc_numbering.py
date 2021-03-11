@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# pylint: disable=too-many-lines,bad-continuation
+# pylint: disable=too-many-lines
 
 """
 Pandoc filter to number all kinds of things.
@@ -81,6 +81,8 @@ class Numbered(object):
         "_global_number",
         "_section_number",
         "_local_number",
+        "_section_alias",
+        "_alias",
     ]
 
     @property
@@ -131,6 +133,20 @@ class Numbered(object):
         Get section_number property.
         """
         return self._section_number
+
+    @property
+    def section_alias(self):
+        """
+        Get section_alias property.
+        """
+        return self._section_alias
+
+    @property
+    def alias(self):
+        """
+        Get alias property.
+        """
+        return self._alias
 
     @property
     def local_number(self):
@@ -194,6 +210,8 @@ class Numbered(object):
         self._global_number = None
         self._section_number = None
         self._local_number = None
+        self._section_alias = None
+        self._alias = None
 
         if self._get_content() and isinstance(self._get_content()[-1], Str):
             self._match = re.match(Numbered.marker_regex, self._get_content()[-1].text)
@@ -226,10 +244,12 @@ class Numbered(object):
         self._compute_basic_category()
         self._compute_levels()
         self._compute_section_number()
+        self._compute_section_alias()
         self._compute_leading()
         self._compute_category()
         self._compute_number()
         self._compute_tag()
+        self._compute_alias()
         self._compute_local_number()
         self._compute_global_number()
         self._compute_data()
@@ -286,6 +306,13 @@ class Numbered(object):
             map(str, self._doc.headers[: self._last_section_level])
         )
 
+    def _compute_section_alias(self):
+        strings = list(map(str, self._doc.aliases[: self._last_section_level]))
+        for index, string in enumerate(strings):
+            if string == "":
+                strings[index] = "0"
+        self._section_alias = ".".join(strings)
+
     def _compute_leading(self):
         # Compute the leading (composed of the section numbering and a dot)
         if self._last_section_level != 0:
@@ -318,6 +345,35 @@ class Numbered(object):
 
         self._doc.collections[self._basic_category].append(self._tag)
 
+    def _compute_alias(self):
+        # Determine the final alias
+        if not self._title:
+            if self._section_alias:
+                self._alias = (
+                    self._basic_category
+                    + ":"
+                    + self._section_alias
+                    + "."
+                    + self._number
+                )
+            else:
+                self._alias = self._basic_category + ":" + self._number
+        else:
+            if self._section_alias:
+                self._alias = (
+                    self._basic_category
+                    + ":"
+                    + self._section_alias
+                    + "."
+                    + Numbered._identifier(stringify(Span(*self._title)))
+                )
+            else:
+                self._alias = (
+                    self._basic_category
+                    + ":"
+                    + Numbered._identifier(stringify(Span(*self._title)))
+                )
+
     def _compute_local_number(self):
         # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
         self._local_number = ".".join(
@@ -339,21 +395,24 @@ class Numbered(object):
         # pylint: disable=too-many-statements
         classes = self._doc.defined[self._basic_category]["classes"]
         self._set_content(
-            [Span(classes=["pandoc-numbering-text"] + classes, identifier=self._tag)]
+            [
+                Span(identifier=self._alias),
+                Span(identifier=self._tag, classes=["pandoc-numbering-text"] + classes),
+            ]
         )
         self._link.classes = self._link.classes + classes
         self._entry.classes = self._entry.classes + classes
 
         # Prepare the final data
         if self._title:
-            self._get_content()[0].content = copy.deepcopy(
+            self._get_content()[1].content = copy.deepcopy(
                 self._doc.defined[self._basic_category]["format-text-title"]
             )
-            # Check for numbering
+            # Check for numbering; if it exists, title appearance should be modified
             if self._local_number is not None:
-                # Remove parentheses and italics from title and insert a colon before it
-                del self._get_content()[0].content[1:]
-                self._get_content()[0].content[0].content.extend([Str(":"), Space(), Str("%T")]) 
+                # Format title without parentheses and italics and insert a colon before it
+                del self._get_content()[1].content[1:]
+                self._get_content()[1].content[0].content.extend([Str(":"), Space(), Str("%T")])
             self._link.content = copy.deepcopy(
                 self._doc.defined[self._basic_category]["format-link-title"]
             )
@@ -364,7 +423,7 @@ class Numbered(object):
                 "format-caption-title"
             ]
         else:
-            self._get_content()[0].content = copy.deepcopy(
+            self._get_content()[1].content = copy.deepcopy(
                 self._doc.defined[self._basic_category]["format-text-classic"]
             )
             self._link.content = copy.deepcopy(
@@ -388,7 +447,7 @@ class Numbered(object):
         self._caption = self._caption.replace("%g", self._global_number)
         self._caption = self._caption.replace("%n", self._local_number)
         self._caption = self._caption.replace("#", self._local_number)
-        if self._doc.format == "latex":
+        if self._doc.format in {"tex", "latex"}:
             self._caption = self._caption.replace("%p", "\\pageref{" + self._tag + "}")
 
         # Compute content
@@ -411,7 +470,7 @@ class Numbered(object):
         replace_global_number(self._link, self._global_number)
         replace_section_number(self._link, self._section_number)
         replace_local_number(self._link, self._local_number)
-        if self._doc.format == "latex":
+        if self._doc.format in {"tex", "latex"}:
             replace_page_number(self._link, self._tag)
 
         # Compute entry
@@ -422,8 +481,11 @@ class Numbered(object):
         replace_local_number(self._entry, self._local_number)
 
         # Finalize the content
-        if self._doc.format == "latex":
-            self._get_content()[0].content.insert(
+        if self._doc.format in {"tex", "latex"}:
+            self._get_content()[1].content.insert(
+                0, RawInline("\\label{" + self._alias + "}", "tex")
+            )
+            self._get_content()[1].content.insert(
                 0, RawInline("\\label{" + self._tag + "}", "tex")
             )
 
@@ -709,6 +771,7 @@ def numbering(elem, doc):
     if isinstance(elem, (Para, DefinitionItem, Header)):
         if isinstance(elem, Header):
             update_header_numbers(elem, doc)
+            update_header_aliases(elem, doc)
         numbered = Numbered(elem, doc)
         if numbered.tag is not None:
             doc.information[numbered.tag] = numbered
@@ -751,7 +814,7 @@ def referencing_link(elem, doc):
             replace_section_number(elem, doc.information[tag].section_number)
             replace_local_number(elem, doc.information[tag].local_number)
             replace_count(elem, str(doc.count[doc.information[tag].category]))
-            if doc.format == "latex":
+            if doc.format in {"tex", "latex"}:
                 replace_page_number(elem, tag)
 
             title = stringify(Span(*doc.information[tag].title))
@@ -767,7 +830,7 @@ def referencing_link(elem, doc):
             elem.title = elem.title.replace(
                 "%c", str(doc.count[doc.information[tag].category])
             )
-            if doc.format == "latex":
+            if doc.format in {"tex", "latex"}:
                 elem.title = elem.title.replace("%p", "\\pageref{" + tag + "}")
 
 
@@ -818,6 +881,20 @@ def update_header_numbers(elem, doc):
             doc.headers[index] = 0
 
 
+def update_header_aliases(elem, doc):
+    """
+    update header aliases.
+
+    Arguments
+    ---------
+        elem: element to update
+        doc: pandoc document
+    """
+    doc.aliases[elem.level - 1] = elem.identifier
+    for index in range(elem.level, 6):
+        doc.aliases[index] = ""
+
+
 def prepare(doc):
     """
     Prepare document.
@@ -827,6 +904,7 @@ def prepare(doc):
         doc: pandoc document
     """
     doc.headers = [0, 0, 0, 0, 0, 0]
+    doc.aliases = ["", "", "", "", "", ""]
     doc.information = {}
     doc.defined = {}
 
@@ -864,7 +942,7 @@ def add_definition(category, definition, doc):
         meta_classes(category, definition["general"], doc.defined)
 
     # Detect LaTeX options
-    if doc.format == "latex":
+    if doc.format in {"tex", "latex"}:
         if "latex" in definition:
             meta_format_text(category, definition["latex"], doc.defined)
             meta_format_link(category, definition["latex"], doc.defined)
@@ -1304,7 +1382,7 @@ def finalize(doc):
     """
     # Loop on all listings definition
 
-    if doc.format == "latex":
+    if doc.format in {"tex", "latex"}:
         # Add header-includes if necessary
         if "header-includes" not in doc.metadata:
             doc.metadata["header-includes"] = MetaList()
@@ -1315,16 +1393,21 @@ def finalize(doc):
         doc.metadata["header-includes"].append(
             MetaInlines(RawInline(r"\usepackage{tocloft}", "tex"))
         )
+        doc.metadata["header-includes"].append(
+            MetaInlines(RawInline(r"\usepackage{etoolbox}", "tex"))
+        )
 
     i = 0
     listof = []
     for category, definition in doc.defined.items():
         if definition["listing-title"] is not None:
-            if doc.format == "latex":
+            if doc.format in {"tex", "latex"}:
                 latex_category = re.sub("[^a-z]+", "", category)
                 latex = (
                     r"\newlistof{%s}{%s}{%s}"
                     r"\renewcommand{\cft%stitlefont}{\cfttoctitlefont}"
+                    r"\setlength{\cft%snumwidth}{\cftfignumwidth}"
+                    r"\setlength{\cft%sindent}{\cftfigindent}"
                     % (
                         latex_category,
                         latex_category,
@@ -1333,6 +1416,8 @@ def finalize(doc):
                             input_format="panflute",
                             output_format="latex",
                         ),
+                        latex_category,
+                        latex_category,
                         latex_category,
                     )
                 )
@@ -1380,7 +1465,7 @@ def finalize(doc):
                     doc.content.insert(i, table)
                     i = i + 1
 
-    if doc.format == "latex":
+    if doc.format in {"tex", "latex"}:
         header = (
             r"\ifdef{\mainmatter}"
             r"{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"

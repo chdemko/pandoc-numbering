@@ -26,13 +26,13 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 # -- Project information -----------------------------------------------------
 
 project = "pandoc-numbering"
-copyright = "2015-2020, Christophe Demko"
+copyright = "2015-2021, Christophe Demko"
 author = "Christophe Demko"
 
 # The short X.Y version
-version = "3.2"
+version = "3.4"
 # The full version, including alpha/beta/rc tags
-release = "3.2.1.0"
+release = "3.4.0.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,7 +40,7 @@ release = "3.2.1.0"
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
-needs_sphinx = "2.4"
+needs_sphinx = "3.5"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
