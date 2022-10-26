@@ -178,7 +178,8 @@ class Numbered(object):
     @staticmethod
     def _remove_accents(string):
         nfkd_form = unicodedata.normalize("NFKD", string)
-        return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+        # pylint: disable=redundant-u-string-prefix
+        return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
     @staticmethod
     def _identifier(string):
@@ -1396,6 +1397,7 @@ def finalize(doc):
     listof = []
     for category, definition in doc.defined.items():
         if definition["listing-title"] is not None:
+            # pylint: disable=consider-using-f-string
             if doc.format in {"tex", "latex"}:
                 latex_category = re.sub("[^a-z]+", "", category)
                 latex = (

@@ -210,7 +210,7 @@ header-includes:
 ```{=tex}
 \ifdef{\mainmatter}{}{}
 ```
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[]{#exercise:equation-a-b}[`\label{exercise:1}`{=tex}`\label{exercise:equation-a-b}`{=tex}**Exercise 1** *(Equation $a=b$)*]{#exercise:1 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[]{#exercise:equation-a-b}[`\label{exercise:1}`{=tex}`\label{exercise:equation-a-b}`{=tex}**Exercise 1** *(Equation $a=b$`<!-- -->`{=html})*]{#exercise:1 .pandoc-numbering-text .exercise}
             """,
             "latex",
         )
