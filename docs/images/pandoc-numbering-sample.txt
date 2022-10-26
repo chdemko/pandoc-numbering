@@ -62,7 +62,7 @@ This is the second section
 Example -.#
  ~ This is the first example of the second section
 
-> Theorem #
+> Theorem ($a=b$) #
 >
 > Another theorem. Can be useful in [](#exercise:1)
 

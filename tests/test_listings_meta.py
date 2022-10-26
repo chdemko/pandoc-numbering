@@ -222,7 +222,7 @@ pandoc-numbering:
       listing-title: List of exercises
     standard:
       format-entry-classic: "%g %D"
-      format-entry-title: %g %D (%T)
+      format-entry-title: "%g %D (%T)"
 ---
 
 # List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
@@ -272,7 +272,7 @@ pandoc-numbering:
       entry-space: 3
       entry-tab: 2
       format-entry-classic: "%D"
-      format-entry-title: %D (%T)
+      format-entry-title: "%D (%T)"
 toccolor: blue
 ---
 
