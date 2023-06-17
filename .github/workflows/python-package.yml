@@ -20,11 +20,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: uses: actions/setup-python@v4
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Set up Poetry ${{ matrix.poetry-version }}
-      uses: uses: abatilo/actions-poetry@v2
+      uses: abatilo/actions-poetry@v2
       with:
         poetry-version: ${{ matrix.poetry-version }}
     - name: View poetry --help
