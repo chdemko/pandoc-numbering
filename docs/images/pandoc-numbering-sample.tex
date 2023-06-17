@@ -1,85 +1,11 @@
-\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[]{article}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\usepackage{fixltx2e} % provides \textsubscript
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provides euro and other symbols
-\else % if luatex or xelatex
-  \usepackage{unicode-math}
-  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\fi
-% use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage[]{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\IfFileExists{parskip.sty}{%
-\usepackage{parskip}
-}{% else
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
-}
-\usepackage{hyperref}
-\hypersetup{
-            pdftitle={Sample use of automatic numbering},
-            pdfauthor={Ch. Demko chdemko@gmail.com},
-            pdfborder={0 0 0},
-            breaklinks=true}
-\urlstyle{same}  % don't use monospace font for urls
-\setlength{\emergencystretch}{3em}  % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{0}
-% Redefines (sub)paragraphs to behave more like sections
-\ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
-\fi
-\ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
-
-% set default figure placement to htbp
-\makeatletter
-\def\fps@figure{htbp}
-\makeatother
-
-
-\title{Sample use of automatic numbering}
-\author{Ch. Demko \href{mailto:chdemko@gmail.com}{\nolinkurl{chdemko@gmail.com}}}
-\date{09/01/2018}
-
-\begin{document}
-\maketitle
-
-\section*{List of examples}
-\addcontentsline{toc}{section}{List of examples}
-
-\hypersetup{linkcolor=black}\makeatletter\newcommand*\l@example{\@dottedtocline{1}{1.5em}{2.3em}}\@starttoc{example}\makeatother
-
-\section*{List of exercises}
-\addcontentsline{toc}{section}{List of exercises}
-
-\hypersetup{linkcolor=black}\makeatletter\newcommand*\l@exercise{\@dottedtocline{1}{2.0em}{3.0em}}\@starttoc{exercise}\makeatother
-
-\section*{List of theorems}
-\addcontentsline{toc}{section}{List of theorems}
-
-\hypersetup{linkcolor=black}\makeatletter\newcommand*\l@theorem{\@dottedtocline{1}{1.5em}{2.3em}}\@starttoc{theorem}\makeatother
+\ifdef{\mainmatter}{}{\listofexample
+\listofexercise
+\listoftheorem}
 
 \hypertarget{this-is-the-first-section}{%
 \section{This is the first section}\label{this-is-the-first-section}}
 
-\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {}}}\protect\hypertarget{exercise:1}{}{\label{exercise:1}\textbf{Exercise
+\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {}}}\protect\hypertarget{exercise:1}{}{}\protect\hypertarget{exercise:1}{}{\label{exercise:1}\label{exercise:1}\textbf{Exercise
 1}}
 
 This is the first exercise. Have also a look at the
@@ -89,7 +15,7 @@ This is the first exercise. Have also a look at the
 \protect\hyperlink{exercise:last}{{exercise 3}}.
 
 \begin{quote}
-\phantomsection\addcontentsline{theorem}{theorem}{\protect\numberline {1.1}{\ignorespaces {Needed for the \protect\hyperlink{exercise:second}{second exercise}}}}\protect\hypertarget{theorem:first}{}{\label{theorem:first}\emph{Theorem
+\phantomsection\addcontentsline{theorem}{theorem}{\protect\numberline {1.1}{\ignorespaces {Needed for the \protect\hyperlink{exercise:second}{second exercise}}}}\protect\hypertarget{theorem:this-is-the-first-section.needed-for-the-second-exercise}{}{}\protect\hypertarget{theorem:first}{}{\label{theorem:first}\label{theorem:this-is-the-first-section.needed-for-the-second-exercise}\emph{Theorem
 1.1: Needed for the \protect\hyperlink{exercise:second}{second
 exercise}}}
 
@@ -97,7 +23,7 @@ This is a the first theorem. Look at the
 \protect\hyperlink{exercise:second}{exercise}.
 \end{quote}
 
-\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {}}}\protect\hypertarget{exercise:second}{}{\label{exercise:second}\textbf{Exercise
+\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {}}}\protect\hypertarget{exercise:this-is-the-second-exercise}{}{}\protect\hypertarget{exercise:second}{}{\label{exercise:second}\label{exercise:this-is-the-second-exercise}\textbf{Exercise
 2} \emph{(This is the second exercise)}}
 
 Use \protect\hyperlink{theorem:first}{\emph{theorem 1.1} page
@@ -105,10 +31,10 @@ Use \protect\hyperlink{theorem:first}{\emph{theorem 1.1} page
 
 \begin{description}
 \tightlist
-\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {1.1}{\ignorespaces {Example}}}\protect\hypertarget{example:1.1}{}{\label{example:1.1}\textbf{Example
+\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {1.1}{\ignorespaces {Example}}}\protect\hypertarget{example:this-is-the-first-section.1}{}{}\protect\hypertarget{example:1.1}{}{\label{example:1.1}\label{example:this-is-the-first-section.1}\textbf{Example
 1}}]
 This is the first example of the first section
-\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {1.2}{\ignorespaces {Example}}}\protect\hypertarget{example:1.2}{}{\label{example:1.2}\textbf{Example
+\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {1.2}{\ignorespaces {Example}}}\protect\hypertarget{example:this-is-the-first-section.2}{}{}\protect\hypertarget{example:1.2}{}{\label{example:1.2}\label{example:this-is-the-first-section.2}\textbf{Example
 2}}]
 This is the second example of the first section
 \end{description}
@@ -118,20 +44,20 @@ This is the second example of the first section
 
 \begin{description}
 \tightlist
-\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {2.1}{\ignorespaces {Example}}}\protect\hypertarget{example:2.1}{}{\label{example:2.1}\textbf{Example
+\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {2.1}{\ignorespaces {Example}}}\protect\hypertarget{example:this-is-the-second-section.1}{}{}\protect\hypertarget{example:2.1}{}{\label{example:2.1}\label{example:this-is-the-second-section.1}\textbf{Example
 1}}]
 This is the first example of the second section
 \end{description}
 
 \begin{quote}
-\phantomsection\addcontentsline{theorem}{theorem}{\protect\numberline {2.1}{\ignorespaces {Theorem}}}\protect\hypertarget{theorem:2.1}{}{\label{theorem:2.1}\emph{Theorem
-2.1}}
+\phantomsection\addcontentsline{theorem}{theorem}{\protect\numberline {2.1}{\ignorespaces {\(a=b\)}}}\protect\hypertarget{theorem:this-is-the-second-section.a-b}{}{}\protect\hypertarget{theorem:2.1}{}{\label{theorem:2.1}\label{theorem:this-is-the-second-section.a-b}\emph{Theorem
+2.1: \(a=b\)}}
 
 Another theorem. Can be useful in \protect\hyperlink{exercise:1}{}
 \end{quote}
 
 \begin{quote}
-\phantomsection\addcontentsline{theorem}{theorem}{\protect\numberline {2.2}{\ignorespaces {Theorem}}}\protect\hypertarget{theorem:2.2}{}{\label{theorem:2.2}\emph{Theorem
+\phantomsection\addcontentsline{theorem}{theorem}{\protect\numberline {2.2}{\ignorespaces {Theorem}}}\protect\hypertarget{theorem:this-is-the-second-section.2}{}{}\protect\hypertarget{theorem:2.2}{}{\label{theorem:2.2}\label{theorem:this-is-the-second-section.2}\emph{Theorem
 2.2}}
 
 A last theorem.
@@ -139,16 +65,14 @@ A last theorem.
 
 \begin{description}
 \tightlist
-\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {2.2}{\ignorespaces {Example}}}\protect\hypertarget{example:2.2}{}{\label{example:2.2}\textbf{Example
+\item[\phantomsection\addcontentsline{example}{example}{\protect\numberline {2.2}{\ignorespaces {Example}}}\protect\hypertarget{example:this-is-the-second-section.2}{}{}\protect\hypertarget{example:2.2}{}{\label{example:2.2}\label{example:this-is-the-second-section.2}\textbf{Example
 2}}]
 This is the second example of the second section
 \end{description}
 
-\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {3}{\ignorespaces {}}}\protect\hypertarget{exercise:last}{}{\label{exercise:last}\textbf{Exercise
+\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {3}{\ignorespaces {}}}\protect\hypertarget{exercise:3}{}{}\protect\hypertarget{exercise:last}{}{\label{exercise:last}\label{exercise:3}\textbf{Exercise
 3}}
 
 This is the third exercise.
 
 Unnumbered \#
-
-\end{document}

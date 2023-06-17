@@ -2,9 +2,7 @@
 
 # pylint: disable=too-many-lines
 
-"""
-Pandoc filter to number all kinds of things.
-"""
+"""Pandoc filter to number all kinds of things."""
 
 import copy
 import re
@@ -30,6 +28,11 @@ from panflute import (  # type: ignore
     LineItem,
     Link,
     ListItem,
+    MetaBool,
+    MetaInlines,
+    MetaList,
+    MetaMap,
+    MetaString,
     Note,
     Para,
     Plain,
@@ -43,22 +46,17 @@ from panflute import (  # type: ignore
     Table,
     TableCell,
     TableRow,
-    MetaBool,
-    MetaInlines,
-    MetaList,
-    MetaMap,
-    MetaString,
-    run_filters,
-    stringify,
     convert_text,
     debug,
+    run_filters,
+    stringify,
 )
 
 
 # pylint: disable=bad-option-value,useless-object-inheritance
-class Numbered(object):
+class Numbered:
     """
-    Numbered elements
+    Numbered elements.
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -88,84 +86,132 @@ class Numbered(object):
     @property
     def tag(self):
         """
-        Get tag property.
+        Get the tag property.
+
+        Returns
+        -------
+            The tag property.
         """
         return self._tag
 
     @property
     def entry(self):
         """
-        Get entry property.
+        Get the entry property.
+
+        Returns
+        -------
+            The entry property.
         """
         return self._entry
 
     @property
     def link(self):
         """
-        Get link property.
+        Get the link property.
+
+        Returns
+        -------
+            The link property.
         """
         return self._link
 
     @property
     def title(self):
         """
-        Get title property.
+        Get the title property.
+
+        Returns
+        -------
+            The title property.
         """
         return self._title
 
     @property
     def description(self):
         """
-        Get description property.
+        Get the description property.
+
+        Returns
+        -------
+            The description property.
         """
         return self._description
 
     @property
     def global_number(self):
         """
-        Get global_number property.
+        Get the global_number property.
+
+        Returns
+        -------
+            The global_number property.
         """
         return self._global_number
 
     @property
     def section_number(self):
         """
-        Get section_number property.
+        Get the section_number property.
+
+        Returns
+        -------
+            The section_number property.
         """
         return self._section_number
 
     @property
     def section_alias(self):
         """
-        Get section_alias property.
+        Get the section_alias property.
+
+        Returns
+        -------
+            The section_alias property.
         """
         return self._section_alias
 
     @property
     def alias(self):
         """
-        Get alias property.
+        Get the alias property.
+
+        Returns
+        -------
+            The alias property.
         """
         return self._alias
 
     @property
     def local_number(self):
         """
-        Get local_number property.
+        Get the local_number property.
+
+        Returns
+        -------
+            The local_number property.
         """
         return self._local_number
 
     @property
     def category(self):
         """
-        Get category property.
+        Get the category property.
+
+        Returns
+        -------
+            The category property.
         """
         return self._category
 
     @property
     def caption(self):
         """
-        Get caption property.
+        Get the caption property.
+
+        Returns
+        -------
+            The caption property.
         """
         return self._caption
 
@@ -189,11 +235,19 @@ class Numbered(object):
         )
 
         # Remove leading digits
-        string = re.sub("^[^a-zA-Z]+", "", string)
-
-        return string
+        return re.sub("^[^a-zA-Z]+", "", string)
 
     def __init__(self, elem, doc):
+        """
+        Initialise an instance.
+
+        Arguments
+        ---------
+        elem
+            An element.
+        doc
+            The document.
+        """
         self._elem = elem
         self._doc = doc
         self._tag = None
@@ -261,7 +315,7 @@ class Numbered(object):
             isinstance(self._get_content()[-3], Str)
             and self._get_content()[-3].text[-1:] == ")"
         ):
-            for (i, item) in enumerate(self._get_content()):
+            for i, item in enumerate(self._get_content()):
                 if isinstance(item, Str) and item.text[0] == "(":
                     self._title = self._get_content()[i:-2]
                     # Detach from original parent
@@ -294,7 +348,7 @@ class Numbered(object):
         self._last_section_level = len(self._match.group("header")) // 2
 
         # Get the default first and last section level
-        if self._first_section_level == 0 and self._last_section_level == 0:
+        if self._first_section_level == self._last_section_level == 0:
             self._first_section_level = self._doc.defined[self._basic_category][
                 "first-section-level"
             ]
@@ -393,7 +447,7 @@ class Numbered(object):
             self._global_number = self._number
 
     def _compute_data(self):
-        # pylint: disable=too-many-statements
+        # pylint: disable=too-many-statements,no-member
         classes = self._doc.defined[self._basic_category]["classes"]
         self._set_content(
             [
@@ -432,7 +486,7 @@ class Numbered(object):
                 "format-caption-classic"
             ]
 
-        # Compute caption (delay replacing %c at the end since it is not known for the moment)
+        # Compute caption (delay replacing %c at the end)
         title = stringify(Span(*self._title))
         description = stringify(Span(*self._description))
         self._caption = self._caption.replace("%t", title.lower())
@@ -487,16 +541,11 @@ class Numbered(object):
 
             latex_category = re.sub("[^a-z]+", "", self._basic_category)
             latex = (
-                "\\phantomsection\\addcontentsline{"
-                + latex_category
-                + "}{"
-                + latex_category
-                + "}{\\protect\\numberline {"
-                + self._leading
-                + self._number
-                + "}{\\ignorespaces "
-                + to_latex(self._entry)
-                + "}}"
+                "\\phantomsection"
+                f"\\addcontentsline{{{latex_category}}}{{{latex_category}}}"
+                f"{{\\protect\\numberline {{{self._leading + self._number}}}"
+                f"{{\\ignorespaces {to_latex(self._entry)}"
+                "}}"
             )
             self._get_content().insert(0, RawInline(latex, "tex"))
 
@@ -507,15 +556,17 @@ def replace_description(where, description):
 
     Arguments
     ---------
-        where: where to replace
-        description: replace %D and %d by description
+    where
+        where to replace
+    description
+        replace %D and %d by description
     """
     where.walk(partial(replacing, search="%D", replace=copy.deepcopy(description)))
     where.walk(
         partial(
             replacing,
             search="%d",
-            replace=list(item.walk(lowering) for item in copy.deepcopy(description)),
+            replace=[item.walk(lowering) for item in copy.deepcopy(description)],
         )
     )
 
@@ -526,15 +577,17 @@ def replace_title(where, title):
 
     Arguments
     ---------
-        where: where to replace
-        title: replace %T and %t by title
+    where
+        where to replace
+    title
+        replace %T and %t by title
     """
     where.walk(partial(replacing, search="%T", replace=copy.deepcopy(title)))
     where.walk(
         partial(
             replacing,
             search="%t",
-            replace=list(item.walk(lowering) for item in copy.deepcopy(title)),
+            replace=[item.walk(lowering) for item in copy.deepcopy(title)],
         )
     )
 
@@ -545,8 +598,10 @@ def replace_section_number(where, section_number):
 
     Arguments
     ---------
-        where: where to replace
-        section_number: replace %s by section_number
+    where
+        where to replace
+    section_number
+        replace %s by section_number
     """
     where.walk(partial(replacing, search="%s", replace=[Str(section_number)]))
 
@@ -557,8 +612,10 @@ def replace_global_number(where, global_number):
 
     Arguments
     ---------
-        where: where to replace
-        global_number: replace %g by global_number
+    where
+        where to replace
+    global_number
+        replace %g by global_number
     """
     where.walk(partial(replacing, search="%g", replace=[Str(global_number)]))
 
@@ -569,8 +626,10 @@ def replace_local_number(where, local_number):
 
     Arguments
     ---------
-        where: where to replace
-        local_number: replace %n and # by local_number
+    where
+        where to replace
+    local_number
+        replace %n and # by local_number
     """
     where.walk(partial(replacing, search="%n", replace=[Str(local_number)]))
     where.walk(partial(replacing, search="#", replace=[Str(local_number)]))
@@ -582,8 +641,10 @@ def replace_page_number(where, tag):
 
     Arguments
     ---------
-        where: where to replace
-        tag: replace %p by tag
+    where
+        where to replace
+    tag
+        replace %p by tag
     """
     where.walk(
         partial(
@@ -598,8 +659,10 @@ def replace_count(where, count):
 
     Arguments
     ---------
-        where: where to replace
-        count: replace %c by count
+    where
+        where to replace
+    count
+        replace %c by count
     """
     where.walk(partial(replacing, search="%c", replace=[Str(count)]))
 
@@ -610,7 +673,8 @@ def remove_useless_latex(elem, _):
 
     Arguments
     ---------
-        elem: elem to scan
+    elem
+        elem to scan
 
     Returns
     -------
@@ -656,7 +720,8 @@ def to_latex(elem):
 
     Arguments
     ---------
-        elem: elem to convert
+    elem
+        elem to convert
 
     Returns
     -------
@@ -676,8 +741,10 @@ def define(category, doc):
 
     Arguments
     ---------
-        category: category to define
-        doc: pandoc document
+    category
+        category to define
+    doc
+        pandoc document
     """
     # pylint: disable=line-too-long
     doc.defined[category] = {
@@ -717,7 +784,8 @@ def lowering(elem, _):
 
     Arguments
     ---------
-        elem: element to lower
+    elem
+        element to lower
     """
     if isinstance(elem, Str):
         elem.text = elem.text.lower()
@@ -725,21 +793,24 @@ def lowering(elem, _):
 
 def replacing(elem, _, search=None, replace=None):
     """
-    Function to replace.
+    Replace an element.
 
     Arguments
     ---------
-        elem: element to scan
+    elem
+        element to scan
+    search
+        string to search
+    replace
+        string to replace
 
-    Keyword arguments
-    -----------------
-        search: string to search
-        replace: string to replace
+    Returns
+    -------
+        The modified elements.
     """
     if isinstance(elem, Str):
         search_splitted = elem.text.split(search)
         if len(search_splitted) > 1:
-
             text = []
 
             if search_splitted[0] != "":
@@ -757,12 +828,14 @@ def replacing(elem, _, search=None, replace=None):
 
 def numbering(elem, doc):
     """
-    number element.
+    Add the numbering of an element.
 
     Arguments
     ---------
-        elem: element to number
-        doc: pandoc document
+    elem
+        element to number
+    doc
+        pandoc document
     """
     if isinstance(elem, Header):
         update_header_numbers(elem, doc)
@@ -775,12 +848,18 @@ def numbering(elem, doc):
 
 def referencing(elem, doc):
     """
-    reference element.
+    Add a reference for an element.
 
     Arguments
     ---------
-        elem: element to reference
-        doc: pandoc document
+    elem
+        element to reference
+    doc
+        pandoc document
+
+    Returns
+    -------
+        A Link or None
     """
     if isinstance(elem, Link):
         return referencing_link(elem, doc)
@@ -793,12 +872,14 @@ def referencing(elem, doc):
 
 def referencing_link(elem, doc):
     """
-    reference link.
+    Add a eference link.
 
     Arguments
     ---------
-        elem: element to reference
-        doc: pandoc document
+    elem
+        element to reference
+    doc
+        pandoc document
     """
     match = re.match("^#(?P<tag>([a-zA-Z][\\w:.-]*))$", elem.url)
     if match:
@@ -832,12 +913,18 @@ def referencing_link(elem, doc):
 
 def referencing_cite(elem, doc):
     """
-    reference cite.
+    Cite reference.
 
     Arguments
     ---------
-        elem: element to reference
-        doc: pandoc document
+    elem
+        element to reference
+    doc
+        pandoc document
+
+    Returns
+    -------
+        A Link or None
     """
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
         match = re.match(
@@ -864,12 +951,14 @@ def referencing_cite(elem, doc):
 
 def update_header_numbers(elem, doc):
     """
-    update header numbers.
+    Update header numbers.
 
     Arguments
     ---------
-        elem: element to update
-        doc: pandoc document
+    elem
+        element to update
+    doc
+        pandoc document
     """
     if "unnumbered" not in elem.classes:
         doc.headers[elem.level - 1] = doc.headers[elem.level - 1] + 1
@@ -879,12 +968,14 @@ def update_header_numbers(elem, doc):
 
 def update_header_aliases(elem, doc):
     """
-    update header aliases.
+    Update header aliases.
 
     Arguments
     ---------
-        elem: element to update
-        doc: pandoc document
+    elem
+        element to update
+    doc
+        pandoc document
     """
     doc.aliases[elem.level - 1] = elem.identifier
     for index in range(elem.level, 6):
@@ -897,7 +988,8 @@ def prepare(doc):
 
     Arguments
     ---------
-        doc: pandoc document
+    doc
+        pandoc document
     """
     doc.headers = [0, 0, 0, 0, 0, 0]
     doc.aliases = ["", "", "", "", "", ""]
@@ -923,9 +1015,12 @@ def add_definition(category, definition, doc):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    doc
+        The pandoc document
     """
     # Create the category with options by default
     define(category, doc)
@@ -961,9 +1056,12 @@ def meta_cite(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "cite-shortcut" in definition:
         if isinstance(definition["cite-shortcut"], MetaBool):
@@ -982,9 +1080,12 @@ def meta_listing(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "listing-title" in definition:
         if isinstance(definition["listing-title"], MetaInlines):
@@ -1003,8 +1104,8 @@ def meta_listing(category, definition, defined):
             ].boolean
         else:
             debug(
-                "[WARNING] pandoc-numbering: listing-unnumbered is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "listing-unnumbered is not correct for category " + category
             )
     if "listing-unlisted" in definition:
         if isinstance(definition["listing-unlisted"], MetaBool):
@@ -1013,8 +1114,8 @@ def meta_listing(category, definition, defined):
             ].boolean
         else:
             debug(
-                "[WARNING] pandoc-numbering: listing-unlisted is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "listing-unlisted is not correct for category " + category
             )
     if "listing-identifier" in definition:
         if isinstance(definition["listing-identifier"], MetaBool):
@@ -1031,8 +1132,8 @@ def meta_listing(category, definition, defined):
             )
         else:
             debug(
-                "[WARNING] pandoc-numbering: listing-identifier is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "listing-identifier is not correct for category " + category
             )
 
 
@@ -1042,9 +1143,12 @@ def meta_format_text(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "format-text-classic" in definition:
         if isinstance(definition["format-text-classic"], MetaInlines):
@@ -1055,8 +1159,8 @@ def meta_format_text(category, definition, defined):
             defined[category]["format-text-classic"].parent = None
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-text-classic is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-text-classic is not correct for category " + category
             )
 
     if "format-text-title" in definition:
@@ -1068,8 +1172,8 @@ def meta_format_text(category, definition, defined):
             defined[category]["format-text-title"].parent = None
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-text-title is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-text-title is not correct for category " + category
             )
 
 
@@ -1079,9 +1183,12 @@ def meta_format_link(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "format-link-classic" in definition:
         if isinstance(definition["format-link-classic"], MetaInlines):
@@ -1092,8 +1199,8 @@ def meta_format_link(category, definition, defined):
             defined[category]["format-link-classic"].parent = None
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-link-classic is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-link-classic is not correct for category " + category
             )
 
     if "format-link-title" in definition:
@@ -1105,8 +1212,8 @@ def meta_format_link(category, definition, defined):
             defined[category]["format-link-title"].parent = None
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-link-title is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-link-title is not correct for category " + category
             )
 
 
@@ -1116,9 +1223,12 @@ def meta_format_caption(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "format-caption-classic" in definition:
         if isinstance(definition["format-caption-classic"], MetaInlines):
@@ -1127,8 +1237,8 @@ def meta_format_caption(category, definition, defined):
             )
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-caption-classic is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-caption-classic is not correct for category " + category
             )
 
     if "format-caption-title" in definition:
@@ -1138,8 +1248,8 @@ def meta_format_caption(category, definition, defined):
             )
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-caption-title is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-caption-title is not correct for category " + category
             )
 
 
@@ -1149,9 +1259,12 @@ def meta_format_entry(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "format-entry-classic" in definition:
         if isinstance(definition["format-entry-classic"], MetaInlines):
@@ -1162,8 +1275,8 @@ def meta_format_entry(category, definition, defined):
             defined[category]["format-entry-classic"].parent = None
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-entry-classic is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-entry-classic is not correct for category " + category
             )
 
     if "format-entry-title" in definition:
@@ -1175,8 +1288,8 @@ def meta_format_entry(category, definition, defined):
             defined[category]["format-entry-title"].parent = None
         else:
             debug(
-                "[WARNING] pandoc-numbering: format-entry-title is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "format-entry-title is not correct for category " + category
             )
 
 
@@ -1186,9 +1299,12 @@ def meta_entry_tab(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "entry-tab" in definition:
         if isinstance(definition["entry-tab"], MetaString):
@@ -1211,8 +1327,8 @@ def meta_entry_tab(category, definition, defined):
                 defined[category]["entry-tab"] = tab
             else:
                 debug(
-                    "[WARNING] pandoc-numbering: entry-tab must be positive for category "
-                    + category
+                    "[WARNING] pandoc-numbering: "
+                    "entry-tab must be positive for category " + category
                 )
         except ValueError:
             debug(
@@ -1227,9 +1343,12 @@ def meta_entry_space(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "entry-space" in definition:
         if isinstance(definition["entry-space"], MetaString):
@@ -1252,8 +1371,8 @@ def meta_entry_space(category, definition, defined):
                 defined[category]["entry-space"] = space
             else:
                 debug(
-                    "[WARNING] pandoc-numbering: entry-space must be positive for category "
-                    + category
+                    "[WARNING] pandoc-numbering: "
+                    "entry-space must be positive for category " + category
                 )
         except ValueError:
             debug(
@@ -1268,9 +1387,12 @@ def meta_levels(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if (
         "sectioning-levels" in definition
@@ -1294,8 +1416,8 @@ def meta_levels(category, definition, defined):
             value = definition["first-section-level"].content[0].text
         else:
             debug(
-                "[WARNING] pandoc-numbering: first-section-level is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "first-section-level is not correct for category " + category
             )
             return
 
@@ -1304,8 +1426,8 @@ def meta_levels(category, definition, defined):
             level = int(value) - 1
         except ValueError:
             debug(
-                "[WARNING] pandoc-numbering: first-section-level is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "first-section-level is not correct for category " + category
             )
 
         if 0 <= level <= 6:
@@ -1313,8 +1435,8 @@ def meta_levels(category, definition, defined):
         else:
             # pylint: disable=line-too-long
             debug(
-                "[WARNING] pandoc-numbering: first-section-level must be positive or zero for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "first-section-level must be positive or zero for category " + category
             )
 
     if "last-section-level" in definition:
@@ -1327,8 +1449,8 @@ def meta_levels(category, definition, defined):
             value = definition["last-section-level"].content[0].text
         else:
             debug(
-                "[WARNING] pandoc-numbering: last-section-level is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "last-section-level is not correct for category " + category
             )
             return
 
@@ -1337,8 +1459,8 @@ def meta_levels(category, definition, defined):
             level = int(value)
         except ValueError:
             debug(
-                "[WARNING] pandoc-numbering: last-section-level is not correct for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "last-section-level is not correct for category " + category
             )
 
         if 0 <= level <= 6:
@@ -1346,8 +1468,8 @@ def meta_levels(category, definition, defined):
         else:
             # pylint: disable=line-too-long
             debug(
-                "[WARNING] pandoc-numbering: last-section-level must be positive or zero for category "
-                + category
+                "[WARNING] pandoc-numbering: "
+                "last-section-level must be positive or zero for category " + category
             )
 
 
@@ -1357,15 +1479,17 @@ def meta_classes(category, definition, defined):
 
     Arguments
     ---------
-        category:
-        definition:
-        defined:
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
     """
     if "classes" in definition and isinstance(definition["classes"], MetaList):
-        classes = []
-        for elt in definition["classes"].content:
-            classes.append(stringify(elt))
-        defined[category]["classes"] = classes
+        defined[category]["classes"] = [
+            stringify(elt) for elt in definition["classes"].content
+        ]
 
 
 def finalize(doc):
@@ -1374,7 +1498,8 @@ def finalize(doc):
 
     Arguments
     ---------
-        doc: pandoc document
+    doc
+        The pandoc document
     """
     # Loop on all listings definition
 
@@ -1421,7 +1546,7 @@ def finalize(doc):
                 doc.metadata["header-includes"].append(
                     MetaInlines(RawInline(latex, "tex"))
                 )
-                listof.append(r"\listof%s" % latex_category)
+                listof.append(f"\\listof{latex_category}")
             else:
                 classes = ["pandoc-numbering-listing"] + definition["classes"]
 
@@ -1450,7 +1575,7 @@ def finalize(doc):
                         *definition["listing-title"],
                         level=1,
                         classes=classes,
-                        identifier=definition["listing-identifier"]
+                        identifier=definition["listing-identifier"],
                     )
 
                 doc.content.insert(i, header)
@@ -1482,21 +1607,23 @@ def table_other(doc, category, _):
 
     Arguments
     ---------
-        doc: pandoc document
-        category: category numbered
-        definition: definition
+    doc
+        pandoc document
+    category
+        category numbered
+
+    Returns
+    -------
+        A BulletList or None
     """
     if category in doc.collections:
-        # Prepare the list
-        elements = []
-        # Loop on the collection
-        for tag in doc.collections[category]:
-            # Add an item to the list
-            elements.append(
-                ListItem(Plain(Link(doc.information[tag].entry, url="#" + tag)))
-            )
         # Return a bullet list
-        return BulletList(*elements)
+        return BulletList(
+            *(
+                ListItem(Plain(Link(doc.information[tag].entry, url="#" + tag)))
+                for tag in doc.collections[category]
+            )
+        )
     return None
 
 
@@ -1506,7 +1633,12 @@ def link_color(doc):
 
     Arguments
     ---------
-        doc: pandoc document
+    doc
+        pandoc document
+
+    Returns
+    -------
+        LaTeX code for links.
     """
     # Get the link color
     metadata = doc.get_metadata()
@@ -1515,17 +1647,16 @@ def link_color(doc):
     return "\\hypersetup{linkcolor=black}"
 
 
-def main(doc=None):
+def main(doc=None) -> None:
     """
-    main function.
+    Produce the final document.
 
-    Arguments
-    ---------
-        doc: pandoc document
+    Parameters
+    ----------
+    doc
+        pandoc document
     """
-    return run_filters(
-        [numbering, referencing], prepare=prepare, doc=doc, finalize=finalize
-    )
+    run_filters([numbering, referencing], prepare=prepare, doc=doc, finalize=finalize)
 
 
 if __name__ == "__main__":
