@@ -27,7 +27,7 @@ code style icon by [Google Material Design icons](https://www.iconfinder.com/ico
 Instructions
 ------------
 
-*pandoc-numbering* requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows]. Either python 2.7 or 3.x will do.
+*pandoc-numbering* requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows].
 
 Install *pandoc-numbering* using the bash command
 
