@@ -1,4 +1,6 @@
-# pandoc-numbering
+Installation
+============
+
 ![Python package](https://github.com/chdemko/pandoc-numbering/workflows/Python%20package/badge.svg?branch=develop)
 [![Coveralls](https://img.shields.io/coveralls/github/chdemko/pandoc-numbering/develop.svg?logo=Codecov&logoColor=white)](https://coveralls.io/github/chdemko/pandoc-numbering?branch=develop)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
@@ -22,39 +24,34 @@ code style icon by [Google Material Design icons](https://www.iconfinder.com/ico
 
 [pandoc]: http://pandoc.org/
 
-Documentation
--------------
-
-See the [Read the docs pages](http://pandoc-numbering.readthedocs.io/en/latest/).
-
-Usage
------
-
-To apply the filter, use the following option with pandoc:
-
-    --filter pandoc-numbering
-
-Installation
+Instructions
 ------------
 
 *pandoc-numbering* requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows]. Either python 2.7 or 3.x will do.
 
-Install *pandoc-numbering* as root using the bash command
+Install *pandoc-numbering* using the bash command
 
-    pip install pandoc-numbering
+~~~shell
+$ pip install pandoc-numbering
+~~~
 
 To upgrade to the most recent release, use
 
-    pip install --upgrade pandoc-numbering
+~~~shell
+$ pip install --upgrade pandoc-numbering
+~~~
 
 To upgrade to the current code, use
 
-    pip install --upgrade --force --no-cache git+https://github.com/chdemko/pandoc-numbering
+~~~shell
+$ pip install --upgrade --force --no-cache git+https://github.com/chdemko/pandoc-numbering
+~~~
 
 `pip` is a script that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution. If you are running linux, `pip` may be bundled separately. On a Debian-based system (including Ubuntu), you can install it as root using
 
-    apt-get update
-    apt-get install python-pip
+~~~shell
+$ sudo apt-get install python3-pip
+~~~
 
 Make sure you have the
 
@@ -64,7 +61,9 @@ LaTeX package. On linux you have to install some extra libraries **before**
 *pandoc-numbering*. On a Debian-based system (including Ubuntu), you can install it as
 root using
 
-	apt-get install texlive-latex-extra
+~~~shell
+$ sudo apt-get install texlive-latex-extra
+~~~
 
 [python]: https://www.python.org/
 [on Windows]: https://www.python.org/downloads/windows/

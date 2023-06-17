@@ -8,14 +8,8 @@ Welcome to pandoc-numbering's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
-   numbering
-   referencing
-   list-of-things
-   default-sectioning
-   cite
-   formatting
-   classes
-   example
+   Installation <README>
+   Usage <usage>
 
