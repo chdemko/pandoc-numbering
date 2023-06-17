@@ -35,8 +35,6 @@ jobs:
         poetry install
     - name: Test with tox
       run: |
-        poetry run tox -e style
-        poetry run tox -e linter
         poetry run tox -e py
 
   style:
