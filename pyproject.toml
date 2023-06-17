@@ -4,7 +4,7 @@
 
 [tool.poetry]
     name = "pandoc-numbering"
-    version = "3.4.0.1"
+    version = "3.4.0.2"
     description="A pandoc filter for automatic numbering"
     authors = ["Christophe Demko <chdemko@gmail.com>"]
     license = "BSD-3-Clause"
