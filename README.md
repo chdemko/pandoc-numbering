@@ -81,10 +81,10 @@ If you have any difficulties with *pandoc-numbering*, please feel welcome to [fi
 Notes
 -----
 
-* license icon by [Icooon Mono](https://www.svgrepo.com/svg/479891/balance-1)
 * format icon by [Picol](https://www.iconfinder.com/icons/103509/document_text_icon)
+* license icon by [Icooon Mono](https://www.svgrepo.com/svg/479891/balance-1)
+* download icon by [zest](https://www.svgrepo.com/svg/509901/download)
 * status icon by [Just Icon](https://www.iconfinder.com/icons/2672768/app_battery_essential_object_status_ui_ux_icon)
 * code style icon by [Google Material Design icons](https://www.iconfinder.com/icons/352148/style_icon)
-* download icon by [zest](https://www.svgrepo.com/svg/509901/download)
 * size icon by [Iconscout](https://www.svgrepo.com/svg/358408/weight)
 
