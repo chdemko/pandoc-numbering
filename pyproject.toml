@@ -82,7 +82,7 @@
     darglint = "^1.8.1"
     teyit = {version = "^0.4.3", python = ">=3.9"}
     slotscheck = "^0.16.5"
-    refurb = {version = "^1.18.0", python = ">=3.10"}
+    refurb = {version = "^1.19.0", python = ">=3.10"}
     
 [tool.poetry.scripts]
     pandoc-numbering = "pandoc_numbering:main"
