@@ -928,7 +928,8 @@ def referencing_cite(elem, doc):
     """
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
         match = re.match(
-            "^(@(?P<tag>(?P<category>[a-zA-Z][\\w.-]*):(([a-zA-Z][\\w.-]*)|(\\d*(\\.\\d*)*))))$",
+            "^(@(?P<tag>(?P<category>[a-zA-Z][\\w.-]*):"
+            "(([a-zA-Z][\\w.-]*)|(\\d*(\\.\\d*)*))))$",
             elem.content[0].text,
         )
         if match:
@@ -1590,7 +1591,8 @@ def finalize(doc):
     if doc.format in {"tex", "latex"}:
         header = (
             r"\ifdef{\mainmatter}"
-            r"{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
+            r"{\let\oldmainmatter\mainmatter"
+            r"\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
             r"{}"
         )
         doc.metadata["header-includes"].append(
