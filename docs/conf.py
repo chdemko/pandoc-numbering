@@ -16,8 +16,11 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import importlib.metadata
 import os
 import sys
+
+from datetime import date
 
 sys.path.insert(0, os.path.abspath("../.."))
 
@@ -25,15 +28,13 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 # -- Project information -----------------------------------------------------
 
-project = "pandoc-numbering"
-copyright = "2015-2023, Christophe Demko"
-author = "Christophe Demko"
+project, release = os.popen("poetry version").readline().strip().split(" ")
+author = importlib.metadata.metadata(project)["Author"]
+year = date.today().year
+copyright = f"2015-{year}, {author}"
 
 # The short X.Y version
-version = "3.4"
-# The full version, including alpha/beta/rc tags
-release = "3.4.0.2"
-
+version = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 
