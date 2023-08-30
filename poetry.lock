@@ -1428,6 +1428,22 @@ files = [
 ]
 
 [[package]]
+name = "readthedocs-sphinx-ext"
+version = "2.2.2"
+description = "Sphinx extension for Read the Docs overrides"
+optional = false
+python-versions = "*"
+files = [
+    {file = "readthedocs-sphinx-ext-2.2.2.tar.gz", hash = "sha256:92217bef14d91377bcf27bdf7da363e574b3b1e4180b65eef6e7cfa55f0fd0b8"},
+    {file = "readthedocs_sphinx_ext-2.2.2-py2.py3-none-any.whl", hash = "sha256:9476f00640d019a4395201ac1cb88bd76a4a7853ecb36c8b73ede9fdf32a866b"},
+]
+
+[package.dependencies]
+Jinja2 = ">=2.9"
+packaging = "*"
+requests = "*"
+
+[[package]]
 name = "refactor"
 version = "0.6.3"
 description = "AST-based fragmental source code refactoring toolkit"
@@ -1973,4 +1989,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "2a2e36e2e613828e1180054340b2c26d8b89ab44d8d1937896de62a1d0d7ebd0"
+content-hash = "2722eafea77edf7658b93aea6890242a18e70c3449cae62b63ce3723e8ecfb74"
