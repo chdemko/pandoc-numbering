@@ -99,17 +99,29 @@
 [tool.poetry-dynamic-versioning]
     enable = true
     pattern = """(?x)                                                    (?# ignore whitespace)
-            ^((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)                 (?# 1.2.3 or 1!2000.1.2)
-            ([-._]?((?P<stage>[a-zA-Z]+)[-._]?(?P<revision>\\d+)?))?     (?# b0)
-            (\\+(?P<tagged_metadata>.+))?$                               (?# +linux)
+        ^((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)                 (?# 1.2.3 or 1!2000.1.2)
+        ([-._]?((?P<stage>[a-zA-Z]+)[-._]?(?P<revision>\\d+)?))?     (?# b0)
+        (\\+(?P<tagged_metadata>.+))?$                               (?# +linux)
     """
     format-jinja = """
         {%- if distance == 0 -%}
-            {{ serialize_pep440(base, stage, revision) }}
+            {%- if epoch|length -%}
+                {{ serialize_pep440(base, stage, revision, epoch=epoch) }}
+            {%- else -%}
+                {{ serialize_pep440(base, stage, revision) }}
+            {%- endif -%}
         {%- elif revision is not none -%}
-            {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit]) }}
+            {%- if epoch|length -%}
+                {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit], epoch=epoch) }}
+            {%- else -%}
+                {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit]) }}
+            {%- endif -%}
         {%- else -%}
-            {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit]) }}
+            {%- if epoch|length -%}
+                {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit], epoch=epoch) }}
+            {%- else -%}
+                {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit]) }}
+            {%- endif -%}
         {%- endif -%}
     """
 
