@@ -2,6 +2,7 @@ Installation
 ============
 
 [![Python package](https://github.com/chdemko/pandoc-numbering/workflows/Python%20package/badge.svg?branch=develop)](https://github.com/chdemko/pandoc-numbering/actions/workflows/python-package.yml)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Coveralls](https://img.shields.io/coveralls/github/chdemko/pandoc-numbering/develop.svg?logo=Codecov&logoColor=white)](https://coveralls.io/github/chdemko/pandoc-numbering?branch=develop)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
 [![Code Climate](https://codeclimate.com/github/chdemko/pandoc-numbering/badges/gpa.svg)](https://codeclimate.com/github/chdemko/pandoc-numbering/)

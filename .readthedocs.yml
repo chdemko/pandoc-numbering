@@ -1,3 +1,4 @@
+---
 # Read the Docs configuration file for Sphinx projects
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
@@ -6,27 +7,26 @@ version: 2
 
 # Set the OS, Python version and other tools you might need
 build:
-  os: ubuntu-22.04
-  tools:
-    python: "3.11"
-  jobs:
-    post_create_environment:
-      # Install poetry
-      # https://python-poetry.org/docs/#installing-manually
-      - pip install poetry
-      - poetry self add "poetry-dynamic-versioning[plugin]"
-      # Tell poetry to not use a virtual environment
-      - poetry config virtualenvs.create false
-    post_install:
-      # Install dependencies with 'docs' dependency group
-      # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
-      - poetry install --with docs
+    os: ubuntu-22.04
+    tools:
+        python: '3.11'
+    jobs:
+        post_create_environment:
+            # Install poetry
+            # https://python-poetry.org/docs/#installing-manually
+            - pip install poetry
+            - poetry self add "poetry-dynamic-versioning[plugin]"
+            # Tell poetry to not use a virtual environment
+            - poetry config virtualenvs.create false
+        post_install:
+            # Install dependencies with 'docs' dependency group
+            # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
+            - poetry install --with docs
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
-   configuration: docs/conf.py
+    configuration: docs/conf.py
 
 # Optionally build your docs in additional formats such as PDF and ePub
 formats:
-   - htmlzip
-
+    - htmlzip

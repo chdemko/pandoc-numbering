@@ -43,13 +43,17 @@
     panflute = "^2.3.0"
 
 [tool.poetry.group.dev.dependencies]
-    tox = "^4.11.0"
+    # pre-commit
+    pre-commit = "^3.4.0"
+
+    # Test
+    tox = "^4.11.1"
 
     # Formatter
     black = "^23.7.0"
 
     # Tests
-    pytest = "^7.4.0"
+    pytest = "^7.4.1"
     pytest-cov = "^4.1.0"
 
     # Style checkers
