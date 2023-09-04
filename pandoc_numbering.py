@@ -9,7 +9,7 @@ import re
 import unicodedata
 from functools import partial
 
-from panflute import (
+from panflute import (  # type: ignore
     BlockQuote,
     BulletList,
     Citation,

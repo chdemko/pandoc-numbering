@@ -65,7 +65,8 @@ repos:
   hooks:
   - id: mypy
     language: system
-    exclude: ^(?!pandoc_numbering.py)
+    pass_filenames: false
+    args: [--package, pandoc_numbering]
 
 - repo: https://github.com/pycqa/flake8
   rev: 6.1.0
