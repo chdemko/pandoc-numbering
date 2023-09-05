@@ -1,5 +1,5 @@
-Installation
-============
+Install
+=======
 
 [![Python package](https://github.com/chdemko/pandoc-numbering/workflows/Python%20package/badge.svg?branch=develop)](https://github.com/chdemko/pandoc-numbering/actions/workflows/python-package.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
@@ -81,8 +81,23 @@ If you have any difficulties with *pandoc-numbering*, please feel welcome to [fi
 
 [file an issue]: https://github.com/chdemko/pandoc-numbering/issues
 
+Contribute
+==========
+
+Instructions
+------------
+
+Install `poetry`, then run
+
+~~~shell
+$ poetry install
+$ poetry shell
+~~~
+
+And submit your changes. When you commit, hooks will be executed to check your code.
+
 Notes
------
+=====
 
 * format icon by [Picol](https://www.iconfinder.com/icons/103509/document_text_icon)
 * license icon by [Icooon Mono](https://www.svgrepo.com/svg/479891/balance-1)
