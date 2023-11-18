@@ -166,10 +166,8 @@ format-jinja = """
         {{ serialize_pep440(base, stage, revision, epoch=epoch if epoch|length else none) }}
     {%- elif revision is not none -%}
         {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- elif 'hotfix/' in branch -%}
-        {{ serialize_pep440(branch | replace('hotfix/', ''), 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- elif 'release/' in branch -%}
-        {{ serialize_pep440(branch | replace('release/', ''), 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
+    {%- elif 'hotfix/' in branch or 'release/' in branch -%}
+        {{ serialize_pep440(branch | replace('hotfix/', '') | replace('release/', ''), 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
     {%- else -%}
         {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch if epoch|length else none) }}
     {%- endif -%}
