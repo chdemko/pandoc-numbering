@@ -25,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   # Natural language used
   "Natural Language :: English"
 ]
@@ -162,23 +163,15 @@ module = "panflute.*"
 enable = true
 format-jinja = """
     {%- if distance == 0 -%}
-        {%- if epoch|length -%}
-            {{ serialize_pep440(base, stage, revision, epoch=epoch) }}
-        {%- else -%}
-            {{ serialize_pep440(base, stage, revision) }}
-        {%- endif -%}
+        {{ serialize_pep440(base, stage, revision, epoch=epoch if epoch|length else none) }}
     {%- elif revision is not none -%}
-        {%- if epoch|length -%}
-            {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch) }}
-        {%- else -%}
-            {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit]) }}
-        {%- endif -%}
+        {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
+    {%- elif 'hotfix/' in branch -%}
+        {{ serialize_pep440(branch | replace('hotfix/', ''), 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
+    {%- elif 'release/' in branch -%}
+        {{ serialize_pep440(branch | replace('release/', ''), 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
     {%- else -%}
-        {%- if epoch|length -%}
-            {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch) }}
-        {%- else -%}
-            {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit]) }}
-        {%- endif -%}
+        {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch if epoch|length else none) }}
     {%- endif -%}
 """
 pattern = """(?x)                                                (?# ignore whitespace)
