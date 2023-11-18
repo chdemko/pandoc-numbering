@@ -43,7 +43,7 @@ python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
 # Formatter
-black = "^23.9.1"
+black = "^23.11.0"
 darglint = "^1.8.1"
 # pre-commit
 pre-commit = "^3.5.0"
@@ -54,7 +54,7 @@ flake8-annotations-complexity = "^0.0.7"
 flake8-black = "^0.3.6"
 flake8-blind-except = "^0.2.1"
 flake8-bugbear = "^23.9.16"
-flake8-builtins = "^2.1.0"
+flake8-builtins = "^2.2.0"
 flake8-cognitive-complexity = "^0.1.0"
 flake8-comprehensions = "^3.14.0"
 flake8-docstrings = "^1.7.0"
@@ -63,22 +63,22 @@ flake8-fixme = "^1.1.1"
 flake8-functions = "^0.0.7"
 flake8-import-order = "^0.18.2"
 flake8-mypy = "^17.8.0"
-flake8-pydocstyle = "^0.2.2"
-flake8-pyi = "^23.10.0"
+flake8-pydocstyle = "^0.2.3"
+flake8-pyi = "^23.11.0"
 flake8-pyproject = "^1.2.3"
 flake8-return = "^1.2.0"
 flake8-simplify = "^0.19.3"
 flake8-spellcheck = "^0.28.0"
 flake8-use-fstring = "^1.4"
 flake8-variables-names = "^0.0.5"
-mypy = "^1.6.0"
+mypy = "^1.7.0"
 pep8-naming = "^0.13.3"
 pylint = {version = "^2.17.7", python = ">=3.9"}
 # Tests
 tox = "^4.11.3"
-pytest = "^7.4.2"
+pytest = "^7.4.3"
 pytest-cov = "^4.1.0"
-refurb = {version = "^1.21.0", python = ">=3.10"}
+refurb = {version = "^1.24.0", python = ">=3.10"}
 ruff = "^0.0.254"
 slotscheck = "^0.16.5"
 teyit = {version = "^0.4.3", python = ">=3.9"}
@@ -169,15 +169,15 @@ format-jinja = """
         {%- endif -%}
     {%- elif revision is not none -%}
         {%- if epoch|length -%}
-            {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit], epoch=epoch) }}
+            {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch) }}
         {%- else -%}
-            {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit]) }}
+            {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit]) }}
         {%- endif -%}
     {%- else -%}
         {%- if epoch|length -%}
-            {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit], epoch=epoch) }}
+            {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch) }}
         {%- else -%}
-            {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit]) }}
+            {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit]) }}
         {%- endif -%}
     {%- endif -%}
 """
