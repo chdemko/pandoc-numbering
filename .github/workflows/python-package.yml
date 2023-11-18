@@ -122,7 +122,7 @@ jobs:
         poetry-version: 1.7.1
     - name: Install dependencies
       run: |
-        wget https://github.com/jgm/pandoc/releases/download/3.1.7/pandoc-3.1.9-1-amd64.deb
+        wget https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-1-amd64.deb
         sudo dpkg -i ./pandoc-3.1.9-1-amd64.deb
         poetry install
     - name: Test
