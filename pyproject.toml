@@ -161,26 +161,30 @@ module = "panflute.*"
 
 [tool.poetry-dynamic-versioning]
 enable = true
-format-jinja = """
-    {%- set branch_length = 16 -%}
-    {%- if distance == 0 -%}
-        {{ serialize_pep440(base, stage, revision, epoch=epoch if epoch|length else none) }}
-    {%- elif revision is not none -%}
-        {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- elif branch.startswith('hotfix/') -%}
-        {{ serialize_pep440(branch['hotfix/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- elif branch.startswith('release/') -%}
-        {{ serialize_pep440(branch['release/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- elif branch.startswith('feature/') -%}
-        {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[branch_escaped['feature' | length:][:branch_length], commit], epoch=epoch if epoch|length else none) }}
-    {%- else -%}
-        {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- endif -%}
-"""
+# tag regex
 pattern = """(?x)                                                (?# ignore whitespace)
     ^((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)                 (?# 1.2.3 or 1!2000.1.2)
     ([-._]?((?P<stage>[a-zA-Z]+)[-._]?(?P<revision>\\d+)?))?     (?# b0)
     (\\+(?P<tagged_metadata>.+))?$                               (?# +linux)
+"""
+# version format
+format-jinja = """
+    {%- set branch_length = 16 -%}
+    {%- set epoch = epoch if epoch|length else none -%}
+    {%- if distance == 0 -%}
+        {{ serialize_pep440(base, stage, revision, epoch=epoch) }}
+    {%- elif revision is not none -%}
+        {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch) }}
+    {%- elif branch.startswith('hotfix/') -%}
+        {{ serialize_pep440(branch['hotfix/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch) }}
+    {%- elif branch.startswith('release/') -%}
+        {{ serialize_pep440(branch['release/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch) }}
+    {%- elif branch.startswith('feature/') -%}
+        {%- set branch_metadata = branch_escaped['feature' | length:][:branch_length] -%}
+        {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[branch_metadata, commit], epoch=epoch) }}
+    {%- else -%}
+        {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch) }}
+    {%- endif -%}
 """
 
 [tool.pydocstyle]
