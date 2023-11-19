@@ -162,12 +162,17 @@ module = "panflute.*"
 [tool.poetry-dynamic-versioning]
 enable = true
 format-jinja = """
+    {%- set branch_length = 16 -%}
     {%- if distance == 0 -%}
         {{ serialize_pep440(base, stage, revision, epoch=epoch if epoch|length else none) }}
     {%- elif revision is not none -%}
         {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
-    {%- elif 'hotfix/' in branch or 'release/' in branch -%}
-        {{ serialize_pep440(branch | replace('hotfix/', '') | replace('release/', ''), 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
+    {%- elif branch.startswith('hotfix/') -%}
+        {{ serialize_pep440(branch['hotfix/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
+    {%- elif branch.startswith('release/') -%}
+        {{ serialize_pep440(branch['release/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch if epoch|length else none) }}
+    {%- elif branch.startswith('feature/') -%}
+        {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[branch_escaped['feature' | length:][:branch_length], commit], epoch=epoch if epoch|length else none) }}
     {%- else -%}
         {{ serialize_pep440(base, stage, revision, post=distance, dev=0, metadata=[commit], epoch=epoch if epoch|length else none) }}
     {%- endif -%}
