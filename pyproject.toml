@@ -171,11 +171,11 @@ pattern = """(?x)                                                (?# ignore whit
 format-jinja = """
     {%- set branch_length = 16 -%}
     {%- set epoch = epoch if epoch|length else none -%}
-    {%- if stage is not none -%}
+    {%- if distance == 0 -%}
+        {{ serialize_pep440(base, stage, revision, epoch=epoch) }}
+    {%- elif stage is not none -%}
         {%- set revision = revision if revision else 0 -%}
         {{ serialize_pep440(base, stage, revision, dev=distance, metadata=[commit], epoch=epoch) }}
-    {%- elif distance == 0 -%}
-        {{ serialize_pep440(base, stage, revision, epoch=epoch) }}
     {%- elif branch.startswith('hotfix/') -%}
         {{ serialize_pep440(branch['hotfix/' | length:], 'a', 0, dev=distance, metadata=[commit], epoch=epoch) }}
     {%- elif branch.startswith('release/') -%}
