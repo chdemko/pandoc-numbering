@@ -170,37 +170,19 @@ pattern = """(?x)                                                (?# ignore whit
 # version format
 format-jinja = """
     {%- set epoch = epoch if epoch|length else none -%}
-    {%- set dev = none -%}
-    {%- set post = none -%}
     {%- if distance == 0 -%}
-        {%- set metadata = [] -%}
+        {{- serialize_pep440(base, stage, revision, epoch=epoch) -}}
     {%- elif stage is not none -%}
-        {%- set revision = revision if revision else 0 -%}
-        {%- set post = distance -%}
-        {%- set dev = 0 -%}
-        {%- set metadata = [commit] -%}
+        {{- serialize_pep440(base, stage, revision if revision else 0, epoch=epoch, post=distance, dev=0, metadata=[commit]) -}}
     {%- elif branch.startswith('hotfix/') -%}
-        {%- set base = branch['hotfix/' | length:] -%}
-        {%- set stage = 'a' -%}
-        {%- set revision = 0 -%}
-        {%- set dev = distance -%}
-        {%- set metadata = [commit] -%}
+        {{- serialize_pep440(branch['hotfix/' | length:], 'a', 0, epoch=epoch, dev=distance, metadata=[commit]) -}}
     {%- elif branch.startswith('release/') -%}
-        {%- set base = branch['release/' | length:] -%}
-        {%- set stage = 'a' -%}
-        {%- set revision = 0 -%}
-        {%- set dev = distance -%}
-        {%- set metadata = [commit] -%}
+        {{- serialize_pep440(branch['release/' | length:], 'a', 0, epoch=epoch, dev=distance, metadata=[commit]) -}}
+    {%- elif branch.startswith('feature/') -%}
+        {{- serialize_pep440(base, stage, revision, epoch=epoch, post=distance, dev=0, metadata=[branch_escaped['feature' | length:][:16], commit]) -}}
     {%- else -%}
-        {%- set post = distance -%}
-        {%- set dev = 0 -%}
-        {%- if branch.startswith('feature/') -%}
-            {%- set metadata = [branch_escaped['feature' | length:][:16], commit] -%}
-        {%- else -%}
-            {%- set metadata = [commit] -%}
-        {%- endif -%}
+        {{- serialize_pep440(base, stage, revision, epoch=epoch, post=distance, dev=0, metadata=[commit]) -}}
     {%- endif -%}
-    {{- serialize_pep440(base, stage, revision, epoch=epoch, post=post, dev=dev, metadata=metadata) -}}
 """
 
 [tool.pydocstyle]
