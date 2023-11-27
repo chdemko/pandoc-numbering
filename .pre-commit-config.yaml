@@ -9,12 +9,12 @@ repos:
   rev: v1.0.0
   hooks:
   - id: check-poetry
-  - id: check-gitlab-ci
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.10.0
   hooks:
   - id: pretty-format-toml
+    exclude: ^poetry.lock$
     args: [--autofix, --no-sort]
   - id: pretty-format-yaml
     args: [--autofix]
