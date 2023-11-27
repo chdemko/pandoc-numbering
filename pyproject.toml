@@ -54,7 +54,7 @@ flake8 = "^6.1.0"
 flake8-annotations-complexity = "^0.0.7"
 flake8-black = "^0.3.6"
 flake8-blind-except = "^0.2.1"
-flake8-bugbear = "^23.9.16"
+flake8-bugbear = "^23.11.26"
 flake8-builtins = "^2.2.0"
 flake8-cognitive-complexity = "^0.1.0"
 flake8-comprehensions = "^3.14.0"
@@ -72,7 +72,7 @@ flake8-simplify = "^0.19.3"
 flake8-spellcheck = "^0.28.0"
 flake8-use-fstring = "^1.4"
 flake8-variables-names = "^0.0.5"
-mypy = "^1.7.0"
+mypy = "^1.7.1"
 pep8-naming = "^0.13.3"
 pylint = {version = "^2.17.7", python = ">=3.9"}
 # Tests
@@ -180,6 +180,8 @@ format-jinja = """
         {{- serialize_pep440(branch['release/' | length:], 'a', 0, epoch=epoch, dev=distance, metadata=[commit]) -}}
     {%- elif branch.startswith('feature/') -%}
         {{- serialize_pep440(base, stage, revision, epoch=epoch, post=distance, dev=0, metadata=[branch_escaped['feature' | length:][:16], commit]) -}}
+    {%- elif branch != 'develop' -%}
+        {{- serialize_pep440(base, stage, revision, epoch=epoch, post=distance, dev=0, metadata=[branch_escaped[:16], commit]) -}}
     {%- else -%}
         {{- serialize_pep440(base, stage, revision, epoch=epoch, post=distance, dev=0, metadata=[commit]) -}}
     {%- endif -%}
