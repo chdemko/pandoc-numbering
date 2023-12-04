@@ -54,7 +54,7 @@ flake8 = "^6.1.0"
 flake8-annotations-complexity = "^0.0.7"
 flake8-black = "^0.3.6"
 flake8-blind-except = "^0.2.1"
-flake8-bugbear = "^23.11.26"
+flake8-bugbear = "^23.12.2"
 flake8-builtins = "^2.2.0"
 flake8-cognitive-complexity = "^0.1.0"
 flake8-comprehensions = "^3.14.0"
@@ -76,7 +76,7 @@ mypy = "^1.7.1"
 pep8-naming = "^0.13.3"
 pylint = {version = "^2.17.7", python = ">=3.9"}
 # Tests
-tox = "^4.11.3"
+tox = "^4.11.4"
 pytest = "^7.4.3"
 pytest-cov = "^4.1.0"
 refurb = {version = "^1.24.0", python = ">=3.10"}
@@ -174,6 +174,8 @@ format-jinja = """
         {{- serialize_pep440(base, stage, revision, epoch=epoch) -}}
     {%- elif stage is not none -%}
         {{- serialize_pep440(base, stage, revision if revision else 0, epoch=epoch, post=distance, dev=0, metadata=[commit]) -}}
+    {%- elif branch is none -%}
+        {{- serialize_pep440(base, stage, revision, epoch=epoch, post=distance, dev=0, metadata=[commit]) -}}
     {%- elif branch.startswith('hotfix/') -%}
         {{- serialize_pep440(branch['hotfix/' | length:], 'a', 0, epoch=epoch, dev=distance, metadata=[commit]) -}}
     {%- elif branch.startswith('release/') -%}
