@@ -20,9 +20,9 @@ Example #
 Example #
             """,
             r"""
-[]{#example:1}[**Example 1**]{#example:1 .pandoc-numbering-text .example}
+[**Example 1**]{#example:1 .pandoc-numbering-text .example}
 
-[]{#example:2}[**Example 2**]{#example:2 .pandoc-numbering-text .example}
+[**Example 2**]{#example:2 .pandoc-numbering-text .example}
             """,
         )
 
@@ -47,7 +47,7 @@ Example (This is the second title) #
         verify_conversion(
             self,
             "Example #ex:",
-            "[]{#ex:1}[**Example 1**]{#ex:1 .pandoc-numbering-text .ex}",
+            "[**Example 1**]{#ex:1 .pandoc-numbering-text .ex}",
         )
 
     def test_para_double(self):
@@ -59,9 +59,9 @@ Example #
 Example #
             """,
             r"""
-[]{#example:1}[**Example 1**]{#example:1 .pandoc-numbering-text .example}
+[**Example 1**]{#example:1 .pandoc-numbering-text .example}
 
-[]{#example:2}[**Example 2**]{#example:2 .pandoc-numbering-text .example}
+[**Example 2**]{#example:2 .pandoc-numbering-text .example}
             """,
         )
 
@@ -129,7 +129,7 @@ Exercice #
 
 []{#exercise:second-chapter.2}[**Exercise 2**]{#exercise:2.2 .pandoc-numbering-text .exercise}
 
-[]{#exercice:1}[**Exercice 1**]{#exercice:1 .pandoc-numbering-text .exercice}
+[**Exercice 1**]{#exercice:1 .pandoc-numbering-text .exercice}
             """,
         )
 
@@ -171,7 +171,7 @@ Second section
 Exercise +.+.#
             """,
             r"""
-[]{#exercise:0.0.1}[**Exercise 0.0.1**]{#exercise:0.0.1 .pandoc-numbering-text .exercise}
+[**Exercise 0.0.1**]{#exercise:0.0.1 .pandoc-numbering-text .exercise}
 
 # First chapter
 
@@ -210,7 +210,7 @@ header-includes:
 ```{=tex}
 \ifdef{\mainmatter}{}{}
 ```
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[]{#exercise:equation-a-b}[`\label{exercise:1}`{=tex}`\label{exercise:equation-a-b}`{=tex}**Exercise 1** *(Equation $a=b$`<!-- -->`{=html})*]{#exercise:1 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[]{#exercise:equation-a-b}[**Exercise 1** *(Equation $a=b$`<!-- -->`{=html})*]{#exercise:1 .pandoc-numbering-text .exercise}
             """,
             "latex",
         )

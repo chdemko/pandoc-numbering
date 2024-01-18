@@ -9,7 +9,7 @@ import re
 import unicodedata
 from functools import partial
 
-from panflute import (  # type: ignore
+from panflute import (
     BlockQuote,
     BulletList,
     Citation,
@@ -449,12 +449,26 @@ class Numbered:
     def _compute_data(self):
         # pylint: disable=too-many-statements,no-member
         classes = self._doc.defined[self._basic_category]["classes"]
-        self._set_content(
-            [
-                Span(identifier=self._alias),
-                Span(identifier=self._tag, classes=["pandoc-numbering-text"] + classes),
-            ]
-        )
+        if self._alias == self._tag:
+            self._set_content(
+                [
+                    Span(),
+                    Span(
+                        identifier=self._tag,
+                        classes=["pandoc-numbering-text"] + classes,
+                    ),
+                ]
+            )
+        else:
+            self._set_content(
+                [
+                    Span(identifier=self._alias),
+                    Span(
+                        identifier=self._tag,
+                        classes=["pandoc-numbering-text"] + classes,
+                    ),
+                ]
+            )
         self._link.classes = self._link.classes + classes
         self._entry.classes = self._entry.classes + classes
 
@@ -532,13 +546,6 @@ class Numbered:
 
         # Finalize the content
         if self._doc.format in {"tex", "latex"}:
-            self._get_content()[1].content.insert(
-                0, RawInline("\\label{" + self._alias + "}", "tex")
-            )
-            self._get_content()[1].content.insert(
-                0, RawInline("\\label{" + self._tag + "}", "tex")
-            )
-
             latex_category = re.sub("[^a-z]+", "", self._basic_category)
             latex = (
                 "\\phantomsection"
@@ -928,7 +935,8 @@ def referencing_cite(elem, doc):
     """
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
         match = re.match(
-            "^(@(?P<tag>(?P<category>[a-zA-Z][\\w.-]*):(([a-zA-Z][\\w.-]*)|(\\d*(\\.\\d*)*))))$",
+            "^(@(?P<tag>(?P<category>[a-zA-Z][\\w.-]*):"
+            "(([a-zA-Z][\\w.-]*)|(\\d*(\\.\\d*)*))))$",
             elem.content[0].text,
         )
         if match:
@@ -1590,7 +1598,8 @@ def finalize(doc):
     if doc.format in {"tex", "latex"}:
         header = (
             r"\ifdef{\mainmatter}"
-            r"{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
+            r"{\let\oldmainmatter\mainmatter"
+            r"\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
             r"{}"
         )
         doc.metadata["header-includes"].append(

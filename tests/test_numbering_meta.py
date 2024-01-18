@@ -31,7 +31,7 @@ pandoc-numbering:
       - myclass
 ---
 
-[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .myclass}
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .myclass}
 
 []{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .myclass}
             """,
@@ -62,7 +62,7 @@ pandoc-numbering:
       format-text-title: "**%D %d %n/%c: %T %t**"
 ---
 
-[]{#exercise:1}[**Exercise exercise 1/2**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise exercise 1/2**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 []{#exercise:title}[**Exercise exercise 2/2: Title title**]{#exercise:2 .pandoc-numbering-text .exercise}
             """,

@@ -16,8 +16,11 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import importlib.metadata
 import os
 import sys
+
+from datetime import date
 
 sys.path.insert(0, os.path.abspath("../.."))
 
@@ -25,15 +28,13 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 # -- Project information -----------------------------------------------------
 
-project = "pandoc-numbering"
-copyright = "2015-2023, Christophe Demko"
-author = "Christophe Demko"
+project, release = os.popen("poetry version").readline().strip().split(" ")
+author = importlib.metadata.metadata(project)["Author"]
+year = date.today().year
+copyright = f"2015-{year}, {author}"
 
 # The short X.Y version
-version = "3.4"
-# The full version, including alpha/beta/rc tags
-release = "3.4.0.2"
-
+version = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 
@@ -45,9 +46,7 @@ needs_sphinx = "6.0"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    'myst_parser'
-]
+extensions = ["myst_parser"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = []
@@ -57,8 +56,8 @@ templates_path = []
 #
 # source_suffix = ['.rst', '.md']
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.md': 'markdown',
+    ".rst": "restructuredtext",
+    ".md": "markdown",
 }
 
 
@@ -75,7 +74,7 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['images']
+exclude_patterns = ["images"]
 
 # The name of the Pygments (syntax highlighting) style to use.
 # pygments_style = None
@@ -87,11 +86,8 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
 
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -113,4 +109,3 @@ html_static_path = []
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-

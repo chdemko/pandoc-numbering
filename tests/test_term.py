@@ -14,7 +14,7 @@ Definition #
 :   This is the definition
             """,
             r"""
-[]{#definition:1}[**Definition 1**]{#definition:1 .pandoc-numbering-text .definition}
+[**Definition 1**]{#definition:1 .pandoc-numbering-text .definition}
 :   This is the definition
             """,
         )
@@ -60,17 +60,17 @@ Lemma #
 
 :   Big assumption
 
-[]{#lemma:1}[**Lemma 1**]{#lemma:1 .pandoc-numbering-text .lemma}
+[**Lemma 1**]{#lemma:1 .pandoc-numbering-text .lemma}
 
 :   A random lemma
 
-[]{#lemma:2}[**Lemma 2**]{#lemma:2 .pandoc-numbering-text .lemma}
+[**Lemma 2**]{#lemma:2 .pandoc-numbering-text .lemma}
 
 :   A random lemma
 
 Now we derive a result which uses [Assumption 1](#assumption:big).
 
-[]{#lemma:3}[**Lemma 3**]{#lemma:3 .pandoc-numbering-text .lemma}
+[**Lemma 3**]{#lemma:3 .pandoc-numbering-text .lemma}
 
 :   Under [Assumption 1](#assumption:big), we have ...
             """,
