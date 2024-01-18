@@ -34,7 +34,7 @@ pandoc-numbering:
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 []{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
@@ -70,7 +70,7 @@ pandoc-numbering:
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 []{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
@@ -106,7 +106,7 @@ pandoc-numbering:
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 []{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
@@ -144,7 +144,7 @@ pandoc-numbering:
 -   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 []{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
@@ -189,9 +189,9 @@ pandoc-numbering:
 ```{=tex}
 \ifdef{\mainmatter}{}{\listofexercise}
 ```
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:1}[`\label{exercise:1}`{=tex}`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title}[`\label{exercise:2}`{=tex}`\label{exercise:title}`{=tex}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
             "latex",
         )
@@ -230,7 +230,7 @@ pandoc-numbering:
 -   [[1 Exercise]{.pandoc-numbering-entry .exercise}](#exercise:1)
 -   [[2 Exercise (Title)]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
-[]{#exercise:1}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 []{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
@@ -287,9 +287,9 @@ toccolor: blue
 ```{=tex}
 \ifdef{\mainmatter}{}{\listofexercise}
 ```
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:1}[`\label{exercise:1}`{=tex}`\label{exercise:1}`{=tex}**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Exercise (Title)}}}`{=tex}[]{#exercise:title}[`\label{exercise:2}`{=tex}`\label{exercise:title}`{=tex}**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Exercise (Title)}}}`{=tex}[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
             """,
             "latex",
         )
