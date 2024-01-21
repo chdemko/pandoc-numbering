@@ -24,7 +24,7 @@ jobs:
         poetry-version: 1.7.1
     - name: Set up poetry-dynamic-versioning
       run: |
-        poetry self add "poetry-dynamic-versioning[plugin]"        
+        poetry self add "poetry-dynamic-versioning[plugin]"
     - name: Install dependencies
       run: |
         poetry install
