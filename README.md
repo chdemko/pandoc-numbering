@@ -42,7 +42,7 @@ $ pipx install pandoc-numbering
 To upgrade to the most recent release, use
 
 ~~~shell
-$ pipx install --upgrade pandoc-numbering
+$ pipx upgrade pandoc-numbering
 ~~~
 
 `pipx` is a script to install and run python applications in isolated environments from the Python Package Index, [PyPI]. It can be installed using instructions given [here](https://pipx.pypa.io/stable/).

@@ -8,6 +8,7 @@ import copy
 import re
 import unicodedata
 from functools import partial
+from textwrap import dedent
 
 from panflute import (
     BlockQuote,
@@ -1520,7 +1521,22 @@ def finalize(doc):
             doc.metadata["header-includes"] = MetaList(doc.metadata["header-includes"])
 
         doc.metadata["header-includes"].append(
-            MetaInlines(RawInline(r"\usepackage{tocloft}", "tex"))
+            MetaInlines(
+                RawInline(
+                    dedent(
+                        r"""
+                        \makeatletter
+                        \@ifpackageloaded{subfig}{
+                            \usepackage[subfigure]{tocloft}
+                        }{
+                            \usepackage{tocloft}
+                        }
+                        \makeatother
+                        """
+                    ),
+                    "tex",
+                )
+            )
         )
         doc.metadata["header-includes"].append(
             MetaInlines(RawInline(r"\usepackage{etoolbox}", "tex"))

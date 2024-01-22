@@ -168,7 +168,16 @@ Exercise (Title) #
             r"""
 ---
 header-includes:
-- "`\\usepackage{tocloft}`{=tex}"
+- |
+  `
+  \makeatletter
+  \@ifpackageloaded{subfig}{
+      \usepackage[subfigure]{tocloft}
+  }{
+      \usepackage{tocloft}
+  }
+  \makeatother
+  `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}\\setlength{\\cftexercisenumwidth}{\\cftfignumwidth}\\setlength{\\cftexerciseindent}{\\cftfigindent}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
@@ -178,7 +187,15 @@ pandoc-numbering:
       listing-title: List of exercises
 ---
 
-`\usepackage{tocloft}`{=tex}
+`
+\makeatletter
+\@ifpackageloaded{subfig}{
+    \usepackage[subfigure]{tocloft}
+}{
+    \usepackage{tocloft}
+}
+\makeatother
+`{=tex}
 
 `\usepackage{etoolbox}`{=tex}
 
@@ -260,7 +277,16 @@ Exercise (Title) #
             r"""
 ---
 header-includes:
-- "`\\usepackage{tocloft}`{=tex}"
+- |
+  `
+  \makeatletter
+  \@ifpackageloaded{subfig}{
+      \usepackage[subfigure]{tocloft}
+  }{
+      \usepackage{tocloft}
+  }
+  \makeatother
+  `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}\\setlength{\\cftexercisenumwidth}{\\cftfignumwidth}\\setlength{\\cftexerciseindent}{\\cftfigindent}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
@@ -276,7 +302,15 @@ pandoc-numbering:
 toccolor: blue
 ---
 
-`\usepackage{tocloft}`{=tex}
+`
+\makeatletter
+\@ifpackageloaded{subfig}{
+    \usepackage[subfigure]{tocloft}
+}{
+    \usepackage{tocloft}
+}
+\makeatother
+`{=tex}
 
 `\usepackage{etoolbox}`{=tex}
 
