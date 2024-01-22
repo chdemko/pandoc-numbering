@@ -82,7 +82,16 @@ See @exercise:second
             r"""
 ---
 header-includes:
-- "`\\usepackage{tocloft}`{=tex}"
+- |
+  `
+  \makeatletter
+  \@ifpackageloaded{subfig}{
+      \usepackage[subfigure]{tocloft}
+  }{
+      \usepackage{tocloft}
+  }
+  \makeatother
+  `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
@@ -94,7 +103,15 @@ pandoc-numbering:
       format-link-title: "**%D %d %T %t %g %s %n %p**"
 ---
 
-`\usepackage{tocloft}`{=tex}
+`
+\makeatletter
+\@ifpackageloaded{subfig}{
+    \usepackage[subfigure]{tocloft}
+}{
+    \usepackage{tocloft}
+}
+\makeatother
+`{=tex}
 
 `\usepackage{etoolbox}`{=tex}
 
@@ -192,7 +209,16 @@ See @exercise:second
             r"""
 ---
 header-includes:
-- "`\\usepackage{tocloft}`{=tex}"
+- |
+  `
+  \makeatletter
+  \@ifpackageloaded{subfig}{
+      \usepackage[subfigure]{tocloft}
+  }{
+      \usepackage{tocloft}
+  }
+  \makeatother
+  `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
@@ -204,7 +230,15 @@ pandoc-numbering:
       format-caption-title: "%D %d %T %t %g %s %n %c %p"
 ---
 
-`\usepackage{tocloft}`{=tex}
+`
+\makeatletter
+\@ifpackageloaded{subfig}{
+    \usepackage[subfigure]{tocloft}
+}{
+    \usepackage{tocloft}
+}
+\makeatother
+`{=tex}
 
 `\usepackage{etoolbox}`{=tex}
 

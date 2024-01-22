@@ -57,12 +57,29 @@ See [%D %d %T %t %g %s %n # %c %p](#exercise:second)
             r"""
 ---
 header-includes:
-- "`\\usepackage{tocloft}`{=tex}"
+- |
+  `
+  \makeatletter
+  \@ifpackageloaded{subfig}{
+      \usepackage[subfigure]{tocloft}
+  }{
+      \usepackage{tocloft}
+  }
+  \makeatother
+  `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\oldmainmatter}}{}`{=tex}"
 ---
 
-`\usepackage{tocloft}`{=tex}
+`
+\makeatletter
+\@ifpackageloaded{subfig}{
+    \usepackage[subfigure]{tocloft}
+}{
+    \usepackage{tocloft}
+}
+\makeatother
+`{=tex}
 
 `\usepackage{etoolbox}`{=tex}
 
