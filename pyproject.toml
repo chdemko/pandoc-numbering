@@ -46,8 +46,9 @@ python = "^3.9"
 # Formatter
 black = "^23.12.1"
 darglint = "^1.8.1"
+pydoclint = {extras = ["flake8"], version = "^0.4.0"}
 # pre-commit
-pre-commit = "^3.6.0"
+pre-commit = "^3.6.1"
 # Style checkers
 doc8 = "^0.11.2"
 flake8 = "^6.1.0"
@@ -64,7 +65,7 @@ flake8-fixme = "^1.1.1"
 flake8-functions = "^0.0.7"
 flake8-import-order = "^0.18.2"
 flake8-mypy = "^17.8.0"
-flake8-pydocstyle = "^0.2.3"
+flake8-pydocstyle = "^0.2.4"
 flake8-pyi = "^23.11.0"
 flake8-pyproject = "^1.2.3"
 flake8-return = "^1.2.0"
@@ -79,7 +80,7 @@ pylint = {version = "^2.17.7", python = ">=3.9"}
 tox = "^4.12.1"
 pytest = "^7.4.4"
 pytest-cov = "^4.1.0"
-refurb = {version = "^1.27.0", python = ">=3.10"}
+refurb = {version = "^1.28.0", python = ">=3.10"}
 ruff = "^0.0.254"
 slotscheck = "^0.16.5"
 teyit = {version = "^0.4.3", python = ">=3.9"}
@@ -133,10 +134,26 @@ ignore = [
   # undefined name TODO: remove
   "F821",
   # The docstring parameter type doesn't match function.
-  "DAR103"
+  "DAR103",
+  # pydoclint
+  # there are no argument type hints in the signature
+  "DOC106",
+  # not all args in the signature have type hints
+  "DOC107",
+  # there are no type hints in the docstring arg list
+  "DOC109",
+  # not all args in the docstring arg list have type hints
+  "DOC110",
+  # Function does not have a return section in docstring
+  "DOC201",
+  # __init__() should not have a docstring; please combine it with the docstring of the class
+  "DOC301"
 ]
 max-line-length = 88
 statistics = true
+
+[tool.pydoclint]
+style = "numpy"
 
 [tool.mypy]
 disallow_any_generics = true

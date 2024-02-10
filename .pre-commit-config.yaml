@@ -80,3 +80,4 @@ repos:
   - id: pylint
     language: system
     exclude: ^(?!pandoc_numbering.py)
+
