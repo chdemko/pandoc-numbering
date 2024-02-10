@@ -45,7 +45,7 @@ python = "^3.9"
 [tool.poetry.group.dev.dependencies]
 # Formatter
 black = "^23.12.1"
-darglint = "^1.8.1"
+darglint2 = "^1.8.2"
 pydoclint = {extras = ["flake8"], version = "^0.4.0"}
 # pre-commit
 pre-commit = "^3.6.1"

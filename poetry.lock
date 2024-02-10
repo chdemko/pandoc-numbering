@@ -380,14 +380,14 @@ tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.1
 toml = ["tomli"]
 
 [[package]]
-name = "darglint"
-version = "1.8.1"
+name = "darglint2"
+version = "1.8.2"
 description = "A utility for ensuring Google-style docstrings stay up to date with the source code."
 optional = false
 python-versions = ">=3.6,<4.0"
 files = [
-    {file = "darglint-1.8.1-py3-none-any.whl", hash = "sha256:5ae11c259c17b0701618a20c3da343a3eb98b3bc4b5a83d31cdd94f5ebdced8d"},
-    {file = "darglint-1.8.1.tar.gz", hash = "sha256:080d5106df149b199822e7ee7deb9c012b49891538f14a11be681044f0bb20da"},
+    {file = "darglint2-1.8.2-py3-none-any.whl", hash = "sha256:8f950c9b5fab25dd54bf537bef1569c267073e5828cb5ab76428876df6d947af"},
+    {file = "darglint2-1.8.2.tar.gz", hash = "sha256:11e0fc9c999bf09e192f42b72d202d177cb82da258eba387b24c2f0f5943650f"},
 ]
 
 [[package]]
@@ -828,13 +828,13 @@ files = [
 
 [[package]]
 name = "identify"
-version = "2.5.33"
+version = "2.5.34"
 description = "File identification library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "identify-2.5.33-py2.py3-none-any.whl", hash = "sha256:d40ce5fcd762817627670da8a7d8d8e65f24342d14539c59488dc603bf662e34"},
-    {file = "identify-2.5.33.tar.gz", hash = "sha256:161558f9fe4559e1557e1bff323e8631f6a0e4837f7497767c1782832f16b62d"},
+    {file = "identify-2.5.34-py2.py3-none-any.whl", hash = "sha256:a4316013779e433d08b96e5eabb7f641e6c7942e4ab5d4c509ebd2e7a8994aed"},
+    {file = "identify-2.5.34.tar.gz", hash = "sha256:ee17bc9d499899bc9eaec1ac7bf2dc9eedd480db9d88b96d123d3b64a9d34f5d"},
 ]
 
 [package.extras]
@@ -2074,4 +2074,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "ed7436083dbef081903809334d9ad246b29cd909967a058ce4116a4a1d2024cf"
+content-hash = "42fb3596b43b689551e9c9d1bbc719d0df188ad6b098000ba7ee256699c35312"
