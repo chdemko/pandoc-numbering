@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.5.0
   hooks:
   - id: check-toml
   - id: check-yaml
@@ -11,7 +11,7 @@ repos:
   - id: check-poetry
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.10.0
+  rev: v2.13.0
   hooks:
   - id: pretty-format-toml
     exclude: ^poetry.lock$
@@ -25,14 +25,14 @@ repos:
   - id: tox-ini-fmt
 
 - repo: https://github.com/ariebovenberg/slotscheck
-  rev: v0.17.0
+  rev: v0.19.0
   hooks:
   - id: slotscheck
     language: system
     exclude: ^(?!pandoc_numbering.py)
 
 - repo: https://github.com/dosisod/refurb
-  rev: v1.20.0
+  rev: v2.0.0
   hooks:
   - id: refurb
 
@@ -42,14 +42,14 @@ repos:
   - id: teyit
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.0.287
+  rev: v0.3.5
   hooks:
   - id: ruff
     language: system
     exclude: ^(?!pandoc_numbering.py)
 
 - repo: https://github.com/psf/black
-  rev: 23.7.0
+  rev: 24.3.0
   hooks:
   - id: black-jupyter
     args: [--config=pyproject.toml, pandoc_numbering.py, tests]
@@ -61,14 +61,14 @@ repos:
     args: [docs]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.5.1
+  rev: v1.9.0
   hooks:
   - id: mypy
     language: system
     exclude: ^(?!pandoc_numbering.py)
 
 - repo: https://github.com/pycqa/flake8
-  rev: 6.1.0
+  rev: 7.0.0
   hooks:
   - id: flake8
     language: system

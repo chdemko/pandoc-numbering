@@ -1106,26 +1106,15 @@ def meta_listing(category, definition, defined):
                 "[WARNING] pandoc-numbering: listing-title is not correct for category "
                 + category
             )
-    if "listing-unnumbered" in definition:
-        if isinstance(definition["listing-unnumbered"], MetaBool):
-            defined[category]["listing-unnumbered"] = definition[
-                "listing-unnumbered"
-            ].boolean
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "listing-unnumbered is not correct for category " + category
-            )
-    if "listing-unlisted" in definition:
-        if isinstance(definition["listing-unlisted"], MetaBool):
-            defined[category]["listing-unlisted"] = definition[
-                "listing-unlisted"
-            ].boolean
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "listing-unlisted is not correct for category " + category
-            )
+    for key in ("listing-unnumbered", "listing-unlisted"):
+        if key in definition:
+            if isinstance(definition[key], MetaBool):
+                defined[category][key] = definition[key].boolean
+            else:
+                debug(
+                    f"[WARNING] pandoc-numbering: "
+                    f"{key} is not correct for category {category}"
+                )
     if "listing-identifier" in definition:
         if isinstance(definition["listing-identifier"], MetaBool):
             defined[category]["listing-identifier"] = definition[
