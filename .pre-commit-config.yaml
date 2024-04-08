@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.6.0
   hooks:
   - id: check-toml
   - id: check-yaml
@@ -29,7 +29,7 @@ repos:
   hooks:
   - id: slotscheck
     language: system
-    exclude: ^(?!pandoc_numbering.py)
+    exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/dosisod/refurb
   rev: v2.0.0
@@ -46,13 +46,13 @@ repos:
   hooks:
   - id: ruff
     language: system
-    exclude: ^(?!pandoc_numbering.py)
+    exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/psf/black
   rev: 24.3.0
   hooks:
   - id: black-jupyter
-    args: [--config=pyproject.toml, pandoc_numbering.py, tests]
+    args: [--config=pyproject.toml, pandoc_numbering, tests]
 
 - repo: https://github.com/PyCQA/doc8/
   rev: v1.1.1
@@ -65,19 +65,19 @@ repos:
   hooks:
   - id: mypy
     language: system
-    exclude: ^(?!pandoc_numbering.py)
+    exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/pycqa/flake8
   rev: 7.0.0
   hooks:
   - id: flake8
     language: system
-    exclude: ^(?!pandoc_numbering.py)
+    exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/pre-commit/mirrors-pylint
   rev: v3.0.0a5
   hooks:
   - id: pylint
     language: system
-    exclude: ^(?!pandoc_numbering.py)
+    exclude: ^(?!pandoc_numbering/.*.py)
 

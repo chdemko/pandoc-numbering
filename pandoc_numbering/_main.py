@@ -1135,6 +1135,33 @@ def meta_listing(category, definition, defined):
             )
 
 
+def meta_format(category, definition, defined, tag):
+    """
+    Compute format text for a category and a tag.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    tag
+        The tag parameter
+    """
+    if tag in definition:
+        if isinstance(definition[tag], MetaInlines):
+            # Detach from original parent
+            defined[category][tag] = definition[tag].content
+            defined[category][tag].parent = None
+        else:
+            debug(
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
+            )
+
+
 def meta_format_text(category, definition, defined):
     """
     Compute format text for a category.
@@ -1148,31 +1175,8 @@ def meta_format_text(category, definition, defined):
     defined
         The defined parameter
     """
-    if "format-text-classic" in definition:
-        if isinstance(definition["format-text-classic"], MetaInlines):
-            defined[category]["format-text-classic"] = definition[
-                "format-text-classic"
-            ].content
-            # Detach from original parent
-            defined[category]["format-text-classic"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-text-classic is not correct for category " + category
-            )
-
-    if "format-text-title" in definition:
-        if isinstance(definition["format-text-title"], MetaInlines):
-            defined[category]["format-text-title"] = definition[
-                "format-text-title"
-            ].content
-            # Detach from original parent
-            defined[category]["format-text-title"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-text-title is not correct for category " + category
-            )
+    meta_format(category, definition, defined, "format-text-classic")
+    meta_format(category, definition, defined, "format-text-title")
 
 
 def meta_format_link(category, definition, defined):
@@ -1188,67 +1192,8 @@ def meta_format_link(category, definition, defined):
     defined
         The defined parameter
     """
-    if "format-link-classic" in definition:
-        if isinstance(definition["format-link-classic"], MetaInlines):
-            defined[category]["format-link-classic"] = definition[
-                "format-link-classic"
-            ].content
-            # Detach from original parent
-            defined[category]["format-link-classic"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-link-classic is not correct for category " + category
-            )
-
-    if "format-link-title" in definition:
-        if isinstance(definition["format-link-title"], MetaInlines):
-            defined[category]["format-link-title"] = definition[
-                "format-link-title"
-            ].content
-            # Detach from original parent
-            defined[category]["format-link-title"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-link-title is not correct for category " + category
-            )
-
-
-def meta_format_caption(category, definition, defined):
-    """
-    Compute format caption for a category.
-
-    Arguments
-    ---------
-    category
-        The category
-    definition
-        The definition
-    defined
-        The defined parameter
-    """
-    if "format-caption-classic" in definition:
-        if isinstance(definition["format-caption-classic"], MetaInlines):
-            defined[category]["format-caption-classic"] = stringify(
-                definition["format-caption-classic"]
-            )
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-caption-classic is not correct for category " + category
-            )
-
-    if "format-caption-title" in definition:
-        if isinstance(definition["format-caption-title"], MetaInlines):
-            defined[category]["format-caption-title"] = stringify(
-                definition["format-caption-title"]
-            )
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-caption-title is not correct for category " + category
-            )
+    meta_format(category, definition, defined, "format-link-classic")
+    meta_format(category, definition, defined, "format-link-title")
 
 
 def meta_format_entry(category, definition, defined):
@@ -1264,30 +1209,77 @@ def meta_format_entry(category, definition, defined):
     defined
         The defined parameter
     """
-    if "format-entry-classic" in definition:
-        if isinstance(definition["format-entry-classic"], MetaInlines):
-            defined[category]["format-entry-classic"] = definition[
-                "format-entry-classic"
-            ].content
-            # Detach from original parent
-            defined[category]["format-entry-classic"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-entry-classic is not correct for category " + category
-            )
+    meta_format(category, definition, defined, "format-entry-classic")
+    meta_format(category, definition, defined, "format-entry-title")
 
-    if "format-entry-title" in definition:
-        if isinstance(definition["format-entry-title"], MetaInlines):
-            defined[category]["format-entry-title"] = definition[
-                "format-entry-title"
-            ].content
-            # Detach from original parent
-            defined[category]["format-entry-title"].parent = None
+
+def meta_format_caption(category, definition, defined):
+    """
+    Compute format caption for a category.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    """
+    for tag in ("format-caption-classic", "format-caption-title"):
+        if tag in definition:
+            if isinstance(definition[tag], MetaInlines):
+                defined[category][tag] = stringify(definition[tag])
+            else:
+                debug(
+                    f"[WARNING] pandoc-numbering: "
+                    f"{tag} is not correct for category {category}"
+                )
+
+
+def meta_entry(category, definition, defined, tag):
+    """
+    Compute entry tab for a category.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    tag
+        The tag parameter
+    """
+    if tag in definition:
+        if isinstance(definition[tag], MetaString):
+            value = definition[tag].text
+        elif (
+            isinstance(definition[tag], MetaInlines)
+            and len(definition[tag].content) == 1
+        ):
+            value = definition[tag].content[0].text
         else:
             debug(
-                "[WARNING] pandoc-numbering: "
-                "format-entry-title is not correct for category " + category
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
+            )
+            return
+        # Get the element
+        try:
+            element = float(value)
+            if element > 0:
+                defined[category][tag] = element
+            else:
+                debug(
+                    f"[WARNING] pandoc-numbering: "
+                    f"{tag} must be positive for category {category}"
+                )
+        except ValueError:
+            debug(
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
             )
 
 
@@ -1304,35 +1296,7 @@ def meta_entry_tab(category, definition, defined):
     defined
         The defined parameter
     """
-    if "entry-tab" in definition:
-        if isinstance(definition["entry-tab"], MetaString):
-            value = definition["entry-tab"].text
-        elif (
-            isinstance(definition["entry-tab"], MetaInlines)
-            and len(definition["entry-tab"].content) == 1
-        ):
-            value = definition["entry-tab"].content[0].text
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: entry-tab is not correct for category "
-                + category
-            )
-            return
-        # Get the tab
-        try:
-            tab = float(value)
-            if tab > 0:
-                defined[category]["entry-tab"] = tab
-            else:
-                debug(
-                    "[WARNING] pandoc-numbering: "
-                    "entry-tab must be positive for category " + category
-                )
-        except ValueError:
-            debug(
-                "[WARNING] pandoc-numbering: entry-tab is not correct for category "
-                + category
-            )
+    meta_entry(category, definition, defined, "entry-tab")
 
 
 def meta_entry_space(category, definition, defined):
@@ -1348,35 +1312,7 @@ def meta_entry_space(category, definition, defined):
     defined
         The defined parameter
     """
-    if "entry-space" in definition:
-        if isinstance(definition["entry-space"], MetaString):
-            value = definition["entry-space"].text
-        elif (
-            isinstance(definition["entry-space"], MetaInlines)
-            and len(definition["entry-space"].content) == 1
-        ):
-            value = definition["entry-space"].content[0].text
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: entry-space is not correct for category "
-                + category
-            )
-            return
-        # Get the space
-        try:
-            space = float(value)
-            if space > 0:
-                defined[category]["entry-space"] = space
-            else:
-                debug(
-                    "[WARNING] pandoc-numbering: "
-                    "entry-space must be positive for category " + category
-                )
-        except ValueError:
-            debug(
-                "[WARNING] pandoc-numbering: entry-space is not correct for category "
-                + category
-            )
+    meta_entry(category, definition, defined, "entry-space")
 
 
 def meta_levels(category, definition, defined):

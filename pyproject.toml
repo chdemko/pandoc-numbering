@@ -34,7 +34,7 @@ homepage = "https://github.com/chdemko/pandoc-numbering"
 keywords = ["pandoc", "filters", "numbering"]
 license = "BSD-3-Clause"
 name = "pandoc-numbering"
-packages = [{include = "pandoc_numbering.py"}]
+packages = [{include = "pandoc_numbering/"}]
 readme = "README.md"
 version = "0.0.0.0"
 
