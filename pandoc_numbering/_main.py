@@ -1082,6 +1082,33 @@ def meta_cite(category, definition, defined):
             )
 
 
+def meta_format(category, definition, defined, tag):
+    """
+    Compute format text for a category and a tag.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    tag
+        The tag parameter
+    """
+    if tag in definition:
+        if isinstance(definition[tag], MetaInlines):
+            # Detach from original parent
+            defined[category][tag] = definition[tag].content
+            defined[category][tag].parent = None
+        else:
+            debug(
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
+            )
+
+
 # pylint:disable=too-many-branches
 def meta_listing(category, definition, defined):
     """
@@ -1096,16 +1123,7 @@ def meta_listing(category, definition, defined):
     defined
         The defined parameter
     """
-    if "listing-title" in definition:
-        if isinstance(definition["listing-title"], MetaInlines):
-            defined[category]["listing-title"] = definition["listing-title"].content
-            # Detach from original parent
-            defined[category]["listing-title"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: listing-title is not correct for category "
-                + category
-            )
+    meta_format(category, definition, defined, "listing-title")
     for key in ("listing-unnumbered", "listing-unlisted"):
         if key in definition:
             if isinstance(definition[key], MetaBool):
@@ -1132,33 +1150,6 @@ def meta_listing(category, definition, defined):
             debug(
                 "[WARNING] pandoc-numbering: "
                 "listing-identifier is not correct for category " + category
-            )
-
-
-def meta_format(category, definition, defined, tag):
-    """
-    Compute format text for a category and a tag.
-
-    Arguments
-    ---------
-    category
-        The category
-    definition
-        The definition
-    defined
-        The defined parameter
-    tag
-        The tag parameter
-    """
-    if tag in definition:
-        if isinstance(definition[tag], MetaInlines):
-            # Detach from original parent
-            defined[category][tag] = definition[tag].content
-            defined[category][tag].parent = None
-        else:
-            debug(
-                f"[WARNING] pandoc-numbering: "
-                f"{tag} is not correct for category {category}"
             )
 
 
@@ -1607,7 +1598,3 @@ def main(doc=None) -> None:
         pandoc document
     """
     run_filters([numbering, referencing], prepare=prepare, doc=doc, finalize=finalize)
-
-
-if __name__ == "__main__":
-    main()
