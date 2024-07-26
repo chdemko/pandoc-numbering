@@ -1,5 +1,3 @@
-# This Python file uses the following encoding: utf-8
-
 from unittest import TestCase
 
 from helper import verify_conversion
@@ -224,9 +222,8 @@ header-includes:
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
 
-```{=tex}
-\ifdef{\mainmatter}{}{}
-```
+`\ifdef{\mainmatter}{}{}`{=tex}
+
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Equation \(a=b\)}}}`{=tex}[]{#exercise:equation-a-b}[**Exercise 1** *(Equation $a=b$`<!-- -->`{=html})*]{#exercise:1 .pandoc-numbering-text .exercise}
             """,
             "latex",

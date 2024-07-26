@@ -39,59 +39,62 @@ readme = "README.md"
 version = "0.0.0.0"
 
 [tool.poetry.dependencies]
+python = ">=3.9,<3.13"
 panflute = "^2.3.1"
-python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
-# Formatter
-black = "^24.3.0"
-darglint = "^1.8.1"
-pydoclint = {extras = ["flake8"], version = "^0.4.0"}
+# Tests
+tox = "^4.16.0"
 # pre-commit
-pre-commit = "^3.7.0"
+pre-commit = "^3.7.1"
+# pyupgrade
+pyupgrade = "^3.16.0"
+# Formatter
+black = {extras = ["jupyter"], version = "^24.4.2"}
+# Tests
+pytest = "^8.3.2"
+pytest-cov = "^4.1.0"
 # Style checkers
-doc8 = "^0.11.2"
-flake8 = "^6.1.0"
-flake8-annotations-complexity = "^0.0.7"
+doc8 = "^1.1.1"
+mypy = "^1.11.0"
+flake8 = "^7.1.0"
+flake8-pyproject = "^1.2.3"
+flake8-annotations-complexity = "^0.0.8"
 flake8-black = "^0.3.6"
 flake8-blind-except = "^0.2.1"
-flake8-bugbear = "^23.12.2"
-flake8-builtins = "^2.4.0"
+flake8-bugbear = "^24.4.26"
+flake8-builtins = "^2.5.0"
 flake8-cognitive-complexity = "^0.1.0"
-flake8-comprehensions = "^3.14.0"
+flake8-comprehensions = "^3.15.0"
 flake8-docstrings = "^1.7.0"
 flake8-expression-complexity = "^0.0.11"
 flake8-fixme = "^1.1.1"
-flake8-functions = "^0.0.7"
+flake8-functions = "^0.0.8"
 flake8-import-order = "^0.18.2"
 flake8-mypy = "^17.8.0"
+flake8-pyi = "^24.6.0"
 flake8-pydocstyle = "^0.2.4"
-flake8-pyi = "^23.11.0"
-flake8-pyproject = "^1.2.3"
 flake8-return = "^1.2.0"
-flake8-simplify = "^0.19.3"
+flake8-simplify = "^0.21.0"
 flake8-spellcheck = "^0.28.0"
 flake8-use-fstring = "^1.4"
-flake8-variables-names = "^0.0.5"
-mypy = "^1.9.0"
+flake8-variables-names = "^0.0.6"
 pep8-naming = "^0.13.3"
-pylint = {version = "^2.17.7", python = ">=3.9"}
-# Tests
-tox = "^4.14.2"
-pytest = "^7.4.4"
-pytest-cov = "^4.1.0"
-refurb = {version = "^1.28.0", python = ">=3.10"}
-ruff = "^0.0.254"
-slotscheck = "^0.16.5"
-teyit = {version = "^0.4.3", python = ">=3.9"}
+pylint = "^3.2.6"
+ruff = "^0.5.0"
+darglint = "^1.8.1"
+pydoclint = {extras = ["flake8"], version = "^0.5.1"}
+teyit = "^0.4.3"
+slotscheck = "^0.17.3"
+refurb = {version = "^2.0.0", python = ">=3.10"}
 
 [tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
 myst-parser = "^2.0"
-sphinx = "^7.2"
-sphinx_rtd_theme = "^2.0"
+Sphinx = "^7.2.6"
+sphinx-rtd-theme = "^2.0.0"
 
 [tool.poetry.scripts]
 pandoc-numbering = "pandoc_numbering:main"
@@ -135,22 +138,15 @@ ignore = [
   "F821",
   # The docstring parameter type doesn't match function.
   "DAR103",
-  # pydoclint
-  # there are no argument type hints in the signature
-  "DOC106",
-  # not all args in the signature have type hints
-  "DOC107",
-  # there are no type hints in the docstring arg list
-  "DOC109",
-  # not all args in the docstring arg list have type hints
-  "DOC110",
-  # Function does not have a return section in docstring
-  "DOC201",
-  # __init__() should not have a docstring; please combine it with the docstring of the class
-  "DOC301"
+  # Class docstring contains fewer class attributes than actual class attributes.
+  "DOC601",
+  # Class docstring attributes are different from actual class attributes.
+  "DOC603"
 ]
 max-line-length = 88
 statistics = true
+# pydoclint
+arg-type-hints-in-docstring = false
 
 [tool.pydoclint]
 style = "numpy"

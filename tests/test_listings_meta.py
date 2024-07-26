@@ -1,5 +1,3 @@
-# This Python file uses the following encoding: utf-8
-
 from unittest import TestCase
 
 from helper import verify_conversion
@@ -203,9 +201,8 @@ pandoc-numbering:
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
 
-```{=tex}
-\ifdef{\mainmatter}{}{\listofexercise}
-```
+`\ifdef{\mainmatter}{}{\listofexercise}`{=tex}
+
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}
@@ -318,9 +315,8 @@ toccolor: blue
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
 
-```{=tex}
-\ifdef{\mainmatter}{}{\listofexercise}
-```
+`\ifdef{\mainmatter}{}{\listofexercise}`{=tex}
+
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {2}{\ignorespaces {Exercise (Title)}}}`{=tex}[]{#exercise:title}[**Exercise 2** *(Title)*]{#exercise:2 .pandoc-numbering-text .exercise}

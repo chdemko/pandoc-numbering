@@ -11,7 +11,7 @@ repos:
   - id: check-poetry
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.13.0
+  rev: v2.14.0
   hooks:
   - id: pretty-format-toml
     exclude: ^poetry.lock$
@@ -42,14 +42,14 @@ repos:
   - id: teyit
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.3.5
+  rev: v0.5.4
   hooks:
   - id: ruff
     language: system
     exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/psf/black
-  rev: 24.3.0
+  rev: 24.4.2
   hooks:
   - id: black-jupyter
     args: [--config=pyproject.toml, pandoc_numbering, tests]
@@ -61,14 +61,14 @@ repos:
     args: [docs]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.9.0
+  rev: v1.11.0
   hooks:
   - id: mypy
     language: system
     exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/pycqa/flake8
-  rev: 7.0.0
+  rev: 7.1.0
   hooks:
   - id: flake8
     language: system
@@ -81,3 +81,10 @@ repos:
     language: system
     exclude: ^(?!pandoc_numbering/.*.py)
 
+
+- repo: https://github.com/asottile/pyupgrade
+  rev: v3.16.0
+  hooks:
+  - id: pyupgrade
+    language: system
+    args: [--py310-plus]
