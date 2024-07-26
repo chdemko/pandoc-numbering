@@ -9,6 +9,7 @@ import re
 import unicodedata
 from functools import partial
 from textwrap import dedent
+from typing import Any
 
 from panflute import (
     BlockQuote,
@@ -20,6 +21,8 @@ from panflute import (
     DefinitionItem,
     DefinitionList,
     Div,
+    Doc,
+    Element,
     Emph,
     Header,
     HorizontalRule,
@@ -58,6 +61,13 @@ from panflute import (
 class Numbered:
     """
     Numbered elements.
+
+    Arguments
+    ---------
+    elem
+        An element.
+    doc
+        The document.
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -238,17 +248,7 @@ class Numbered:
         # Remove leading digits
         return re.sub("^[^a-zA-Z]+", "", string)
 
-    def __init__(self, elem, doc):
-        """
-        Initialise an instance.
-
-        Arguments
-        ---------
-        elem
-            An element.
-        doc
-            The document.
-        """
+    def __init__(self, elem: Element, doc: Doc):
         self._elem = elem
         self._doc = doc
         self._tag = None
@@ -558,7 +558,7 @@ class Numbered:
             self._get_content().insert(0, RawInline(latex, "tex"))
 
 
-def replace_description(where, description):
+def replace_description(where: Element, description: list[Element]) -> None:
     """
     Replace description in where.
 
@@ -579,7 +579,7 @@ def replace_description(where, description):
     )
 
 
-def replace_title(where, title):
+def replace_title(where: Element, title: list[Element]) -> None:
     """
     Replace title in where.
 
@@ -600,7 +600,7 @@ def replace_title(where, title):
     )
 
 
-def replace_section_number(where, section_number):
+def replace_section_number(where: Element, section_number: int) -> None:
     """
     Replace section number in where.
 
@@ -614,7 +614,7 @@ def replace_section_number(where, section_number):
     where.walk(partial(replacing, search="%s", replace=[Str(section_number)]))
 
 
-def replace_global_number(where, global_number):
+def replace_global_number(where: Element, global_number: int) -> None:
     """
     Replace global number in where.
 
@@ -628,7 +628,7 @@ def replace_global_number(where, global_number):
     where.walk(partial(replacing, search="%g", replace=[Str(global_number)]))
 
 
-def replace_local_number(where, local_number):
+def replace_local_number(where: Element, local_number: int) -> None:
     """
     Replace local number in where.
 
@@ -643,7 +643,7 @@ def replace_local_number(where, local_number):
     where.walk(partial(replacing, search="#", replace=[Str(local_number)]))
 
 
-def replace_page_number(where, tag):
+def replace_page_number(where: Element, tag: str):
     """
     Replace page number in where.
 
@@ -661,7 +661,7 @@ def replace_page_number(where, tag):
     )
 
 
-def replace_count(where, count):
+def replace_count(where: Element, count: str) -> None:
     """
     Replace count in where.
 
@@ -675,7 +675,7 @@ def replace_count(where, count):
     where.walk(partial(replacing, search="%c", replace=[Str(count)]))
 
 
-def remove_useless_latex(elem, _):
+def remove_useless_latex(elem: Element, _) -> list[Element] | None:
     """
     Clean up LaTeX element for entries.
 
@@ -686,6 +686,7 @@ def remove_useless_latex(elem, _):
 
     Returns
     -------
+    list[Element] | None
         []: if elem is an instance to remove
         None: otherwise
     """
@@ -722,7 +723,7 @@ def remove_useless_latex(elem, _):
     return None
 
 
-def to_latex(elem):
+def to_latex(elem: Element) -> Any:
     """
     Convert element to LaTeX.
 
@@ -733,6 +734,7 @@ def to_latex(elem):
 
     Returns
     -------
+    Any
         LaTex string
     """
     return convert_text(
@@ -743,7 +745,7 @@ def to_latex(elem):
     )
 
 
-def define(category, doc):
+def define(category: str, doc: Doc) -> None:
     """
     Define a category in document.
 
@@ -786,7 +788,7 @@ def define(category, doc):
         doc.defined[category]["format-entry-classic"] = [Str("%D"), Space(), Str("%g")]
 
 
-def lowering(elem, _):
+def lowering(elem: Element, _) -> None:
     """
     Lower element.
 
@@ -799,7 +801,12 @@ def lowering(elem, _):
         elem.text = elem.text.lower()
 
 
-def replacing(elem, _, search=None, replace=None):
+def replacing(
+    elem: Element,
+    _,
+    search: str | None = None,
+    replace: list[Any] | None = None,
+) -> list[Element]:
     """
     Replace an element.
 
@@ -814,8 +821,11 @@ def replacing(elem, _, search=None, replace=None):
 
     Returns
     -------
+    list[Element]
         The modified elements.
     """
+    if replace is None:
+        replace = []
     if isinstance(elem, Str):
         search_splitted = elem.text.split(search)
         if len(search_splitted) > 1:
@@ -834,7 +844,7 @@ def replacing(elem, _, search=None, replace=None):
     return [elem]
 
 
-def numbering(elem, doc):
+def numbering(elem: Element, doc: Doc) -> None:
     """
     Add the numbering of an element.
 
@@ -854,7 +864,7 @@ def numbering(elem, doc):
             doc.information[numbered.tag] = numbered
 
 
-def referencing(elem, doc):
+def referencing(elem: Element, doc: Doc) -> Element | None:
     """
     Add a reference for an element.
 
@@ -867,10 +877,11 @@ def referencing(elem, doc):
 
     Returns
     -------
+    Element | None
         A Link or None
     """
     if isinstance(elem, Link):
-        return referencing_link(elem, doc)
+        referencing_link(elem, doc)
     if isinstance(elem, Cite):
         return referencing_cite(elem, doc)
     if isinstance(elem, Span) and elem.identifier in doc.information:
@@ -878,7 +889,7 @@ def referencing(elem, doc):
     return None
 
 
-def referencing_link(elem, doc):
+def referencing_link(elem: Element, doc: Doc) -> None:
     """
     Add a eference link.
 
@@ -919,7 +930,7 @@ def referencing_link(elem, doc):
                 elem.title = elem.title.replace("%p", "\\pageref{" + tag + "}")
 
 
-def referencing_cite(elem, doc):
+def referencing_cite(elem: Element, doc: Doc) -> Element | None:
     """
     Cite reference.
 
@@ -932,6 +943,7 @@ def referencing_cite(elem, doc):
 
     Returns
     -------
+    Element | None
         A Link or None
     """
     if len(elem.content) == 1 and isinstance(elem.content[0], Str):
@@ -958,7 +970,7 @@ def referencing_cite(elem, doc):
     return None
 
 
-def update_header_numbers(elem, doc):
+def update_header_numbers(elem: Element, doc: Doc) -> None:
     """
     Update header numbers.
 
@@ -975,7 +987,7 @@ def update_header_numbers(elem, doc):
             doc.headers[index] = 0
 
 
-def update_header_aliases(elem, doc):
+def update_header_aliases(elem: Element, doc: Doc) -> None:
     """
     Update header aliases.
 
@@ -991,7 +1003,7 @@ def update_header_aliases(elem, doc):
         doc.aliases[index] = ""
 
 
-def prepare(doc):
+def prepare(doc: Doc) -> None:
     """
     Prepare document.
 
@@ -1018,7 +1030,7 @@ def prepare(doc):
     doc.collections = {}
 
 
-def add_definition(category, definition, doc):
+def add_definition(category: str, definition: dict[str, MetaList], doc: Doc):
     """
     Add definition for a category.
 
@@ -1059,7 +1071,11 @@ def add_definition(category, definition, doc):
             meta_format_entry(category, definition["standard"], doc.defined)
 
 
-def meta_cite(category, definition, defined):
+def meta_cite(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+) -> None:
     """
     Compute cite for a category.
 
@@ -1082,8 +1098,44 @@ def meta_cite(category, definition, defined):
             )
 
 
+def meta_format(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, Element]],  # noqa: TAE002
+    tag: str,
+) -> None:
+    """
+    Compute format text for a category and a tag.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    tag
+        The tag parameter
+    """
+    if tag in definition:
+        if isinstance(definition[tag], MetaInlines):
+            # Detach from original parent
+            defined[category][tag] = definition[tag].content
+            defined[category][tag].parent = None
+        else:
+            debug(
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
+            )
+
+
 # pylint:disable=too-many-branches
-def meta_listing(category, definition, defined):
+def meta_listing(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+) -> None:
     """
     Compute listing for a category.
 
@@ -1096,36 +1148,16 @@ def meta_listing(category, definition, defined):
     defined
         The defined parameter
     """
-    if "listing-title" in definition:
-        if isinstance(definition["listing-title"], MetaInlines):
-            defined[category]["listing-title"] = definition["listing-title"].content
-            # Detach from original parent
-            defined[category]["listing-title"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: listing-title is not correct for category "
-                + category
-            )
-    if "listing-unnumbered" in definition:
-        if isinstance(definition["listing-unnumbered"], MetaBool):
-            defined[category]["listing-unnumbered"] = definition[
-                "listing-unnumbered"
-            ].boolean
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "listing-unnumbered is not correct for category " + category
-            )
-    if "listing-unlisted" in definition:
-        if isinstance(definition["listing-unlisted"], MetaBool):
-            defined[category]["listing-unlisted"] = definition[
-                "listing-unlisted"
-            ].boolean
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "listing-unlisted is not correct for category " + category
-            )
+    meta_format(category, definition, defined, "listing-title")
+    for key in ("listing-unnumbered", "listing-unlisted"):
+        if key in definition:
+            if isinstance(definition[key], MetaBool):
+                defined[category][key] = definition[key].boolean
+            else:
+                debug(
+                    f"[WARNING] pandoc-numbering: "
+                    f"{key} is not correct for category {category}"
+                )
     if "listing-identifier" in definition:
         if isinstance(definition["listing-identifier"], MetaBool):
             defined[category]["listing-identifier"] = definition[
@@ -1146,7 +1178,11 @@ def meta_listing(category, definition, defined):
             )
 
 
-def meta_format_text(category, definition, defined):
+def meta_format_text(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+) -> None:
     """
     Compute format text for a category.
 
@@ -1159,34 +1195,15 @@ def meta_format_text(category, definition, defined):
     defined
         The defined parameter
     """
-    if "format-text-classic" in definition:
-        if isinstance(definition["format-text-classic"], MetaInlines):
-            defined[category]["format-text-classic"] = definition[
-                "format-text-classic"
-            ].content
-            # Detach from original parent
-            defined[category]["format-text-classic"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-text-classic is not correct for category " + category
-            )
-
-    if "format-text-title" in definition:
-        if isinstance(definition["format-text-title"], MetaInlines):
-            defined[category]["format-text-title"] = definition[
-                "format-text-title"
-            ].content
-            # Detach from original parent
-            defined[category]["format-text-title"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-text-title is not correct for category " + category
-            )
+    meta_format(category, definition, defined, "format-text-classic")
+    meta_format(category, definition, defined, "format-text-title")
 
 
-def meta_format_link(category, definition, defined):
+def meta_format_link(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+) -> None:
     """
     Compute format link for a category.
 
@@ -1199,70 +1216,15 @@ def meta_format_link(category, definition, defined):
     defined
         The defined parameter
     """
-    if "format-link-classic" in definition:
-        if isinstance(definition["format-link-classic"], MetaInlines):
-            defined[category]["format-link-classic"] = definition[
-                "format-link-classic"
-            ].content
-            # Detach from original parent
-            defined[category]["format-link-classic"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-link-classic is not correct for category " + category
-            )
-
-    if "format-link-title" in definition:
-        if isinstance(definition["format-link-title"], MetaInlines):
-            defined[category]["format-link-title"] = definition[
-                "format-link-title"
-            ].content
-            # Detach from original parent
-            defined[category]["format-link-title"].parent = None
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-link-title is not correct for category " + category
-            )
+    meta_format(category, definition, defined, "format-link-classic")
+    meta_format(category, definition, defined, "format-link-title")
 
 
-def meta_format_caption(category, definition, defined):
-    """
-    Compute format caption for a category.
-
-    Arguments
-    ---------
-    category
-        The category
-    definition
-        The definition
-    defined
-        The defined parameter
-    """
-    if "format-caption-classic" in definition:
-        if isinstance(definition["format-caption-classic"], MetaInlines):
-            defined[category]["format-caption-classic"] = stringify(
-                definition["format-caption-classic"]
-            )
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-caption-classic is not correct for category " + category
-            )
-
-    if "format-caption-title" in definition:
-        if isinstance(definition["format-caption-title"], MetaInlines):
-            defined[category]["format-caption-title"] = stringify(
-                definition["format-caption-title"]
-            )
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: "
-                "format-caption-title is not correct for category " + category
-            )
-
-
-def meta_format_entry(category, definition, defined):
+def meta_format_entry(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+) -> None:
     """
     Compute format entry for a category.
 
@@ -1275,34 +1237,94 @@ def meta_format_entry(category, definition, defined):
     defined
         The defined parameter
     """
-    if "format-entry-classic" in definition:
-        if isinstance(definition["format-entry-classic"], MetaInlines):
-            defined[category]["format-entry-classic"] = definition[
-                "format-entry-classic"
-            ].content
-            # Detach from original parent
-            defined[category]["format-entry-classic"].parent = None
+    meta_format(category, definition, defined, "format-entry-classic")
+    meta_format(category, definition, defined, "format-entry-title")
+
+
+def meta_format_caption(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+) -> None:
+    """
+    Compute format caption for a category.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    """
+    for tag in ("format-caption-classic", "format-caption-title"):
+        if tag in definition:
+            if isinstance(definition[tag], MetaInlines):
+                defined[category][tag] = stringify(definition[tag])
+            else:
+                debug(
+                    f"[WARNING] pandoc-numbering: "
+                    f"{tag} is not correct for category {category}"
+                )
+
+
+def meta_entry(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, float]],  # noqa: TAE002
+    tag: str,
+) -> None:
+    """
+    Compute entry tab for a category.
+
+    Arguments
+    ---------
+    category
+        The category
+    definition
+        The definition
+    defined
+        The defined parameter
+    tag
+        The tag parameter
+    """
+    if tag in definition:
+        if isinstance(definition[tag], MetaString):
+            value = definition[tag].text
+        elif (
+            isinstance(definition[tag], MetaInlines)
+            and len(definition[tag].content) == 1
+        ):
+            value = definition[tag].content[0].text
         else:
             debug(
-                "[WARNING] pandoc-numbering: "
-                "format-entry-classic is not correct for category " + category
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
             )
-
-    if "format-entry-title" in definition:
-        if isinstance(definition["format-entry-title"], MetaInlines):
-            defined[category]["format-entry-title"] = definition[
-                "format-entry-title"
-            ].content
-            # Detach from original parent
-            defined[category]["format-entry-title"].parent = None
-        else:
+            return
+        # Get the element
+        try:
+            element = float(value)
+            if element > 0:
+                defined[category][tag] = element
+            else:
+                debug(
+                    f"[WARNING] pandoc-numbering: "
+                    f"{tag} must be positive for category {category}"
+                )
+        except ValueError:
             debug(
-                "[WARNING] pandoc-numbering: "
-                "format-entry-title is not correct for category " + category
+                f"[WARNING] pandoc-numbering: "
+                f"{tag} is not correct for category {category}"
             )
 
 
-def meta_entry_tab(category, definition, defined):
+def meta_entry_tab(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, float]],  # noqa: TAE002
+) -> None:
     """
     Compute entry tab for a category.
 
@@ -1315,38 +1337,14 @@ def meta_entry_tab(category, definition, defined):
     defined
         The defined parameter
     """
-    if "entry-tab" in definition:
-        if isinstance(definition["entry-tab"], MetaString):
-            value = definition["entry-tab"].text
-        elif (
-            isinstance(definition["entry-tab"], MetaInlines)
-            and len(definition["entry-tab"].content) == 1
-        ):
-            value = definition["entry-tab"].content[0].text
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: entry-tab is not correct for category "
-                + category
-            )
-            return
-        # Get the tab
-        try:
-            tab = float(value)
-            if tab > 0:
-                defined[category]["entry-tab"] = tab
-            else:
-                debug(
-                    "[WARNING] pandoc-numbering: "
-                    "entry-tab must be positive for category " + category
-                )
-        except ValueError:
-            debug(
-                "[WARNING] pandoc-numbering: entry-tab is not correct for category "
-                + category
-            )
+    meta_entry(category, definition, defined, "entry-tab")
 
 
-def meta_entry_space(category, definition, defined):
+def meta_entry_space(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, float]],  # noqa: TAE002
+) -> None:
     """
     Compute entry space for a category.
 
@@ -1359,38 +1357,14 @@ def meta_entry_space(category, definition, defined):
     defined
         The defined parameter
     """
-    if "entry-space" in definition:
-        if isinstance(definition["entry-space"], MetaString):
-            value = definition["entry-space"].text
-        elif (
-            isinstance(definition["entry-space"], MetaInlines)
-            and len(definition["entry-space"].content) == 1
-        ):
-            value = definition["entry-space"].content[0].text
-        else:
-            debug(
-                "[WARNING] pandoc-numbering: entry-space is not correct for category "
-                + category
-            )
-            return
-        # Get the space
-        try:
-            space = float(value)
-            if space > 0:
-                defined[category]["entry-space"] = space
-            else:
-                debug(
-                    "[WARNING] pandoc-numbering: "
-                    "entry-space must be positive for category " + category
-                )
-        except ValueError:
-            debug(
-                "[WARNING] pandoc-numbering: entry-space is not correct for category "
-                + category
-            )
+    meta_entry(category, definition, defined, "entry-space")
 
 
-def meta_levels(category, definition, defined):
+def meta_levels(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, float]],  # noqa: TAE002
+) -> None:
     """
     Compute level for a category.
 
@@ -1482,7 +1456,11 @@ def meta_levels(category, definition, defined):
             )
 
 
-def meta_classes(category, definition, defined):
+def meta_classes(
+    category: str,
+    definition: dict[str, MetaList],
+    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+):
     """
     Compute classes for a category.
 
@@ -1501,7 +1479,7 @@ def meta_classes(category, definition, defined):
         ]
 
 
-def finalize(doc):
+def finalize(doc: Doc):
     """
     Finalize document.
 
@@ -1623,10 +1601,10 @@ def finalize(doc):
         )
 
         latex = r"\ifdef{\mainmatter}{}{%s}"
-        doc.content.insert(0, RawBlock(latex % "\n".join(listof), "tex"))
+        doc.content.insert(0, Plain(RawInline(latex % "\n".join(listof), "tex")))
 
 
-def table_other(doc, category, _):
+def table_other(doc: Doc, category: str, _) -> BulletList | None:
     """
     Compute other code for table.
 
@@ -1639,6 +1617,7 @@ def table_other(doc, category, _):
 
     Returns
     -------
+    BulletList | None
         A BulletList or None
     """
     if category in doc.collections:
@@ -1652,7 +1631,7 @@ def table_other(doc, category, _):
     return None
 
 
-def link_color(doc):
+def link_color(doc: Doc) -> str:
     """
     Compute LaTeX code for toc.
 
@@ -1663,6 +1642,7 @@ def link_color(doc):
 
     Returns
     -------
+    str
         LaTeX code for links.
     """
     # Get the link color
@@ -1672,7 +1652,7 @@ def link_color(doc):
     return "\\hypersetup{linkcolor=black}"
 
 
-def main(doc=None) -> None:
+def main(doc: Doc | None = None) -> None:
     """
     Produce the final document.
 
@@ -1682,7 +1662,3 @@ def main(doc=None) -> None:
         pandoc document
     """
     run_filters([numbering, referencing], prepare=prepare, doc=doc, finalize=finalize)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,5 +1,3 @@
-# This Python file uses the following encoding: utf-8
-
 from unittest import TestCase
 
 from helper import verify_conversion
@@ -85,9 +83,8 @@ header-includes:
 
 `\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\oldmainmatter}}{}`{=tex}
 
-```{=tex}
-\ifdef{\mainmatter}{}{}
-```
+`\ifdef{\mainmatter}{}{}`{=tex}
+
 # Title
 
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
