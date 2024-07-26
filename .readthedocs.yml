@@ -12,8 +12,6 @@ build:
   jobs:
     post_checkout:
     - git fetch --unshallow || true
-    - git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*' || true
-    - git fetch --all --tags || true
     post_create_environment:
     # Install poetry
     # https://python-poetry.org/docs/#installing-manually
@@ -25,6 +23,7 @@ build:
     # Install dependencies with 'docs' dependency group
     # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
     - poetry install --with docs
+    - poetry shell
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
