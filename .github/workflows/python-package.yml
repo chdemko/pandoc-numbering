@@ -16,7 +16,7 @@ jobs:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
         poetry-version: [1.8.3]
-        pandoc-version: [3.3]
+        pandoc-version: ['3.3']
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
