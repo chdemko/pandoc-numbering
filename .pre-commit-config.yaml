@@ -81,7 +81,6 @@ repos:
     language: system
     exclude: ^(?!pandoc_numbering/.*.py)
 
-
 - repo: https://github.com/asottile/pyupgrade
   rev: v3.16.0
   hooks:
