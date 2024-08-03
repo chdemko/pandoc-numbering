@@ -31,7 +31,9 @@ Install
 Instructions
 ------------
 
-*pandoc-numbering* requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows].
+*pandoc-numbering* requires [python], a programming language that comes
+pre-installed on linux and Mac OS X, and which is easily installed
+[on Windows].
 
 Install *pandoc-numbering* using the bash command
 
@@ -52,8 +54,8 @@ Make sure you have the
 * *tocloft*
 
 LaTeX package. On linux you have to install some extra libraries **before**
-*pandoc-numbering*. On a Debian-based system (including Ubuntu), you can install it as
-root using
+*pandoc-numbering*. On a Debian-based system (including Ubuntu), you can
+install it as root using
 
 ~~~shell
 $ sudo apt-get install texlive-latex-extra
@@ -67,7 +69,8 @@ $ sudo apt-get install texlive-latex-extra
 Getting Help
 ------------
 
-If you have any difficulties with *pandoc-numbering*, please feel welcome to [file an issue] on github so that we can help.
+If you have any difficulties with *pandoc-numbering*, please feel welcome to
+[file an issue] on github so that we can help.
 
 [file an issue]: https://github.com/chdemko/pandoc-numbering/issues
 
@@ -84,7 +87,8 @@ $ poetry install
 $ poetry shell
 ~~~
 
-And submit your changes. When you commit, hooks will be executed to check your code.
+And submit your changes. When you commit, hooks will be executed to check
+your code.
 
 Notes
 =====
