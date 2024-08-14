@@ -3,9 +3,9 @@ Usage
 
 Run `pandoc` using ``pandoc-numbering`` filter:
 
-.. code-block:: shell
+.. prompt:: bash
 
-    $ pandoc --filter pandoc-numbering
+    pandoc --filter pandoc-numbering
 
 
 .. toctree::

@@ -42,14 +42,14 @@ repos:
   - id: teyit
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.5.4
+  rev: v0.5.7
   hooks:
   - id: ruff
     language: system
     exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/psf/black
-  rev: 24.4.2
+  rev: 24.8.0
   hooks:
   - id: black-jupyter
     args: [--config=pyproject.toml, pandoc_numbering, tests]
@@ -58,17 +58,17 @@ repos:
   rev: v1.1.1
   hooks:
   - id: doc8
-    args: [docs, README.md, -e, .rst, -e, .md]
+    files: \.(rst|md)$
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.11.0
+  rev: v1.11.1
   hooks:
   - id: mypy
     language: system
     exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/pycqa/flake8
-  rev: 7.1.0
+  rev: 7.1.1
   hooks:
   - id: flake8
     language: system
@@ -82,7 +82,7 @@ repos:
     exclude: ^(?!pandoc_numbering/.*.py)
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.16.0
+  rev: v3.17.0
   hooks:
   - id: pyupgrade
     language: system
