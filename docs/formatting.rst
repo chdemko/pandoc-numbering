@@ -52,8 +52,8 @@ By default these values are equal to
          format-link-classic: '%D %n'
          format-link-title: '%D %n (%T)'
          format-caption-classic: '%D %n'
-         format-caption-title': '%D %n (%T)'
-         format-entry-title': '%T'
+         format-caption-title: '%D %n (%T)'
+         format-entry-title: '%T'
          format-entry-classic': '%D %g'
        latex:
          format-text-classic: '**%D %n**'
@@ -62,7 +62,7 @@ By default these values are equal to
          format-link-title: '%D %n (%T)'
          format-caption-classic: '%D %n'
          format-caption-title: '%D %n (%T)'
-         format-entry-title': '%T'
-         format-entry-classic': '%D'
+         format-entry-title: '%T'
+         format-entry-classic: '%D'
    ---
 
