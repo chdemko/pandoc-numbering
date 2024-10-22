@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from helper import verify_conversion
+from .helper import verify_conversion
 
 
 class ListingsTest(TestCase):

@@ -2,4 +2,4 @@ cov
 pylint
 unsubscriptable
 toplevel
-
+noinspection

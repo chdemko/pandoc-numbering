@@ -3,7 +3,7 @@ Usage
 
 Run `pandoc` using ``pandoc-numbering`` filter:
 
-.. code-block:: shell
+.. code-block:: shell-session
 
     $ pandoc --filter pandoc-numbering
 
