@@ -178,7 +178,7 @@ header-includes:
   `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}\\setlength{\\cftexercisenumwidth}{\\cftfignumwidth}\\setlength{\\cftexerciseindent}{\\cftfigindent}`{=tex}"
-- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
+- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\phantomsection\\label{list-of-exercises}\\listofexercise\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
   exercise:
     general:
@@ -199,9 +199,9 @@ pandoc-numbering:
 
 `\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}\setlength{\cftexercisenumwidth}{\cftfignumwidth}\setlength{\cftexerciseindent}{\cftfigindent}`{=tex}
 
-`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\phantomsection\label{list-of-exercises}\listofexercise\oldmainmatter}}{}`{=tex}
 
-`\ifdef{\mainmatter}{}{\listofexercise}`{=tex}
+`\ifdef{\mainmatter}{}{\phantomsection\label{list-of-exercises}\listofexercise}`{=tex}
 
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 
@@ -286,7 +286,7 @@ header-includes:
   `{=tex}
 - "`\\usepackage{etoolbox}`{=tex}"
 - "`\\newlistof{exercise}{exercise}{List of exercises}\\renewcommand{\\cftexercisetitlefont}{\\cfttoctitlefont}\\setlength{\\cftexercisenumwidth}{\\cftfignumwidth}\\setlength{\\cftexerciseindent}{\\cftfigindent}`{=tex}"
-- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\listofexercise\\oldmainmatter}}{}`{=tex}"
+- "`\\ifdef{\\mainmatter}{\\let\\oldmainmatter\\mainmatter\\renewcommand{\\mainmatter}[0]{\\phantomsection\\label{list-of-exercises}\\listofexercise\\oldmainmatter}}{}`{=tex}"
 pandoc-numbering:
   exercise:
     general:
@@ -313,9 +313,9 @@ toccolor: blue
 
 `\newlistof{exercise}{exercise}{List of exercises}\renewcommand{\cftexercisetitlefont}{\cfttoctitlefont}\setlength{\cftexercisenumwidth}{\cftfignumwidth}\setlength{\cftexerciseindent}{\cftfigindent}`{=tex}
 
-`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\listofexercise\oldmainmatter}}{}`{=tex}
+`\ifdef{\mainmatter}{\let\oldmainmatter\mainmatter\renewcommand{\mainmatter}[0]{\phantomsection\label{list-of-exercises}\listofexercise\oldmainmatter}}{}`{=tex}
 
-`\ifdef{\mainmatter}{}{\listofexercise}`{=tex}
+`\ifdef{\mainmatter}{}{\phantomsection\label{list-of-exercises}\listofexercise}`{=tex}
 
 `\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1}{\ignorespaces {Exercise}}}`{=tex}[**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise}
 

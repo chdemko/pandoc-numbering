@@ -239,7 +239,20 @@ class Numbered:
         return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
     @staticmethod
-    def _identifier(string):
+    def identifier(string: str) -> str:
+        """
+        Convert a string to a valid identifier.
+
+        Parameters
+        ----------
+        string
+            A string to convert.
+
+        Returns
+        -------
+        str
+            The corresponding identifier
+        """
         # replace invalid characters by dash
         string = re.sub(
             "[^0-9a-zA-Z_-]+", "-", Numbered._remove_accents(string.lower())
@@ -335,7 +348,7 @@ class Numbered:
 
     def _compute_basic_category(self):
         if self._match.group("prefix") is None:
-            self._basic_category = Numbered._identifier(
+            self._basic_category = Numbered.identifier(
                 "".join(map(stringify, self._description))
             )
         else:
@@ -421,13 +434,13 @@ class Numbered:
                     + ":"
                     + self._section_alias
                     + "."
-                    + Numbered._identifier(stringify(Span(*self._title)))
+                    + Numbered.identifier(stringify(Span(*self._title)))
                 )
             else:
                 self._alias = (
                     self._basic_category
                     + ":"
-                    + Numbered._identifier(stringify(Span(*self._title)))
+                    + Numbered.identifier(stringify(Span(*self._title)))
                 )
 
     def _compute_local_number(self):
@@ -1527,6 +1540,11 @@ def finalize(doc: Doc):
             # pylint: disable=consider-using-f-string
             if doc.format in {"tex", "latex"}:
                 latex_category = re.sub("[^a-z]+", "", category)
+                text = convert_text(
+                    Plain(*definition["listing-title"]),
+                    input_format="panflute",
+                    output_format="latex",
+                )
                 latex = (
                     r"\newlistof{%s}{%s}{%s}"
                     r"\renewcommand{\cft%stitlefont}{\cfttoctitlefont}"
@@ -1535,11 +1553,7 @@ def finalize(doc: Doc):
                     % (
                         latex_category,
                         latex_category,
-                        convert_text(
-                            Plain(*definition["listing-title"]),
-                            input_format="panflute",
-                            output_format="latex",
-                        ),
+                        text,
                         latex_category,
                         latex_category,
                         latex_category,
@@ -1548,7 +1562,18 @@ def finalize(doc: Doc):
                 doc.metadata["header-includes"].append(
                     MetaInlines(RawInline(latex, "tex"))
                 )
-                listof.append(f"\\listof{latex_category}")
+                if definition["listing-identifier"] is False:
+                    listof.append(f"\\listof{latex_category}")
+                elif definition["listing-identifier"] is True:
+                    listof.append(
+                        f"\\phantomsection\\label{{{Numbered.identifier(text)}}}"
+                        f"\\listof{latex_category}"
+                    )
+                else:
+                    listof.append(
+                        f"\\phantomsection\\label{{{definition['listing-identifier']}}}"
+                        f"\\listof{latex_category}"
+                    )
             else:
                 classes = ["pandoc-numbering-listing"] + definition["classes"]
 
