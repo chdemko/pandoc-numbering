@@ -83,6 +83,7 @@ class Numbered:
         "_description",
         "_category",
         "_basic_category",
+        "_classes",
         "_first_section_level",
         "_last_section_level",
         "_leading",
@@ -272,6 +273,7 @@ class Numbered:
         self._description = None
         self._category = None
         self._basic_category = None
+        self._classes = None
         self._first_section_level = None
         self._last_section_level = None
         self._leading = None
@@ -402,11 +404,16 @@ class Numbered:
         self._number = str(self._doc.count[self._category])
 
     def _compute_tag(self):
+        self._classes = [
+            self._category[:-1].replace(":", "-").replace(".", "-") + "-" + self._number
+        ]
+
         # Determine the final tag
         if self._match.group("name") is None:
             self._tag = self._category + self._number
         else:
             self._tag = self._basic_category + ":" + self._match.group("name")
+            self._classes.append(self._basic_category + "-" + self._match.group("name"))
 
         # Compute collections
         if self._basic_category not in self._doc.collections:
@@ -469,7 +476,7 @@ class Numbered:
                     Span(),
                     Span(
                         identifier=self._tag,
-                        classes=["pandoc-numbering-text"] + classes,
+                        classes=["pandoc-numbering-text"] + classes + self._classes,
                     ),
                 ]
             )
@@ -479,7 +486,7 @@ class Numbered:
                     Span(identifier=self._alias),
                     Span(
                         identifier=self._tag,
-                        classes=["pandoc-numbering-text"] + classes,
+                        classes=["pandoc-numbering-text"] + classes + self._classes,
                     ),
                 ]
             )

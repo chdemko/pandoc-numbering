@@ -22,7 +22,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Hatch
-      run: pipx install hatch
+      run: |
+        pipx install hatch
+        pipx inject --force hatch hatchling==1.25.0
     - name: Build and publish
       env:
         HATCH_INDEX_USER: ${{ secrets.PYPI_USERNAME }}
