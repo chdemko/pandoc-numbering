@@ -25,7 +25,6 @@ jobs:
     - name: Install Hatch
       run: |
         pipx install hatch
-        pipx inject --force hatch hatchling==1.25.0
     - name: Install dependencies
       run: |
         wget https://github.com/jgm/pandoc/releases/download/${{ matrix.pandoc-version }}/pandoc-${{ matrix.pandoc-version }}-1-amd64.deb
@@ -49,7 +48,6 @@ jobs:
     - name: Install Hatch
       run: |
         pipx install hatch
-        pipx inject --force hatch hatchling==1.25.0
     - name: Install dependencies
       run: |
         wget https://github.com/jgm/pandoc/releases/download/${{ matrix.pandoc-version }}/pandoc-${{ matrix.pandoc-version }}-1-amd64.deb
@@ -73,7 +71,6 @@ jobs:
     - name: Install Hatch
       run: |
         pipx install hatch
-        pipx inject --force hatch hatchling==1.25.0
     - name: Install dependencies
       run: |
         wget https://github.com/jgm/pandoc/releases/download/${{ matrix.pandoc-version }}/pandoc-${{ matrix.pandoc-version }}-1-amd64.deb
@@ -100,7 +97,6 @@ jobs:
     - name: Install Hatch
       run: |
         pipx install hatch
-        pipx inject --force hatch hatchling==1.25.0
     - name: Install dependencies
       run: |
         wget https://github.com/jgm/pandoc/releases/download/${{ matrix.pandoc-version }}/pandoc-${{ matrix.pandoc-version }}-1-amd64.deb

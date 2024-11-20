@@ -24,7 +24,7 @@ wheels = [
 
 [[package]]
 name = "pandoc-numbering"
-version = "3.4.3.0.post1.dev1"
+version = "3.4.3.0.post1.dev2"
 source = { editable = "." }
 dependencies = [
     { name = "panflute" },
