@@ -101,7 +101,7 @@ dependencies = [
   "pydoclint[flake8]~=0.5",
   "teyit~=0.4",
   "refurb~=2.0",
-  "ruff~=0.7"
+  "ruff~=0.8"
 ]
 
 [tool.hatch.envs.hatch-static-analysis.scripts]
