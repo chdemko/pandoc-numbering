@@ -1,13 +1,13 @@
 Install
 =======
 
-[![Python package](https://github.com/chdemko/pandoc-numbering/workflows/Python%20package/badge.svg?branch=develop)](https://github.com/chdemko/pandoc-numbering/actions/workflows/python-package.yml)
+[![Python package](https://img.shields.io/github/actions/workflow/status/chdemko/pandoc-numbering/python-package.yml?logo=github&branch=develop)](https://github.com/chdemko/pandoc-numbering/actions/workflows/python-package.yml)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://pypi.org/project/black/)
 [![Coveralls](https://img.shields.io/coveralls/github/chdemko/pandoc-numbering/develop.svg?logo=Codecov&logoColor=white)](https://coveralls.io/github/chdemko/pandoc-numbering?branch=develop)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
-[![Code Climate](https://codeclimate.com/github/chdemko/pandoc-numbering/badges/gpa.svg)](https://codeclimate.com/github/chdemko/pandoc-numbering/)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability/chdemko/pandoc-numbering?logo=codeclimate&barnch=develop)](https://codeclimate.com/github/chdemko/pandoc-numbering/)
 [![CodeFactor](https://img.shields.io/codefactor/grade/github/chdemko/pandoc-numbering/develop.svg?logo=codefactor)](https://www.codefactor.io/repository/github/chdemko/pandoc-numbering)
 [![Codacy](https://img.shields.io/codacy/grade/36051716c52147bca7a7f4c1ca6bc998.svg?logo=codacy)](https://app.codacy.com/gh/chdemko/pandoc-numbering/dashboard)
 [![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
@@ -16,7 +16,7 @@ Install
 [![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering?logo=pypi&logoColor=white)](https://pepy.tech/project/pandoc-numbering)
 [![Development Status](https://img.shields.io/pypi/status/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
 [![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg?logo=Python&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
-[![Pandoc version](https://img.shields.io/badge/pandoc-2.14%20|%202.15%20|%202.16%20|%202.17%20|%202.18%20|%202.19%20|%203.0%20|%203.1%20|%203.2%20|%203.3%20|%203.4%20|%203.5-blue.svg?logo=markdown)](https://pandoc.org/)
+[![Pandoc version](https://img.shields.io/badge/pandoc-2.14%20..%203.6-blue.svg?logo=markdown)](https://pandoc.org/)
 [![Latest release](https://img.shields.io/github/release-date/chdemko/pandoc-numbering.svg?logo=github)](https://github.com/chdemko/pandoc-numbering/releases)
 [![Last commit](https://img.shields.io/github/last-commit/chdemko/pandoc-numbering/develop?logo=github)](https://github.com/chdemko/pandoc-numbering/commit/develop/)
 [![Repo Size](https://img.shields.io/github/repo-size/chdemko/pandoc-numbering.svg?logo=github)](http://pandoc-numbering.readthedocs.io/en/latest/)
