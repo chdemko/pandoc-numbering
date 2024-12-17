@@ -42,9 +42,9 @@ pandoc-numbering:
 
 # Title
 
-[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
+[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise .exercise-1-1 .exercise-first}
 
-[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise}
+[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise .exercise-1-2 .exercise-second}
 
 See [[**Exercise exercise 1.1 1 1 2**]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise 1")
 
@@ -119,9 +119,9 @@ pandoc-numbering:
 
 # Title
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise .exercise-1-1 .exercise-first}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise .exercise-1-2 .exercise-second}
 
 See [[**Exercise exercise 1.1 1 1 `\pageref{exercise:first}`{=tex}**]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise 1")
 
@@ -168,9 +168,9 @@ pandoc-numbering:
 
 # Title
 
-[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
+[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise .exercise-1-1 .exercise-first}
 
-[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise}
+[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise .exercise-1-2 .exercise-second}
 
 See [[Exercise 1]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise exercise 1.1 1 1 2")
 
@@ -245,9 +245,9 @@ pandoc-numbering:
 
 # Title
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.1}{\ignorespaces {Exercise}}}`{=tex}[]{#exercise:title.1}[**Exercise 1**]{#exercise:first .pandoc-numbering-text .exercise .exercise-1-1 .exercise-first}
 
-`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise}
+`\phantomsection\addcontentsline{exercise}{exercise}{\protect\numberline {1.2}{\ignorespaces {Title}}}`{=tex}[]{#exercise:title.title}[**Exercise 2** *(Title)*]{#exercise:second .pandoc-numbering-text .exercise .exercise-1-2 .exercise-second}
 
 See [[Exercise 1]{.pandoc-numbering-link .exercise}](#exercise:first "Exercise exercise 1.1 1 1 2 \pageref{exercise:first}")
 
