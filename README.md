@@ -5,6 +5,8 @@ Install
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://pypi.org/project/black/)
+[![Linting - Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Types - Mypy](https://img.shields.io/badge/types-Mypy-blue.svg)](https://github.com/python/mypy)
 [![Coveralls](https://img.shields.io/coveralls/github/chdemko/pandoc-numbering/develop.svg?logo=Codecov&logoColor=white)](https://coveralls.io/github/chdemko/pandoc-numbering?branch=develop)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/chdemko/pandoc-numbering.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/chdemko/pandoc-numbering/)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/chdemko/pandoc-numbering?logo=codeclimate&barnch=develop)](https://codeclimate.com/github/chdemko/pandoc-numbering/)

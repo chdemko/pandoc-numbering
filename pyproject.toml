@@ -70,10 +70,10 @@ dependencies = [
   # Types
   "types-PyYAML~=6.0",
   # Formatter
-  "black[jupyter]~=24.10",
+  "black[jupyter]~=25.1",
   # Style checkers
   "doc8~=1.1",
-  "mypy~=1.13",
+  "mypy~=1.15",
   "flake8~=7.1",
   "flake8-pyproject~=1.2",
   "flake8-annotations-complexity~=0.0",
@@ -98,10 +98,10 @@ dependencies = [
   "flake8-variables-names~=0.0",
   "pep8-naming~=0.14",
   "darglint~=1.8.1",
-  "pydoclint[flake8]~=0.5",
+  "pydoclint[flake8]~=0.6",
   "teyit~=0.4",
   "refurb~=2.0",
-  "ruff~=0.8"
+  "ruff~=0.9"
 ]
 
 [tool.hatch.envs.hatch-static-analysis.scripts]
