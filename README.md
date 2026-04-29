@@ -15,7 +15,7 @@ Install
 [![PyPI version](https://img.shields.io/pypi/v/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
 [![PyPI format](https://img.shields.io/pypi/format/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
 [![License](https://img.shields.io/pypi/l/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://raw.githubusercontent.com/chdemko/pandoc-numbering/develop/LICENSE)
-[![Downloads](https://img.shields.io/pypi/dm/pandoc-numbering?logo=pypi&logoColor=white)](https://pepy.tech/project/pandoc-numbering)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/pandoc-numbering?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/pandoc-numbering)
 [![Development Status](https://img.shields.io/pypi/status/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
 [![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg?logo=Python&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
 [![Pandoc version](https://img.shields.io/badge/pandoc-3.8%20..%203.9-blue.svg?logo=markdown)](https://pandoc.org/)
