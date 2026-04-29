@@ -29,8 +29,8 @@ pandoc-numbering:
 
 # List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
--   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
--   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
+- [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
+- [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise .exercise-1}
 
@@ -65,8 +65,8 @@ pandoc-numbering:
 
 # List of exercises {.pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
--   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
--   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
+- [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
+- [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise .exercise-1}
 
@@ -101,8 +101,8 @@ pandoc-numbering:
 
 # List of exercises {#myident .pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
--   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
--   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
+- [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
+- [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise .exercise-1}
 
@@ -139,8 +139,8 @@ pandoc-numbering:
 
 # List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise}
 
--   [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
--   [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
+- [[Exercise 1]{.pandoc-numbering-entry .exercise}](#exercise:1)
+- [[Title]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise .exercise-1}
 
@@ -241,8 +241,8 @@ pandoc-numbering:
 
 # List of exercises {#list-of-exercises .pandoc-numbering-listing .exercise .unnumbered .unlisted}
 
--   [[1 Exercise]{.pandoc-numbering-entry .exercise}](#exercise:1)
--   [[2 Exercise (Title)]{.pandoc-numbering-entry .exercise}](#exercise:2)
+- [[1 Exercise]{.pandoc-numbering-entry .exercise}](#exercise:1)
+- [[2 Exercise (Title)]{.pandoc-numbering-entry .exercise}](#exercise:2)
 
 [**Exercise 1**]{#exercise:1 .pandoc-numbering-text .exercise .exercise-1}
 

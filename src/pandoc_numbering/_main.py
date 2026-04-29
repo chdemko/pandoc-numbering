@@ -96,133 +96,145 @@ class Numbered:
     ]
 
     @property
-    def tag(self):
+    def tag(self) -> str:
         """
         Get the tag property.
 
         Returns
         -------
+        str
             The tag property.
         """
         return self._tag
 
     @property
-    def entry(self):
+    def entry(self) -> str:
         """
         Get the entry property.
 
         Returns
         -------
+        str
             The entry property.
         """
         return self._entry
 
     @property
-    def link(self):
+    def link(self) -> str:
         """
         Get the link property.
 
         Returns
         -------
+        str
             The link property.
         """
         return self._link
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get the title property.
 
         Returns
         -------
+        str
             The title property.
         """
         return self._title
 
     @property
-    def description(self):
+    def description(self) -> str:
         """
         Get the description property.
 
         Returns
         -------
+        str
             The description property.
         """
         return self._description
 
     @property
-    def global_number(self):
+    def global_number(self) -> str:
         """
         Get the global_number property.
 
         Returns
         -------
+        str
             The global_number property.
         """
         return self._global_number
 
     @property
-    def section_number(self):
+    def section_number(self) -> str:
         """
         Get the section_number property.
 
         Returns
         -------
+        str
             The section_number property.
         """
         return self._section_number
 
     @property
-    def section_alias(self):
+    def section_alias(self) -> str:
         """
         Get the section_alias property.
 
         Returns
         -------
+        str
             The section_alias property.
         """
         return self._section_alias
 
     @property
-    def alias(self):
+    def alias(self) -> str:
         """
         Get the alias property.
 
         Returns
         -------
+        str
             The alias property.
         """
         return self._alias
 
     @property
-    def local_number(self):
+    def local_number(self) -> str:
         """
         Get the local_number property.
 
         Returns
         -------
+        str
             The local_number property.
         """
         return self._local_number
 
     @property
-    def category(self):
+    def category(self) -> str:
         """
         Get the category property.
 
         Returns
         -------
+        str
             The category property.
         """
         return self._category
 
     @property
-    def caption(self):
+    def caption(self) -> str:
         """
         Get the caption property.
 
         Returns
         -------
+        str
             The caption property.
         """
         return self._caption
@@ -761,7 +773,7 @@ def to_latex(elem: Element) -> Any:
         run_filters([remove_useless_latex], doc=Plain(elem)),
         input_format="panflute",
         output_format="latex",
-        extra_args=["--no-highlight"],
+        extra_args=["--syntax-highlighting=none"],
     )
 
 
@@ -1521,8 +1533,7 @@ def finalize(doc: Doc):
         doc.metadata["header-includes"].append(
             MetaInlines(
                 RawInline(
-                    dedent(
-                        r"""
+                    dedent(r"""
                         \makeatletter
                         \@ifpackageloaded{subfig}{
                             \usepackage[subfigure]{tocloft}
@@ -1530,8 +1541,7 @@ def finalize(doc: Doc):
                             \usepackage{tocloft}
                         }
                         \makeatother
-                        """
-                    ),
+                        """),
                     "tex",
                 )
             )
