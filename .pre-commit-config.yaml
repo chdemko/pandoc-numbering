@@ -1,12 +1,12 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-toml
   - id: check-yaml
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.14.0
+  rev: v2.16.0
   hooks:
   - id: pretty-format-toml
     args: [--autofix, --no-sort]
@@ -14,7 +14,7 @@ repos:
     args: [--autofix]
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.18.0
+  rev: v3.21.2
   hooks:
   - id: pyupgrade
     args: [--py310-plus]

@@ -773,7 +773,7 @@ def to_latex(elem: Element) -> Any:
         run_filters([remove_useless_latex], doc=Plain(elem)),
         input_format="panflute",
         output_format="latex",
-        extra_args=["--no-highlight"],
+        extra_args=["--syntax-highlighting=none"],
     )
 
 
@@ -1533,8 +1533,7 @@ def finalize(doc: Doc):
         doc.metadata["header-includes"].append(
             MetaInlines(
                 RawInline(
-                    dedent(
-                        r"""
+                    dedent(r"""
                         \makeatletter
                         \@ifpackageloaded{subfig}{
                             \usepackage[subfigure]{tocloft}
@@ -1542,8 +1541,7 @@ def finalize(doc: Doc):
                             \usepackage{tocloft}
                         }
                         \makeatother
-                        """
-                    ),
+                        """),
                     "tex",
                 )
             )
