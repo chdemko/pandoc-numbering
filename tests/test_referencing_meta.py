@@ -14,8 +14,8 @@ pandoc-numbering:
     general:
       cite-shortcut: True
     standard:
-      format-link-classic: '**%D %d %g %s %n %c**' 
-      format-link-title: '**%D %d %T %t %g %s %n %c**' 
+      format-link-classic: '**%D %d %g %s %n %c**'
+      format-link-title: '**%D %d %T %t %g %s %n %c**'
 ---
 
 Title

@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.14']
     steps:
     - uses: actions/checkout@v6
       with:
@@ -23,7 +23,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Hatch
       run: |
-        pipx install hatch==1.16.5
+        pipx install hatch
     - name: Build and publish
       env:
         HATCH_INDEX_USER: ${{ secrets.PYPI_USERNAME }}

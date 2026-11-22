@@ -9,11 +9,11 @@ class TermTest(TestCase):
             self,
             r"""
 Definition #
-:   This is the definition
+: This is the definition
             """,
             r"""
 [**Definition 1**]{#definition:1 .pandoc-numbering-text .definition .definition-1}
-:   This is the definition
+: This is the definition
             """,
         )
 
@@ -22,11 +22,11 @@ Definition #
             self,
             r"""
 Definition (This is the title) #
-:   This is the definition
+: This is the definition
             """,
             r"""
 []{#definition:this-is-the-title}[**Definition 1** *(This is the title)*]{#definition:1 .pandoc-numbering-text .definition .definition-1}
-:   This is the definition
+: This is the definition
             """,
         )
 
@@ -37,39 +37,39 @@ Definition (This is the title) #
             """
 Assumption #big
 
-:   Big assumption
+: Big assumption
 
 Lemma #
 
-:   A random lemma
+: A random lemma
 
 Lemma #
 
-:   A random lemma
+: A random lemma
 
 Now we derive a result which uses [Assumption #](#assumption:big).
 
 Lemma #
 
-:   Under [Assumption #](#assumption:big), we have ... 
+: Under [Assumption #](#assumption:big), we have ...
             """,
             """
 []{#assumption:1}[**Assumption 1**]{#assumption:big .pandoc-numbering-text .assumption .assumption-1 .assumption-big}
 
-:   Big assumption
+: Big assumption
 
 [**Lemma 1**]{#lemma:1 .pandoc-numbering-text .lemma .lemma-1}
 
-:   A random lemma
+: A random lemma
 
 [**Lemma 2**]{#lemma:2 .pandoc-numbering-text .lemma .lemma-2}
 
-:   A random lemma
+: A random lemma
 
 Now we derive a result which uses [Assumption 1](#assumption:big).
 
 [**Lemma 3**]{#lemma:3 .pandoc-numbering-text .lemma .lemma-3}
 
-:   Under [Assumption 1](#assumption:big), we have ...
+: Under [Assumption 1](#assumption:big), we have ...
             """,
         )

@@ -23,12 +23,7 @@ repos:
   hooks:
   - id: format
     name: format
-    entry: hatch fmt --check
-    language: system
-    pass_filenames: false
-  - id: lint
-    name: lint
-    entry: hatch run lint:check
+    entry: hatch check
     language: system
     pass_filenames: false
   - id: test

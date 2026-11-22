@@ -3,15 +3,15 @@ from panflute import convert_text
 import pandoc_numbering
 
 
-def conversion(markdown, format="markdown"):
+def conversion(markdown, output_format="markdown"):
     doc = convert_text(markdown, standalone=True)
-    doc.format = format
+    doc.format = output_format
     pandoc_numbering.main(doc)
     return doc
 
 
-def verify_conversion(test, markdown, expected, format="markdown"):
-    doc = conversion(markdown, format)
+def verify_conversion(test, markdown, expected, output_format="markdown"):
+    doc = conversion(markdown, output_format)
     text = convert_text(
         doc,
         input_format="panflute",
