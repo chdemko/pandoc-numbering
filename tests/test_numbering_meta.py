@@ -71,7 +71,7 @@ pandoc-numbering:
             self,
             r"""
 ---
-pandoc-numbering: 
+pandoc-numbering:
   exercise:
     general:
       first-section-level: 2
@@ -122,7 +122,7 @@ pandoc-numbering:
             self,
             r"""
 ---
-pandoc-numbering: 
+pandoc-numbering:
   exercise:
     general:
       sectioning-levels: '-.+.'

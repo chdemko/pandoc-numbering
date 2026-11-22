@@ -3,9 +3,8 @@
 import datetime
 import os
 import sys
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 with Path("..", "pyproject.toml").resolve().open("rb") as f:
     data = tomllib.load(f)

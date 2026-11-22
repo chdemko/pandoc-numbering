@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # pylint: disable=too-many-lines
 
 """Pandoc filter to number all kinds of things."""
@@ -8,8 +6,9 @@ import copy
 import re
 import unicodedata
 from functools import partial
+from re import Match
 from textwrap import dedent
-from typing import Any
+from typing import Any, cast
 
 from panflute import (
     BlockQuote,
@@ -27,6 +26,7 @@ from panflute import (
     Header,
     HorizontalRule,
     Image,
+    Inline,
     LineBlock,
     LineBreak,
     LineItem,
@@ -56,6 +56,8 @@ from panflute import (
     stringify,
 )
 
+MAX_HEADER_LEVEL = 6
+
 
 # pylint: disable=bad-option-value,useless-object-inheritance
 class Numbered:
@@ -72,31 +74,53 @@ class Numbered:
 
     # pylint: disable=too-many-instance-attributes
     __slots__ = [
-        "_elem",
-        "_doc",
-        "_match",
-        "_tag",
-        "_entry",
-        "_link",
-        "_caption",
-        "_title",
-        "_description",
-        "_category",
+        "_alias",
         "_basic_category",
+        "_caption",
+        "_category",
         "_classes",
+        "_description",
+        "_doc",
+        "_elem",
+        "_entry",
         "_first_section_level",
+        "_global_number",
         "_last_section_level",
         "_leading",
-        "_number",
-        "_global_number",
-        "_section_number",
+        "_link",
         "_local_number",
+        "_match",
+        "_number",
         "_section_alias",
-        "_alias",
+        "_section_number",
+        "_tag",
+        "_title",
     ]
 
+    _elem: Element
+    _doc: Doc
+    _tag: str | None
+    _entry: Span
+    _link: Span
+    _caption: str | None
+    _title: list[Any] | None
+    _description: list[Any] | None
+    _category: str | None
+    _basic_category: str | None
+    _classes: list[str] | None
+    _first_section_level: int | None
+    _last_section_level: int | None
+    _leading: str | None
+    _number: str | None
+    _global_number: str | None
+    _section_number: str | None
+    _local_number: str | None
+    _section_alias: str | None
+    _alias: str | None
+    _match: Match[str] | None
+
     @property
-    def tag(self) -> str:
+    def tag(self) -> str | None:
         """
         Get the tag property.
 
@@ -108,7 +132,7 @@ class Numbered:
         return self._tag
 
     @property
-    def entry(self) -> str:
+    def entry(self) -> Span:
         """
         Get the entry property.
 
@@ -120,7 +144,7 @@ class Numbered:
         return self._entry
 
     @property
-    def link(self) -> str:
+    def link(self) -> Span:
         """
         Get the link property.
 
@@ -132,7 +156,7 @@ class Numbered:
         return self._link
 
     @property
-    def title(self) -> str:
+    def title(self) -> list[Any] | None:
         """
         Get the title property.
 
@@ -144,7 +168,7 @@ class Numbered:
         return self._title
 
     @property
-    def description(self) -> str:
+    def description(self) -> list[Any] | None:
         """
         Get the description property.
 
@@ -156,7 +180,7 @@ class Numbered:
         return self._description
 
     @property
-    def global_number(self) -> str:
+    def global_number(self) -> str | None:
         """
         Get the global_number property.
 
@@ -168,7 +192,7 @@ class Numbered:
         return self._global_number
 
     @property
-    def section_number(self) -> str:
+    def section_number(self) -> str | None:
         """
         Get the section_number property.
 
@@ -180,7 +204,7 @@ class Numbered:
         return self._section_number
 
     @property
-    def section_alias(self) -> str:
+    def section_alias(self) -> str | None:
         """
         Get the section_alias property.
 
@@ -192,7 +216,7 @@ class Numbered:
         return self._section_alias
 
     @property
-    def alias(self) -> str:
+    def alias(self) -> str | None:
         """
         Get the alias property.
 
@@ -204,7 +228,7 @@ class Numbered:
         return self._alias
 
     @property
-    def local_number(self) -> str:
+    def local_number(self) -> str | None:
         """
         Get the local_number property.
 
@@ -216,7 +240,7 @@ class Numbered:
         return self._local_number
 
     @property
-    def category(self) -> str:
+    def category(self) -> str | None:
         """
         Get the category property.
 
@@ -228,7 +252,7 @@ class Numbered:
         return self._category
 
     @property
-    def caption(self) -> str:
+    def caption(self) -> str | None:
         """
         Get the caption property.
 
@@ -246,7 +270,7 @@ class Numbered:
     double_sharp_regex = "^" + _regex + "#" + number_regex + "$"
 
     @staticmethod
-    def _remove_accents(string):
+    def _remove_accents(string: str) -> str:
         nfkd_form = unicodedata.normalize("NFKD", string)
         # pylint: disable=redundant-u-string-prefix
         return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
@@ -295,6 +319,7 @@ class Numbered:
         self._local_number = None
         self._section_alias = None
         self._alias = None
+        self._match = None
 
         if self._get_content() and isinstance(self._get_content()[-1], Str):
             self._match = re.match(Numbered.marker_regex, self._get_content()[-1].text)
@@ -303,25 +328,25 @@ class Numbered:
             elif re.match(Numbered.double_sharp_regex, self._get_content()[-1].text):
                 self._replace_double_sharp()
 
-    def _set_content(self, content):
+    def _set_content(self, content: Any) -> None:
         if isinstance(self._elem, Para):
             self._elem.content = content
         elif isinstance(self._elem, DefinitionItem):
             self._elem.term = content
 
-    def _get_content(self):
+    def _get_content(self) -> Any:
         if isinstance(self._elem, Para):
             return self._elem.content
         if isinstance(self._elem, DefinitionItem):
             return self._elem.term
         return None
 
-    def _replace_double_sharp(self):
+    def _replace_double_sharp(self) -> None:
         self._get_content()[-1].text = self._get_content()[-1].text.replace(
             "##", "#", 1
         )
 
-    def _replace_marker(self):
+    def _replace_marker(self) -> None:
         self._compute_title()
         self._compute_description()
         self._compute_basic_category()
@@ -337,7 +362,7 @@ class Numbered:
         self._compute_global_number()
         self._compute_data()
 
-    def _compute_title(self):
+    def _compute_title(self) -> None:
         self._title = []
         if (
             isinstance(self._get_content()[-3], Str)
@@ -345,35 +370,35 @@ class Numbered:
         ):
             for i, item in enumerate(self._get_content()):
                 if isinstance(item, Str) and item.text[0] == "(":
-                    self._title = self._get_content()[i:-2]
+                    title = self._get_content()[i:-2]
                     # Detach from original parent
-                    self._title.parent = None
-                    self._title[0].text = self._title[0].text[1:]
-                    self._title[-1].text = self._title[-1].text[:-1]
+                    title.parent = None
+                    title[0].text = title[0].text[1:]
+                    title[-1].text = title[-1].text[:-1]
+                    self._title = list(title)
                     del self._get_content()[i - 1 : -2]
                     break
-        self._title = list(self._title)
 
-    def _compute_description(self):
-        self._description = self._get_content()[:-2]
+    def _compute_description(self) -> None:
+        description = self._get_content()[:-2]
         # Detach from original parent
-        self._description.parent = None
-        self._description = list(self._description)
+        description.parent = None
+        self._description = list(description)
 
-    def _compute_basic_category(self):
-        if self._match.group("prefix") is None:
+    def _compute_basic_category(self) -> None:
+        if self._match.group("prefix") is None:  # type: ignore[union-attr]
             self._basic_category = Numbered.identifier(
-                "".join(map(stringify, self._description))
+                "".join(map(stringify, self._description))  # type: ignore[arg-type]
             )
         else:
-            self._basic_category = self._match.group("prefix")
+            self._basic_category = self._match.group("prefix")  # type: ignore[union-attr]
         if self._basic_category not in self._doc.defined:
             define(self._basic_category, self._doc)
 
-    def _compute_levels(self):
+    def _compute_levels(self) -> None:
         # Compute the first and last section level values
-        self._first_section_level = len(self._match.group("hidden")) // 2
-        self._last_section_level = len(self._match.group("header")) // 2
+        self._first_section_level = len(self._match.group("hidden")) // 2  # type: ignore[union-attr]
+        self._last_section_level = len(self._match.group("header")) // 2  # type: ignore[union-attr]
 
         # Get the default first and last section level
         if self._first_section_level == self._last_section_level == 0:
@@ -384,27 +409,27 @@ class Numbered:
                 "last-section-level"
             ]
 
-    def _compute_section_number(self):
+    def _compute_section_number(self) -> None:
         self._section_number = ".".join(
             map(str, self._doc.headers[: self._last_section_level])
         )
 
-    def _compute_section_alias(self):
+    def _compute_section_alias(self) -> None:
         strings = list(map(str, self._doc.aliases[: self._last_section_level]))
         for index, string in enumerate(strings):
             if string == "":
                 strings[index] = "0"
         self._section_alias = ".".join(strings)
 
-    def _compute_leading(self):
+    def _compute_leading(self) -> None:
         # Compute the leading (composed of the section numbering and a dot)
         if self._last_section_level != 0:
-            self._leading = self._section_number + "."
+            self._leading = self._section_number + "."  # type: ignore[operator]
         else:
             self._leading = ""
 
-    def _compute_category(self):
-        self._category = self._basic_category + ":" + self._leading
+    def _compute_category(self) -> None:
+        self._category = self._basic_category + ":" + self._leading  # type: ignore[operator]
 
         # Is it a new category?
         if self._category not in self._doc.count:
@@ -412,20 +437,22 @@ class Numbered:
 
         self._doc.count[self._category] = self._doc.count[self._category] + 1
 
-    def _compute_number(self):
+    def _compute_number(self) -> None:
         self._number = str(self._doc.count[self._category])
 
-    def _compute_tag(self):
+    def _compute_tag(self) -> None:
         self._classes = [
-            self._category[:-1].replace(":", "-").replace(".", "-") + "-" + self._number
+            self._category[:-1].replace(":", "-").replace(".", "-")  # type: ignore[index,operator]
+            + "-"
+            + self._number
         ]
 
         # Determine the final tag
-        if self._match.group("name") is None:
-            self._tag = self._category + self._number
+        if self._match.group("name") is None:  # type: ignore[union-attr]
+            self._tag = self._category + self._number  # type: ignore[operator]
         else:
-            self._tag = self._basic_category + ":" + self._match.group("name")
-            self._classes.append(self._basic_category + "-" + self._match.group("name"))
+            self._tag = self._basic_category + ":" + self._match.group("name")  # type: ignore[operator,union-attr]
+            self._classes.append(self._basic_category + "-" + self._match.group("name"))  # type: ignore[operator,union-attr]
 
         # Compute collections
         if self._basic_category not in self._doc.collections:
@@ -433,53 +460,56 @@ class Numbered:
 
         self._doc.collections[self._basic_category].append(self._tag)
 
-    def _compute_alias(self):
+    def _compute_alias(self) -> None:
         # Determine the final alias
         if not self._title:
             if self._section_alias:
                 self._alias = (
-                    self._basic_category
+                    self._basic_category  # type: ignore[operator]
                     + ":"
                     + self._section_alias
                     + "."
                     + self._number
                 )
             else:
-                self._alias = self._basic_category + ":" + self._number
+                self._alias = self._basic_category + ":" + self._number  # type: ignore[operator]
+        elif self._section_alias:
+            self._alias = (
+                self._basic_category  # type: ignore[operator]
+                + ":"
+                + self._section_alias
+                + "."
+                + Numbered.identifier(stringify(Span(*self._title)))
+            )
         else:
-            if self._section_alias:
-                self._alias = (
-                    self._basic_category
-                    + ":"
-                    + self._section_alias
-                    + "."
-                    + Numbered.identifier(stringify(Span(*self._title)))
-                )
-            else:
-                self._alias = (
-                    self._basic_category
-                    + ":"
-                    + Numbered.identifier(stringify(Span(*self._title)))
-                )
+            self._alias = (
+                self._basic_category  # type: ignore[operator]
+                + ":"
+                + Numbered.identifier(stringify(Span(*self._title)))
+            )
 
-    def _compute_local_number(self):
+    def _compute_local_number(self) -> None:
         # Replace the '-.-.+.+...#' by the category count (omitting the hidden part)
         self._local_number = ".".join(
             map(
                 str,
-                self._doc.headers[self._first_section_level : self._last_section_level]
-                + [self._number],
+                [
+                    *self._doc.headers[
+                        self._first_section_level : self._last_section_level
+                    ],
+                    self._number,
+                ],
             )
         )
 
-    def _compute_global_number(self):
+    def _compute_global_number(self) -> None:
         # Compute the global number
         if self._section_number:
-            self._global_number = self._section_number + "." + self._number
+            self._global_number = self._section_number + "." + self._number  # type: ignore[operator]
         else:
             self._global_number = self._number
 
-    def _compute_data(self):
+    def _compute_data(self) -> None:
         # pylint: disable=too-many-statements,no-member
         classes = self._doc.defined[self._basic_category]["classes"]
         if self._alias == self._tag:
@@ -487,18 +517,18 @@ class Numbered:
                 [
                     Span(),
                     Span(
-                        identifier=self._tag,
-                        classes=["pandoc-numbering-text"] + classes + self._classes,
+                        identifier=self._tag,  # type: ignore[arg-type]
+                        classes=["pandoc-numbering-text", *classes, *self._classes],  # type: ignore[misc]
                     ),
                 ]
             )
         else:
             self._set_content(
                 [
-                    Span(identifier=self._alias),
+                    Span(identifier=self._alias),  # type: ignore[arg-type]
                     Span(
-                        identifier=self._tag,
-                        classes=["pandoc-numbering-text"] + classes + self._classes,
+                        identifier=self._tag,  # type: ignore[arg-type]
+                        classes=["pandoc-numbering-text", *classes, *self._classes],  # type: ignore[misc]
                     ),
                 ]
             )
@@ -534,56 +564,58 @@ class Numbered:
             ]
 
         # Compute caption (delay replacing %c at the end)
-        title = stringify(Span(*self._title))
-        description = stringify(Span(*self._description))
+        title = stringify(Span(*self._title))  # type: ignore[misc]
+        description = stringify(Span(*self._description))  # type: ignore[misc]
         self._caption = self._caption.replace("%t", title.lower())
         self._caption = self._caption.replace("%T", title)
         self._caption = self._caption.replace("%d", description.lower())
         self._caption = self._caption.replace("%D", description)
-        self._caption = self._caption.replace("%s", self._section_number)
-        self._caption = self._caption.replace("%g", self._global_number)
-        self._caption = self._caption.replace("%n", self._local_number)
-        self._caption = self._caption.replace("#", self._local_number)
+        self._caption = self._caption.replace("%s", self._section_number)  # type: ignore[arg-type]
+        self._caption = self._caption.replace("%g", self._global_number)  # type: ignore[arg-type]
+        self._caption = self._caption.replace("%n", self._local_number)  # type: ignore[arg-type]
+        self._caption = self._caption.replace("#", self._local_number)  # type: ignore[arg-type]
         if self._doc.format in {"tex", "latex"}:
-            self._caption = self._caption.replace("%p", "\\pageref{" + self._tag + "}")
+            self._caption = self._caption.replace(
+                "%p", "\\pageref{" + self._tag + "}"  # type: ignore[operator]
+            )
 
         # Compute content
         if isinstance(self._elem, DefinitionItem):
-            replace_description(Plain(*self._elem.term), self._description)
-            replace_title(Plain(*self._elem.term), self._title)
-            replace_global_number(Plain(*self._elem.term), self._global_number)
-            replace_section_number(Plain(*self._elem.term), self._section_number)
-            replace_local_number(Plain(*self._elem.term), self._local_number)
+            replace_description(Plain(*self._elem.term), self._description)  # type: ignore[arg-type]
+            replace_title(Plain(*self._elem.term), self._title)  # type: ignore[arg-type]
+            replace_global_number(Plain(*self._elem.term), self._global_number)  # type: ignore[arg-type]
+            replace_section_number(Plain(*self._elem.term), self._section_number)  # type: ignore[arg-type]
+            replace_local_number(Plain(*self._elem.term), self._local_number)  # type: ignore[arg-type]
         else:
-            replace_description(self._elem, self._description)
-            replace_title(self._elem, self._title)
-            replace_global_number(self._elem, self._global_number)
-            replace_section_number(self._elem, self._section_number)
-            replace_local_number(self._elem, self._local_number)
+            replace_description(self._elem, self._description)  # type: ignore[arg-type]
+            replace_title(self._elem, self._title)  # type: ignore[arg-type]
+            replace_global_number(self._elem, self._global_number)  # type: ignore[arg-type]
+            replace_section_number(self._elem, self._section_number)  # type: ignore[arg-type]
+            replace_local_number(self._elem, self._local_number)  # type: ignore[arg-type]
 
         # Compute link
-        replace_description(self._link, self._description)
-        replace_title(self._link, self._title)
-        replace_global_number(self._link, self._global_number)
-        replace_section_number(self._link, self._section_number)
-        replace_local_number(self._link, self._local_number)
+        replace_description(self._link, self._description)  # type: ignore[arg-type]
+        replace_title(self._link, self._title)  # type: ignore[arg-type]
+        replace_global_number(self._link, self._global_number)  # type: ignore[arg-type]
+        replace_section_number(self._link, self._section_number)  # type: ignore[arg-type]
+        replace_local_number(self._link, self._local_number)  # type: ignore[arg-type]
         if self._doc.format in {"tex", "latex"}:
-            replace_page_number(self._link, self._tag)
+            replace_page_number(self._link, self._tag)  # type: ignore[arg-type]
 
         # Compute entry
-        replace_description(self._entry, self._description)
-        replace_title(self._entry, self._title)
-        replace_global_number(self._entry, self._global_number)
-        replace_section_number(self._entry, self._section_number)
-        replace_local_number(self._entry, self._local_number)
+        replace_description(self._entry, self._description)  # type: ignore[arg-type]
+        replace_title(self._entry, self._title)  # type: ignore[arg-type]
+        replace_global_number(self._entry, self._global_number)  # type: ignore[arg-type]
+        replace_section_number(self._entry, self._section_number)  # type: ignore[arg-type]
+        replace_local_number(self._entry, self._local_number)  # type: ignore[arg-type]
 
         # Finalize the content
         if self._doc.format in {"tex", "latex"}:
-            latex_category = re.sub("[^a-z]+", "", self._basic_category)
+            latex_category = re.sub("[^a-z]+", "", self._basic_category)  # type: ignore[arg-type]
             latex = (
                 "\\phantomsection"
                 f"\\addcontentsline{{{latex_category}}}{{{latex_category}}}"
-                f"{{\\protect\\numberline {{{self._leading + self._number}}}"
+                f"{{\\protect\\numberline {{{self._leading + self._number}}}"  # type: ignore[operator]
                 f"{{\\ignorespaces {to_latex(self._entry)}"
                 "}}"
             )
@@ -632,7 +664,7 @@ def replace_title(where: Element, title: list[Element]) -> None:
     )
 
 
-def replace_section_number(where: Element, section_number: int) -> None:
+def replace_section_number(where: Element, section_number: str) -> None:
     """
     Replace section number in where.
 
@@ -646,7 +678,7 @@ def replace_section_number(where: Element, section_number: int) -> None:
     where.walk(partial(replacing, search="%s", replace=[Str(section_number)]))
 
 
-def replace_global_number(where: Element, global_number: int) -> None:
+def replace_global_number(where: Element, global_number: str) -> None:
     """
     Replace global number in where.
 
@@ -660,7 +692,7 @@ def replace_global_number(where: Element, global_number: int) -> None:
     where.walk(partial(replacing, search="%g", replace=[Str(global_number)]))
 
 
-def replace_local_number(where: Element, local_number: int) -> None:
+def replace_local_number(where: Element, local_number: str) -> None:
     """
     Replace local number in where.
 
@@ -675,7 +707,7 @@ def replace_local_number(where: Element, local_number: int) -> None:
     where.walk(partial(replacing, search="#", replace=[Str(local_number)]))
 
 
-def replace_page_number(where: Element, tag: str):
+def replace_page_number(where: Element, tag: str) -> None:
     """
     Replace page number in where.
 
@@ -707,7 +739,7 @@ def replace_count(where: Element, count: str) -> None:
     where.walk(partial(replacing, search="%c", replace=[Str(count)]))
 
 
-def remove_useless_latex(elem: Element, _) -> list[Element] | None:
+def remove_useless_latex(elem: Element, _: Any) -> list[Element] | None:
     """
     Clean up LaTeX element for entries.
 
@@ -755,7 +787,7 @@ def remove_useless_latex(elem: Element, _) -> list[Element] | None:
     return None
 
 
-def to_latex(elem: Element) -> Any:
+def to_latex(elem: Element) -> str:
     """
     Convert element to LaTeX.
 
@@ -766,14 +798,18 @@ def to_latex(elem: Element) -> Any:
 
     Returns
     -------
-    Any
+    str
         LaTex string
     """
-    return convert_text(
-        run_filters([remove_useless_latex], doc=Plain(elem)),
-        input_format="panflute",
-        output_format="latex",
-        extra_args=["--syntax-highlighting=none"],
+    doc = Doc(Plain(cast(Inline, elem)))
+    run_filters([remove_useless_latex], doc=doc)
+    return str(
+        convert_text(
+            doc,
+            input_format="panflute",
+            output_format="latex",
+            extra_args=["--syntax-highlighting=none"],
+        )
     )
 
 
@@ -820,13 +856,13 @@ def define(category: str, doc: Doc) -> None:
         doc.defined[category]["format-entry-classic"] = [Str("%D"), Space(), Str("%g")]
 
 
-def lowering(elem: Element, _) -> None:
+def lowering(elem: Element, _: Any) -> None:
     """
     Lower element.
 
     Arguments
     ---------
-    elem
+    elem: Element
         element to lower
     """
     if isinstance(elem, Str):
@@ -835,10 +871,10 @@ def lowering(elem: Element, _) -> None:
 
 def replacing(
     elem: Element,
-    _,
+    _: Any,
     search: str | None = None,
     replace: list[Any] | None = None,
-) -> list[Element]:
+) -> list[Any]:
     """
     Replace an element.
 
@@ -921,7 +957,7 @@ def referencing(elem: Element, doc: Doc) -> Element | None:
     return None
 
 
-def referencing_link(elem: Element, doc: Doc) -> None:
+def referencing_link(elem: Link, doc: Doc) -> None:
     """
     Add a eference link.
 
@@ -962,7 +998,7 @@ def referencing_link(elem: Element, doc: Doc) -> None:
                 elem.title = elem.title.replace("%p", "\\pageref{" + tag + "}")
 
 
-def referencing_cite(elem: Element, doc: Doc) -> Element | None:
+def referencing_cite(elem: Cite, doc: Doc) -> Element | None:
     """
     Cite reference.
 
@@ -1002,7 +1038,7 @@ def referencing_cite(elem: Element, doc: Doc) -> Element | None:
     return None
 
 
-def update_header_numbers(elem: Element, doc: Doc) -> None:
+def update_header_numbers(elem: Header, doc: Doc) -> None:
     """
     Update header numbers.
 
@@ -1019,7 +1055,7 @@ def update_header_numbers(elem: Element, doc: Doc) -> None:
             doc.headers[index] = 0
 
 
-def update_header_aliases(elem: Element, doc: Doc) -> None:
+def update_header_aliases(elem: Header, doc: Doc) -> None:
     """
     Update header aliases.
 
@@ -1062,7 +1098,7 @@ def prepare(doc: Doc) -> None:
     doc.collections = {}
 
 
-def add_definition(category: str, definition: dict[str, MetaList], doc: Doc):
+def add_definition(category: str, definition: Any, doc: Doc) -> None:
     """
     Add definition for a category.
 
@@ -1095,18 +1131,17 @@ def add_definition(category: str, definition: dict[str, MetaList], doc: Doc):
             meta_entry_tab(category, definition["latex"], doc.defined)
             meta_entry_space(category, definition["latex"], doc.defined)
     # Detect standard options
-    else:
-        if "standard" in definition:
-            meta_format_text(category, definition["standard"], doc.defined)
-            meta_format_link(category, definition["standard"], doc.defined)
-            meta_format_caption(category, definition["standard"], doc.defined)
-            meta_format_entry(category, definition["standard"], doc.defined)
+    elif "standard" in definition:
+        meta_format_text(category, definition["standard"], doc.defined)
+        meta_format_link(category, definition["standard"], doc.defined)
+        meta_format_caption(category, definition["standard"], doc.defined)
+        meta_format_entry(category, definition["standard"], doc.defined)
 
 
 def meta_cite(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute cite for a category.
@@ -1132,8 +1167,8 @@ def meta_cite(
 
 def meta_format(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, Element]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
     tag: str,
 ) -> None:
     """
@@ -1165,8 +1200,8 @@ def meta_format(
 # pylint:disable=too-many-branches
 def meta_listing(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute listing for a category.
@@ -1212,8 +1247,8 @@ def meta_listing(
 
 def meta_format_text(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute format text for a category.
@@ -1233,8 +1268,8 @@ def meta_format_text(
 
 def meta_format_link(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute format link for a category.
@@ -1254,8 +1289,8 @@ def meta_format_link(
 
 def meta_format_entry(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute format entry for a category.
@@ -1275,8 +1310,8 @@ def meta_format_entry(
 
 def meta_format_caption(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute format caption for a category.
@@ -1303,8 +1338,8 @@ def meta_format_caption(
 
 def meta_entry(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, float]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
     tag: str,
 ) -> None:
     """
@@ -1323,7 +1358,7 @@ def meta_entry(
     """
     if tag in definition:
         if isinstance(definition[tag], MetaString):
-            value = definition[tag].text
+            value: str = definition[tag].text
         elif (
             isinstance(definition[tag], MetaInlines)
             and len(definition[tag].content) == 1
@@ -1354,8 +1389,8 @@ def meta_entry(
 
 def meta_entry_tab(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, float]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute entry tab for a category.
@@ -1374,8 +1409,8 @@ def meta_entry_tab(
 
 def meta_entry_space(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, float]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute entry space for a category.
@@ -1394,8 +1429,8 @@ def meta_entry_space(
 
 def meta_levels(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, float]],  # noqa: TAE002
+    definition: Any,
+    defined: Any,
 ) -> None:
     """
     Compute level for a category.
@@ -1415,7 +1450,7 @@ def meta_levels(
         and len(definition["sectioning-levels"].content) == 1
     ):
         match = re.match(
-            Numbered.header_regex, definition["sectioning-levels"].content[0].text
+            Numbered.header_regex, stringify(definition["sectioning-levels"].content[0])
         )
         if match:
             # Compute the first and last levels section
@@ -1428,7 +1463,7 @@ def meta_levels(
             isinstance(definition["first-section-level"], MetaInlines)
             and len(definition["first-section-level"].content) == 1
         ):
-            value = definition["first-section-level"].content[0].text
+            value = stringify(definition["first-section-level"].content[0])
         else:
             debug(
                 "[WARNING] pandoc-numbering: "
@@ -1445,7 +1480,7 @@ def meta_levels(
                 "first-section-level is not correct for category " + category
             )
 
-        if 0 <= level <= 6:
+        if 0 <= level <= MAX_HEADER_LEVEL:
             defined[category]["first-section-level"] = level
         else:
             # pylint: disable=line-too-long
@@ -1461,7 +1496,7 @@ def meta_levels(
             isinstance(definition["last-section-level"], MetaInlines)
             and len(definition["last-section-level"].content) == 1
         ):
-            value = definition["last-section-level"].content[0].text
+            value = stringify(definition["last-section-level"].content[0])
         else:
             debug(
                 "[WARNING] pandoc-numbering: "
@@ -1478,7 +1513,7 @@ def meta_levels(
                 "last-section-level is not correct for category " + category
             )
 
-        if 0 <= level <= 6:
+        if 0 <= level <= MAX_HEADER_LEVEL:
             defined[category]["last-section-level"] = level
         else:
             # pylint: disable=line-too-long
@@ -1490,9 +1525,9 @@ def meta_levels(
 
 def meta_classes(
     category: str,
-    definition: dict[str, MetaList],
-    defined: dict[str, dict[str, list[str]]],  # noqa: TAE002
-):
+    definition: Any,
+    defined: Any,
+) -> None:
     """
     Compute classes for a category.
 
@@ -1511,7 +1546,7 @@ def meta_classes(
         ]
 
 
-def finalize(doc: Doc):
+def finalize(doc: Doc) -> None:
     """
     Finalize document.
 
@@ -1522,6 +1557,7 @@ def finalize(doc: Doc):
     """
     # Loop on all listings definition
 
+    header_includes: Any = None
     if doc.format in {"tex", "latex"}:
         # Add header-includes if necessary
         if "header-includes" not in doc.metadata:
@@ -1529,8 +1565,9 @@ def finalize(doc: Doc):
         # Convert header-includes to MetaList if necessary
         elif not isinstance(doc.metadata["header-includes"], MetaList):
             doc.metadata["header-includes"] = MetaList(doc.metadata["header-includes"])
+        header_includes = doc.metadata["header-includes"]
 
-        doc.metadata["header-includes"].append(
+        header_includes.append(
             MetaInlines(
                 RawInline(
                     dedent(r"""
@@ -1546,9 +1583,7 @@ def finalize(doc: Doc):
                 )
             )
         )
-        doc.metadata["header-includes"].append(
-            MetaInlines(RawInline(r"\usepackage{etoolbox}", "tex"))
-        )
+        header_includes.append(MetaInlines(RawInline(r"\usepackage{etoolbox}", "tex")))
 
     i = 0
     listof = []
@@ -1563,22 +1598,12 @@ def finalize(doc: Doc):
                     output_format="latex",
                 )
                 latex = (
-                    r"\newlistof{%s}{%s}{%s}"
-                    r"\renewcommand{\cft%stitlefont}{\cfttoctitlefont}"
-                    r"\setlength{\cft%snumwidth}{\cftfignumwidth}"
-                    r"\setlength{\cft%sindent}{\cftfigindent}"
-                    % (
-                        latex_category,
-                        latex_category,
-                        text,
-                        latex_category,
-                        latex_category,
-                        latex_category,
-                    )
+                    rf"\newlistof{{{latex_category}}}{{{latex_category}}}{{{text}}}"
+                    rf"\renewcommand{{\cft{latex_category}titlefont}}{{\cfttoctitlefont}}"
+                    rf"\setlength{{\cft{latex_category}numwidth}}{{\cftfignumwidth}}"
+                    rf"\setlength{{\cft{latex_category}indent}}{{\cftfigindent}}"
                 )
-                doc.metadata["header-includes"].append(
-                    MetaInlines(RawInline(latex, "tex"))
-                )
+                header_includes.append(MetaInlines(RawInline(latex, "tex")))
                 if definition["listing-identifier"] is False:
                     listof.append(f"\\listof{latex_category}")
                 elif definition["listing-identifier"] is True:
@@ -1601,28 +1626,30 @@ def finalize(doc: Doc):
                     classes.append("unlisted")
 
                 if definition["listing-identifier"] is False:
-                    header = Header(
+                    listing_header: Any = Header(
                         *definition["listing-title"], level=1, classes=classes
                     )
                 elif definition["listing-identifier"] is True:
-                    header = Header(
+                    listing_header = Header(
                         *definition["listing-title"], level=1, classes=classes
                     )
-                    header = convert_text(
+                    listing_header = convert_text(
                         convert_text(
-                            header, input_format="panflute", output_format="markdown"
+                            listing_header,
+                            input_format="panflute",
+                            output_format="markdown",
                         ),
                         output_format="panflute",
                     )[0]
                 else:
-                    header = Header(
+                    listing_header = Header(
                         *definition["listing-title"],
                         level=1,
                         classes=classes,
                         identifier=definition["listing-identifier"],
                     )
 
-                doc.content.insert(i, header)
+                doc.content.insert(i, listing_header)
                 i = i + 1
 
                 table = table_other(doc, category, definition)
@@ -1632,21 +1659,21 @@ def finalize(doc: Doc):
                     i = i + 1
 
     if doc.format in {"tex", "latex"}:
-        header = (
+        latex_header = (
             r"\ifdef{\mainmatter}"
             r"{\let\oldmainmatter\mainmatter"
             r"\renewcommand{\mainmatter}[0]{%s\oldmainmatter}}"
             r"{}"
         )
-        doc.metadata["header-includes"].append(
-            MetaInlines(RawInline(header % "\n".join(listof), "tex"))
+        header_includes.append(
+            MetaInlines(RawInline(latex_header % "\n".join(listof), "tex"))
         )
 
         latex = r"\ifdef{\mainmatter}{}{%s}"
         doc.content.insert(0, Plain(RawInline(latex % "\n".join(listof), "tex")))
 
 
-def table_other(doc: Doc, category: str, _) -> BulletList | None:
+def table_other(doc: Doc, category: str, _: Any) -> BulletList | None:
     """
     Compute other code for table.
 

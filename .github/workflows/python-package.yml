@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
-        pandoc-version: [3.9.0.2]
+        python-version: ['3.11', '3.11', '3.12', '3.13', '3.14', '3.15']
+        pandoc-version: ['3.14']
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Hatch
@@ -37,12 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.12']
-        pandoc-version: [3.8.3, 3.9.0.2]
+        python-version: ['3.14']
+        pandoc-version: [3.10.2, '3.11', 3.12.1, '3.13', '3.14']
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Hatch
@@ -60,12 +60,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.12']
-        pandoc-version: [3.9.0.2]
+        python-version: ['3.14']
+        pandoc-version: ['3.14']
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Hatch
@@ -75,23 +75,20 @@ jobs:
       run: |
         wget https://github.com/jgm/pandoc/releases/download/${{ matrix.pandoc-version }}/pandoc-${{ matrix.pandoc-version }}-1-amd64.deb
         sudo dpkg -i ./pandoc-${{ matrix.pandoc-version }}-1-amd64.deb
-    - name: Static check
+    - name: Code checking
       run: |
-        hatch fmt --check
-    - name: Dynamic check
-      run: |
-        hatch run lint:check
+        hatch check
 
   cov:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.12']
-        pandoc-version: [3.9.0.2]
+        python-version: ['3.14']
+        pandoc-version: ['3.14']
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Hatch

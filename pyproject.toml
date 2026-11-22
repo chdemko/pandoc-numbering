@@ -7,11 +7,11 @@ dynamic = ["version"]
 name = "pandoc-numbering"
 description = "A pandoc filter for automatic numbering"
 readme = "README.md"
-requires-python = ">=3.10,<3.15"
-license = {text = "BSD-3-Clause"}
-license-files = {paths = ["LICENSE"]}
-authors = [{name = "Christophe Demko", email = "chdemko@gmail.com"}]
-maintainers = [{name = "Christophe Demko", email = "chdemko@gmail.com"}]
+requires-python = ">=3.11,<3.16"
+license = { text = "BSD-3-Clause" }
+license-files = { paths = ["LICENSE"] }
+authors = [{ name = "Christophe Demko", email = "chdemko@gmail.com" }]
+maintainers = [{ name = "Christophe Demko", email = "chdemko@gmail.com" }]
 keywords = ["pandoc", "filters", "numbering"]
 # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
@@ -31,16 +31,16 @@ classifiers = [
   "Topic :: Text Processing :: Filters",
   # Specify the Python versions you support here. In particular, ensure
   # that you indicate whether you support Python 2, Python 3 or both.
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   # Natural language used
   "Natural Language :: English"
 ]
 dependencies = [
-  "panflute~=2.3"
+  "panflute~=3.0"
 ]
 
 [project.urls]
@@ -64,55 +64,60 @@ local_scheme = "no-local-version"
 packages = ["src/pandoc_numbering"]
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+python = ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
-[tool.hatch.envs.hatch-static-analysis]
+[tool.hatch.envs.hatch-check-code]
 dependencies = [
-  # Types
-  "types-PyYAML~=6.0",
-  # Formatter
-  "black[jupyter]~=26.3",
+  "panflute~=3.0",
   # Style checkers
-  "doc8~=2.0",
-  "mypy~=1.10",
-  "teyit~=0.4",
   "refurb~=2.3",
-  "ruff~=0.15"
+  "ruff~=0.17",
+  # Lint checkers
+  "slotscheck~=0.21",
+  "pylint~=4.1"
 ]
 
-[tool.hatch.envs.hatch-static-analysis.scripts]
-format-check = [
-  "black --check --diff {args:src docs}",
-  "doc8 -q {args:docs README.md} -e .rst -e .md"
-]
-format-fix = [
-  "black {args:src docs}"
-]
+[tool.hatch.envs.hatch-check-code.scripts]
 lint-check = [
-  "refurb {args:src docs}",
-  "ruff check {args:src docs}",
-  "teyit --show-stats --fail-on-change {args:tests}"
+  "ruff check {args:src tests}",
+  "refurb {args:src tests}",
+  "pylint {args:src}"
 ]
 lint-fix = [
-  "ruff check --fix {args:src docs}"
+  "ruff check --fix {args:src tests}"
 ]
 
-[tool.hatch.envs.lint]
+[tool.hatch.envs.hatch-check-fmt]
 dependencies = [
-  "slotscheck~=0.19",
-  "pylint~=4.0"
+  # Formatter
+  "black[jupyter]~=26.10",
+  "doc8~=2.0"
 ]
 
-[tool.hatch.envs.lint.scripts]
+[tool.hatch.envs.hatch-check-fmt.scripts]
+format-check = [
+  "black --check --diff {args:src tests docs}",
+  "doc8 {args:docs README.md}"
+]
+format-fix = [
+  "black {args:src tests docs}"
+]
+
+[tool.hatch.envs.hatch-check-types]
+dependencies = [
+  # Style checkers
+  "mypy~=2.4"  # TODO: migrate to ty or pyrefly ?
+]
+
+[tool.hatch.envs.hatch-check-types.scripts]
 check = [
-  "slotscheck {args:src}",
-  "pylint {args:src}"
+  "mypy --explicit-package-bases {args:src}"
 ]
 
 [tool.hatch.envs.docs]
 dependencies = [
-  "myst-parser~=5.0",
-  "Sphinx~=9.1",
+  "myst-parser~=5.1",
+  "Sphinx~=9.2",
   "sphinx-rtd-theme~=3.1",
   "sphinx-copybutton~=0.5"
 ]
@@ -125,12 +130,16 @@ consider_namespace_packages = true
 pythonpath = ["src"]
 
 [tool.black]
-target-version = ["py310", "py311", "py312"]
+target-version = ["py311", "py312", "py313", "py314", "py315"]
 
 [tool.ruff]
 # Allow lines to be as long as 88.
 line-length = 88
-target-version = "py310"
+target-version = "py311"
+
+[tool.ruff.lint.per-file-ignores]
+"docs/conf.py" = ["INP001"]
+"tests/**/*.py" = ["T201", "PT009", "TID252"]
 
 [tool.mypy]
 ignore_missing_imports = true
@@ -151,10 +160,6 @@ no_implicit_reexport = true
 strict_equality = true
 extra_checks = true
 mypy_path = "src"
-
-[[tool.mypy.overrides]]
-ignore_missing_imports = true
-module = "panflute.*"
 
 [tool.pydocstyle]
 convention = "numpy"

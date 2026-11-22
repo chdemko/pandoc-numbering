@@ -2,9 +2,9 @@
 pandoc_numbering package.
 """
 
-from ._main import Numbered, main
+from pandoc_numbering._main import Numbered, main
 
-__all__ = ("main", "Numbered")
+__all__ = ("Numbered", "main")
 
 if __name__ == "__main__":
     main()
