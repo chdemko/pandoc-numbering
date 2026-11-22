@@ -18,7 +18,7 @@ Install
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pandoc-numbering?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/pandoc-numbering)
 [![Development Status](https://img.shields.io/pypi/status/pandoc-numbering.svg?logo=pypi&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
 [![Python version](https://img.shields.io/pypi/pyversions/pandoc-numbering.svg?logo=Python&logoColor=white)](https://pypi.org/project/pandoc-numbering/)
-[![Pandoc version](https://img.shields.io/badge/pandoc-3.8%20..%203.9-blue.svg?logo=markdown)](https://pandoc.org/)
+[![Pandoc version](https://img.shields.io/badge/pandoc-3.9%20..%203.14-blue.svg?logo=markdown)](https://pandoc.org/)
 [![Latest release](https://img.shields.io/github/release-date/chdemko/pandoc-numbering.svg?logo=github)](https://github.com/chdemko/pandoc-numbering/releases)
 [![Last commit](https://img.shields.io/github/last-commit/chdemko/pandoc-numbering/develop?logo=github)](https://github.com/chdemko/pandoc-numbering/commit/develop/)
 [![Repo Size](https://img.shields.io/github/repo-size/chdemko/pandoc-numbering.svg?logo=github)](http://pandoc-numbering.readthedocs.io/en/latest/)
