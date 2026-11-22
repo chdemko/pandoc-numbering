@@ -99,7 +99,6 @@ When your changes are ready, run
 ~~~shell-session
 $ hatch test
 $ hatch check
-$ hatch run lint:check
 $ hatch run docs:build
 $ hatch build -t wheel
 ~~~
